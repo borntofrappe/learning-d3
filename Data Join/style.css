@@ -1,0 +1,61 @@
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: hsl(0, 0%, 95%);
+  color: hsl(0, 0%, 5%);
+  font-family: "Ubuntu", sans-serif;
+}
+
+main {
+  margin: 1rem auto;
+  max-width: 40rem;
+  padding: 1rem 1.5rem;
+  background: hsl(0, 0%, 100%);
+  box-shadow: 0 0.1rem 0.2rem hsla(0, 0%, 0%, 0.2);
+}
+
+main > * + * {
+  margin-top: 1rem;
+}
+
+div {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  background: inherit;
+  border: 0.1rem solid currentColor;
+  border-radius: 0.2rem;
+  box-shadow: 0 0.1rem 0.2rem hsla(0, 0%, 0%, 0.2);
+}
+
+article {
+  padding: 1rem 2rem;
+  border: 0.2rem solid currentColor;
+  background: hsl(0, 0%, 100%);
+  border-radius: 0.2rem;
+  text-align: center;
+}
+
+article h2 {
+  border: 0.2rem dotted currentColor;
+}
+
+span {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  box-shadow: 0 0.1rem 0.5rem hsla(0, 0%, 0%, 0.2);
+  margin: 0.5rem;
+  /* border-color is set in the script */
+  border: 0.4rem solid;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
