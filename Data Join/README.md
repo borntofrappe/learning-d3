@@ -8,6 +8,8 @@ Consider explaining the project while creating a game of bingo. For instance, cr
 
 ## Helpful Links
 
+- [live demo](https://codepen.io/borntofrappe/pen/wvaxwdY)
+
 - [d3-selection](github.com/d3/d3-selection/blob/master/README.md)
 
 - [select.join](github.com/d3/d3-selection/blob/master/README.md#selection_join)

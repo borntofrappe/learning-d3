@@ -4,6 +4,7 @@ A series of projects exploring the D3 library and its different modules.
 
 ---
 
-| Title     | Keys                    |
-| --------- | ----------------------- |
-| Data Join | enter-update-exit, join |
+| Title       | Keys                     |
+| ----------- | ------------------------ |
+| Data Join   | enter-update-exit, join  |
+| Line Radial | line, lineRadial, random |
