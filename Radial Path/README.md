@@ -11,3 +11,9 @@ The line and area functions work similarly to the non-radial counterpart. You ju
 The center is assumed to be where the path is within the `viewBox` of the SVG, so be sure to translate the shape accordingly.
 
 While the radius can use a linear scale then, the angle takes advantage of an ordinal scale, so to map each successive data point to a value on the defined `Math.PI * 2` spectrum.
+
+## Helpful links
+
+- [Live Demo](https://codepen.io/borntofrappe/pen/BaNOYgq)
+
+- [lineRadial Docs](https://github.com/d3/d3-shape#lineRadial)
