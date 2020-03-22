@@ -15,4 +15,10 @@ body {
 }
 svg {
   max-width: 30rem;
+  animation: bounce 1s 1s ease-in-out infinite;
+}
+@keyframes bounce {
+  50% {
+    transform: scale(0.95);
+  }
 }

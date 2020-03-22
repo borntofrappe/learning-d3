@@ -7,7 +7,7 @@ const {
   scaleLinear,
   scaleOrdinal,
   curveCatmullRomClosed,
-  easeLinear
+  easeLinear,
 } = d3;
 const getRandomPercentage = (min = 0) =>
   Math.floor(Math.random() * (100 - min) + min);
@@ -25,7 +25,8 @@ const radiusScale = scaleLinear()
   .nice();
 
 const angleScale = scaleOrdinal()
-  .domain(data.map((d, i) => i))
+  // start from the end to consider the last elements first
+  .domain(data.map((d, i, { length }) => length - i))
   .range(data.map((d, i, { length }) => ((Math.PI * 2) / length) * i));
 
 const innerRadiusScale = scaleLinear()
@@ -45,11 +46,7 @@ const area = areaRadial()
 
 const svg = select('body')
   .append('svg')
-  .attr(
-    'viewBox',
-    `${-(size) / 2} ${-(size) / 2} ${size} ${size}`
-  );
-
+  .attr('viewBox', `${-size / 2} ${-size / 2} ${size} ${size}`);
 
 svg
   .append('path')
@@ -69,7 +66,6 @@ svg
   .attr('d', area(data))
   .attr('opacity', 0.5);
 
-
 function updateRadial(data) {
   select('path#line')
     .transition()
@@ -87,6 +83,6 @@ function updateRadial(data) {
 }
 
 setInterval(() => {
-  data.push(getRandomPercentage(50))
+  data.push(getRandomPercentage(50));
   updateRadial(data);
 }, duration);
