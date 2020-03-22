@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: hsl(300, 5%, 12%);
+  color: hsl(0, 0%, 98%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+svg {
+  max-width: 35rem;
+  height: auto;
+}
