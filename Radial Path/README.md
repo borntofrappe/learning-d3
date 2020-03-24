@@ -58,7 +58,6 @@ const lineRadial = d3
 ## Docs
 
 - [d3-format](https://github.com/d3/d3-format)
-- [d3-timeParse](https://github.com/d3/d3-time-parse)
 - [d3-timeFormat](https://github.com/d3/d3-time-format)
 - [d3-scale](https://github.com/d3/d3-scale)
 - [d3-shape](https://github.com/d3/d3-shape), most prominently [d3.lineRadial](https://github.com/d3/d3-shape#lineRadial) and [d3.areaRadial](https://github.com/d3/d3-shape#areaRadial)
