@@ -1,16 +1,14 @@
 # Radial Path(s)
 
-With this project I set out to practice with several features of the D3 library, and most notably the functions `d3.lineRadial` and `d3.areaRadial` from the `d3-shape` module. Ultimately I plan to create something that is teaching _and_ useful, but in the build-up, I managed to create a couple more demos.
+With this project I set out to create a visualization with the `d3.lineRadial` and `d3.areaRadial` functions. Ultimately I plan to create something that is teaching _and_ useful, but in the build-up, I managed to create a couple more demos.
 
 - **Static** attempts to use the radial functions in the most straightforward manner
 
 - **Experiment** takes the static foundation and experiments with a constantly updated set of data.
 
-## Goal
+## Data Viz
 
-The idea is to plot the number of deaths registered in Italy due to the recent Coronavirus spread. This using data from [the Covid19 API](https://covid19api.com/), but starting from a fixed set of data. A fetch request can follow to update the visualization if necessary.
-
-A radial line chart is here included next to a normal line chart to describe two facets of the dataset, namely its cumulative, and marginal distribution.
+The idea is to plot the google trends for the four seasons. [Here's a URL for the search](https://trends.google.com/trends/explore?date=2019-01-01%202020-01-01&geo=US&q=spring,summer,fall,winter).
 
 ## Markup
 
@@ -20,35 +18,47 @@ A radial line chart is here included next to a normal line chart to describe two
 div root
   h1 title
   p copy
-  div wrapper
-    p brief
-    svg line chart
-  div wrapper
-    p brief
-    svg radial line chart
+  svg area chart
 ```
 
 ## D3
 
-The script makes use of several functions from D3, and most notably `d3.line`, `d3.lineRadial`. There are however other useful methods picked up from the library:
+Beside the `lineRadial` and the `d3-shape` module, the project takes advantage of several features of the D3 library.
 
-- `format` and `timeFormat`, to format the values and dates scattered throughout the project
+- to format the search result and the dates, `d3-format` and `d3-timeFormat`
 
-- `scaleLinear`, `scaleTime`, to position the elements in the area described by the SVG element
+- to parse the dates, `d3-timeParse`
 
-### d3-shape
+- to map the data on the radial line, and within the boundaries set by the SVG element, `d3-scale`. Specifically using a linear and a time scale.
 
-Feature of this particular project, the radial line chart functions similarly to the non-radial counterpart. Instead of using `x` and `y` values however, the function depends on two different arguments:
+### d3.lineRadial
 
-- `angle`: the rotation around the `[0, Math.PI * 2]` circle
+The function generating the syntax for the path element functions similarly to the non-radial counterpart. Instead of using `x` and `y` values however,
 
-- `radius`: the distance from the center
+```js
+const line = d3
+  .line()
+  .x()
+  .y();
+```
 
-Be aware that the point in the SVG element where you append the path element is considered the center of the visualization. In light of this, use group elements or the `viewBox` attribute to translate the shape where needed.
+The radial function depends on two different arguments:
+
+```js
+const lineRadial = d3
+  .lineRadial()
+  .angle()
+  .radius();
+```
+
+- `angle` describes the rotation around the center. Its value is in radians, so that you need to map the input data to the `[0, Math.PI * 2]` range
+
+- `radius` dictates the distance from the center
 
 ## Docs
 
 - [d3-format](https://github.com/d3/d3-format)
+- [d3-timeParse](https://github.com/d3/d3-time-parse)
 - [d3-timeFormat](https://github.com/d3/d3-time-format)
 - [d3-scale](https://github.com/d3/d3-scale)
 - [d3-shape](https://github.com/d3/d3-shape), most prominently [d3.lineRadial](https://github.com/d3/d3-shape#lineRadial) and [d3.areaRadial](https://github.com/d3/d3-shape#areaRadial)

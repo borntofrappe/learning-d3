@@ -3,8 +3,8 @@
 }
 
 body {
-  background: hsl(300, 5%, 98%);
-  color: hsl(0, 0%, 15%);
+  background: hsl(300, 5%, 10%);
+  color: hsl(0, 0%, 95%);
   display: flex;
   flex-direction: column;
   justify-content: center;
