@@ -39,8 +39,8 @@ a {
 }
 a:hover,
 a:focus {
-  color: palevioletred;
-  outline-color: palevioletred;
+  color: hsl(340, 79%, 48%);
+  outline-color: hsl(340, 79%, 48%);
 }
 #root svg {
   width: 100%;

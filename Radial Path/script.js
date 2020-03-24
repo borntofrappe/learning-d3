@@ -1,5 +1,20 @@
-const { select, selectAll, format, timeFormat, timeParse, scaleLinear, scaleTime, max, min, extent, lineRadial, areaRadial, curveCatmullRomClosed, schemeTableau10, easeQuadInOut } = d3;
-const href = "https://trends.google.com/trends/explore?date=2019-01-01%202020-01-01&geo=US&q=spring,summer,fall,winter";
+const {
+  select,
+  selectAll,
+  timeFormat,
+  timeParse,
+  scaleLinear,
+  scaleTime,
+  max,
+  extent,
+  lineRadial,
+  areaRadial,
+  curveCatmullRomClosed,
+  schemeTableau10,
+} = d3;
+
+const href =
+  'https://trends.google.com/trends/explore?date=2019-01-01%202020-01-01&geo=US&q=spring,summer,fall,winter';
 
 // fixed set of data
 const data = [
@@ -58,38 +73,52 @@ const data = [
 ];
 
 // functions to parse/format the date object
-const parseDate = timeParse("%Y-%m-%d");
-const formatDate = timeFormat("%b %d");
+const parseDate = timeParse('%Y-%m-%d');
+const formatDate = timeFormat('%b %d');
 
-const seasons = ["spring", "summer", "fall", "winter"];
+const seasons = ['spring', 'summer', 'fall', 'winter'];
 
 // array for the path elements, describing one array for each season
-const dataVisualization = seasons.map(season => data.map(point => ({
-  date: parseDate(point.date),
-  value: point[season],
-})));
+const dataVisualization = seasons.map(season =>
+  data.map(point => ({
+    date: parseDate(point.date),
+    value: point[season],
+  }))
+);
 
 // array for the scale, to find the greatest possible value
-const dataValues = dataVisualization.reduce((acc, curr) => [...acc, ...curr.map(({ value }) => value)], []);
+const dataValues = dataVisualization.reduce(
+  (acc, curr) => [...acc, ...curr.map(({ value }) => value)],
+  []
+);
 // array for the scale, to find the min/max date
-const dataDates = data.map(({date}) => parseDate(date));
+const dataDates = data.map(d => parseDate(d.date));
 
 // array for the mask, to hide the portion of the visualization past the most searched result
 const dataMask = data.map(point => {
-  const values = Object.values(point).slice(1).sort((a, b) => b - a);
-  return ({
+  const values = Object.values(point)
+    .slice(1)
+    .sort((a, b) => b - a);
+  return {
     date: parseDate(point.date),
     value: values[1],
-  });
+  };
 });
 
 // array for the max value for each season
-const dataMax = dataVisualization.map(visualization => [...visualization].sort((a, b) => b.value - a.value)[0]);
+const dataMax = dataVisualization.map(
+  visualization => [...visualization].sort((a, b) => b.value - a.value)[0]
+);
 
 // MARKUP
-const root = select('#root')
+const root = select('#root');
 root.append('h1').text('The Season of 2019');
-root.append('p').text('Following ').append('a').attr('href', href).text('Google Trends');
+root
+  .append('p')
+  .text('Following ')
+  .append('a')
+  .attr('href', href)
+  .text('Google Trends');
 
 const duration = 1000;
 const initialDelay = 1000;
@@ -98,31 +127,49 @@ const size = 500;
 const margin = 50;
 
 // line and area function, plotting the data around the SVG
-const angleScale = scaleTime().domain(extent(dataDates)).range([0, Math.PI * 2]);
-const radiusScale = scaleLinear().domain([0, max(dataValues)]).range([0, size / 2]).nice();
+const angleScale = scaleTime()
+  .domain(extent(dataDates))
+  .range([0, Math.PI * 2]);
+const radiusScale = scaleLinear()
+  .domain([0, max(dataValues)])
+  .range([0, size / 2])
+  .nice();
 
 const line = lineRadial()
   .angle(d => angleScale(d.date))
-  .radius(d => radiusScale(d.value)).curve(curveCatmullRomClosed);
+  .radius(d => radiusScale(d.value))
+  .curve(curveCatmullRomClosed);
 
 const area = areaRadial()
   .angle(d => angleScale(d.date))
-  .outerRadius(d => radiusScale(d.value)).curve(curveCatmullRomClosed);
+  .outerRadius(d => radiusScale(d.value))
+  .curve(curveCatmullRomClosed);
 
 // to rotate the shapes according to today's date, use the scale with last year's value
 const date = new Date();
 date.setFullYear(date.getFullYear() - 1);
-const angle = angleScale(date) * 180 / Math.PI;
+const angle = (angleScale(date) * 180) / Math.PI;
 
 const svg = root
   .append('svg')
-  .attr('viewBox', `${-margin} ${-margin} ${size + margin * 2} ${size + margin * 2}`).attr('width', size).attr('height', size);
+  .attr(
+    'viewBox',
+    `${-margin} ${-margin} ${size + margin * 2} ${size + margin * 2}`
+  )
+  .attr('width', size)
+  .attr('height', size);
 
 // legend describing the four seasons and matching colors
 seasons.forEach((season, index, { length }) => {
-  const groupSeason = svg.append('g').attr('transform', `translate(${size / (length + 1) * (index + 1)} ${size + margin / 2})`);
+  const groupSeason = svg
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${(size / (length + 1)) * (index + 1)} ${size + margin / 2})`
+    );
   groupSeason
-    .append('text').text(season)
+    .append('text')
+    .text(season)
     .attr('text-anchor', 'middle')
     .style('text-transform', 'capitalize')
     .attr('fill', 'currentColor');
@@ -165,8 +212,18 @@ const group = svg
   .attr('class', 'rotate');
 
 dataVisualization.forEach((season, index) => {
-  group.append('path').attr('d', line(season)).attr('fill', "none").attr('stroke', schemeTableau10[index]).attr('stroke-width', 5);
-  group.append('path').attr('d', area(season)).attr('fill', schemeTableau10[index]).attr('stroke', "none").attr('opacity', '0.25');
+  group
+    .append('path')
+    .attr('d', line(season))
+    .attr('fill', 'none')
+    .attr('stroke', schemeTableau10[index])
+    .attr('stroke-width', 5);
+  group
+    .append('path')
+    .attr('d', area(season))
+    .attr('fill', schemeTableau10[index])
+    .attr('stroke', 'none')
+    .attr('opacity', '0.25');
 });
 
 const text = svg
@@ -179,30 +236,46 @@ const text = svg
   .attr('dominant-baseline', 'middle')
   .attr('fill', 'currentColor');
 
-text.append('tspan')
+text
+  .append('tspan')
   .text(date.getDate())
   .attr('font-size', 45)
   .attr('y', -20)
   .attr('font-weight', 'bold')
-  .attr('text-shadow', '-1px -1px 5px hsl(0, 0%, 0%, 0.25), 1px 1px 5px hsl(0, 0%, 0%, 0.25), 1px -1px 5px hsl(0, 0%, 0%, 0.25), -1px 1px 5px hsl(0, 0%, 0%, 0.25)');
+  .attr(
+    'text-shadow',
+    '-1px -1px 5px hsl(0, 0%, 0%, 0.25), 1px 1px 5px hsl(0, 0%, 0%, 0.25), 1px -1px 5px hsl(0, 0%, 0%, 0.25), -1px 1px 5px hsl(0, 0%, 0%, 0.25)'
+  );
 
-
-text.append('tspan')
-  .text(timeFormat("%b")(date))
+text
+  .append('tspan')
+  .text(timeFormat('%b')(date))
   .attr('x', 0)
   .attr('y', 20)
   .attr('font-size', 25)
   .attr('font-weight', 'bold');
 
-const groupMax = svg.append('g').attr('transform', `translate(${size / 2} ${size / 2})`);
+const groupMax = svg
+  .append('g')
+  .attr('transform', `translate(${size / 2} ${size / 2})`);
 
-const groups = groupMax.selectAll('g')
+const groups = groupMax
+  .selectAll('g')
   .data(dataMax)
   .enter()
   .append('g')
   .attr('class', 'rotate')
   .append('g')
-  .attr('transform', d => `rotate(${angleScale(d.date) * 180 / Math.PI}) translate(0 ${-radiusScale(d.value)}) rotate(${-angleScale(d.date) * 180 / Math.PI})`)
+  .attr(
+    'transform',
+    d =>
+      `rotate(${(angleScale(d.date) * 180) /
+        Math.PI}) translate(0 ${-radiusScale(d.value)}) rotate(${(-angleScale(
+        d.date
+      ) *
+        180) /
+        Math.PI})`
+  )
   .append('g')
   .attr('transform', 'scale(-1 1)')
   .append('g')
@@ -211,18 +284,23 @@ const groups = groupMax.selectAll('g')
   .attr('transform', 'scale(-1 1)');
 
 groups
-  .append('circle').attr('r', '8').attr('fill', (d, i) => schemeTableau10[i]);
+  .append('circle')
+  .attr('r', '8')
+  .attr('fill', (d, i) => schemeTableau10[i]);
 
 groups
   .append('text')
-  .attr('transform', (d) => {
+  .attr('transform', d => {
     const dx = angleScale(d.date) < Math.PI ? 20 : -20;
-    const dy = angleScale(d.date) < Math.PI / 2 || angleScale(d.date) > Math.PI * 3 / 2 ? -15 : 25;
+    const dy =
+      angleScale(d.date) < Math.PI / 2 || angleScale(d.date) > (Math.PI * 3) / 2
+        ? -15
+        : 25;
     return `translate(${dx} ${dy})`;
   })
   .attr('text-anchor', 'middle')
   .attr('fill', 'currentColor')
-  .text(({date}) => formatDate(date));
+  .text(d => formatDate(d.date));
 
 // silly transitions
 selectAll('.rotate')
@@ -236,5 +314,5 @@ selectAll('.scale')
   .attr('transform', 'scale(0)')
   .transition()
   .duration(duration)
-  .delay(delay+ initialDelay)
+  .delay(delay + initialDelay)
   .attr('transform', 'scale(1)');
