@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Economica&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Economica&display=swap");
 
 * {
   box-sizing: border-box;
@@ -8,9 +8,13 @@
 
 body {
   background: hsl(40, 90%, 95%);
-  color: hsl(0, 0%, 10%);
+  color: hsl(0, 0%, 15%);
   background-size: 10%;
-  font-family: "Economica", sans-serif;
+  font-family: "IBM Plex Mono", monospace;
+
+  --area: hsl(8, 95%, 80%);
+  --line: hsl(5, 90%, 70%);
+  --highlight: hsl(45, 75%, 90%);
 }
 #root {
   margin: 1rem auto;
@@ -21,6 +25,82 @@ body {
 #root > * + * {
   margin-top: 0.5rem;
 }
-svg text {
-  font-family: "Cutive Mono", monospace;
+h1,
+h2 {
+  font-family: "Economica", sans-serif;
+  font-weight: 400;
+}
+h1 {
+  font-size: 2.1rem;
+}
+h2 {
+  font-size: 1.9rem;
+}
+p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+code {
+  font-size: 1.25em;
+  padding: 0.1rem 0.2rem;
+  background: hsl(45, 75%, 90%);
+}
+strong {
+  font-weight: 600;
+}
+
+main {
+  margin: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+main svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 1rem;
+}
+main button {
+  align-self: center;
+  font-family: inherit;
+  color: inherit;
+  border: 1px solid hsl(0, 0%, 15%);
+  background: hsl(45, 75%, 90%);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  outline-color: hsl(5, 90%, 70%);
+  position: relative;
+  overflow: hidden;
+  z-index: 5;
+}
+main button:before {
+  z-index: -5;
+  position: absolute;
+  content: "";
+  background: hsl(5, 90%, 70%);
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transform: translateY(100%);
+  transition: transform 0.25s ease-in-out;
+}
+main button:hover:before {
+  transform: translateY(0);
+}
+
+ul {
+  list-style-position: inside;
+}
+ul li + li {
+  margin-top: 0.75rem;
+}
+a {
+  font-size: 1.05rem;
+  color: inherit;
+  border-bottom: 2px solid hsl(5, 90%, 50%);
+  text-decoration: none;
+}
+a:hover {
+  color: hsl(5, 90%, 50%);
 }
