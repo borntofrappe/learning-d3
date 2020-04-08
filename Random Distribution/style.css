@@ -48,11 +48,15 @@ code {
 strong {
   font-weight: 600;
 }
+header {
+  margin-bottom: 1.25rem;
+}
 
 main {
-  margin: 1.5rem 1rem;
+  margin-bottom: 1.25rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 main svg {
   width: 100%;
@@ -60,31 +64,21 @@ main svg {
   display: block;
   margin-bottom: 1rem;
 }
-main button {
-  align-self: center;
+main form {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
   font-family: inherit;
   color: inherit;
-  border: 1px solid hsl(0, 0%, 15%);
-  background: hsl(45, 75%, 90%);
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
   outline-color: hsl(5, 90%, 70%);
-  position: relative;
-  overflow: hidden;
-  z-index: 5;
 }
-main button:before {
-  z-index: -5;
-  position: absolute;
-  content: "";
-  background: hsl(5, 90%, 70%);
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  transform: translateY(100%);
-  transition: transform 0.25s ease-in-out;
+main form input {
+  margin-bottom: 0.75rem;
 }
+main form output {
+  align-self: center;
+}
+
 main button:hover:before {
   transform: translateY(0);
 }
@@ -100,7 +94,11 @@ a {
   color: inherit;
   border-bottom: 2px solid hsl(5, 90%, 50%);
   text-decoration: none;
+  outline-color: hsl(5, 90%, 70%);
 }
 a:hover {
   color: hsl(5, 90%, 50%);
+}
+a code {
+  background: none;
 }
