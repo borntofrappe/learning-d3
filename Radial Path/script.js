@@ -147,7 +147,7 @@ const area = areaRadial()
 
 // to rotate the shapes according to today's date, use the scale with last year's value
 const date = new Date();
-date.setFullYear(date.getFullYear() - 1);
+date.setFullYear(2019);
 const angle = (angleScale(date) * 180) / Math.PI;
 
 const svg = root

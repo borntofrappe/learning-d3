@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Economica&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: hsl(40, 90%, 95%);
+  color: hsl(0, 0%, 10%);
+  background-size: 10%;
+  font-family: "Economica", sans-serif;
+}
+#root {
+  margin: 1rem auto;
+  width: 95vw;
+  padding: 1rem;
+  max-width: 35rem;
+}
+#root > * + * {
+  margin-top: 0.5rem;
+}
+svg text {
+  font-family: "Cutive Mono", monospace;
+}
