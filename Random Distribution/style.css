@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Economica&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Economica&display=swap");
 
 * {
   box-sizing: border-box;
@@ -11,10 +11,6 @@ body {
   color: hsl(0, 0%, 15%);
   background-size: 10%;
   font-family: "IBM Plex Mono", monospace;
-
-  --area: hsl(8, 95%, 80%);
-  --line: hsl(5, 90%, 70%);
-  --highlight: hsl(45, 75%, 90%);
 }
 #root {
   margin: 1rem auto;
@@ -22,9 +18,19 @@ body {
   padding: 1rem;
   max-width: 35rem;
 }
-#root > * + * {
+#root > * + *,
+header > * + *,
+main > * + *,
+form > * + * {
   margin-top: 0.5rem;
 }
+
+header,
+main,
+form {
+  margin-bottom: 1.25rem;
+}
+
 h1,
 h2 {
   font-family: "Economica", sans-serif;
@@ -46,14 +52,10 @@ code {
   background: hsl(45, 75%, 90%);
 }
 strong {
-  font-weight: 600;
-}
-header {
-  margin-bottom: 1.25rem;
+  font-weight: 500;
 }
 
 main {
-  margin-bottom: 1.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,7 +64,8 @@ main svg {
   width: 100%;
   height: auto;
   display: block;
-  margin-bottom: 1rem;
+  background: hsl(45, 75%, 90%);
+  box-shadow: 0 0 0.5rem hsla(0, 0%, 15%, 0.1);
 }
 main form {
   display: flex;
@@ -72,16 +75,6 @@ main form {
   color: inherit;
   outline-color: hsl(5, 90%, 70%);
 }
-main form input {
-  margin-bottom: 0.75rem;
-}
-main form output {
-  align-self: center;
-}
-
-main button:hover:before {
-  transform: translateY(0);
-}
 
 ul {
   list-style-position: inside;
@@ -89,6 +82,7 @@ ul {
 ul li + li {
   margin-top: 0.75rem;
 }
+
 a {
   font-size: 1.05rem;
   color: inherit;
@@ -96,6 +90,7 @@ a {
   text-decoration: none;
   outline-color: hsl(5, 90%, 70%);
 }
+
 a:hover {
   color: hsl(5, 90%, 50%);
 }
