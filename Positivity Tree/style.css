@@ -7,7 +7,6 @@
 body {
   background: hsl(50, 25%, 95%);
   color: hsl(0, 0%, 10%);
-  --accent: hsl(45, 90%, 85%);
   font-family: "Share Tech Mono", monospace;
 }
 main {

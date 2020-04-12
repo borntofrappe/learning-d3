@@ -1,12 +1,10 @@
 # Positivity Tree
 
+## [Live Demo](https://codepen.io/borntofrappe/full/eYpNRRX)
+
 This project is inspired by one of the visuals shown [in this article](https://www.lemonde.fr/les-decodeurs/article/2020/04/07/les-enjeux-du-deconfinement-expliques-en-schemas_6035827_4355770.html) on [lemonde.fr](https://www.lemonde.fr/), and more specifically the graphic showing how a virus is able to spread to more and more people with each passing generation.
 
 I thought it would be a great way to practice with the `d3-tree` module, using the concept with a more uplifting visualization. The idea is to start with the visual described in `face-smiling.svg`, and have the smile spread to more data points. `face-smiling.svg` as opposed to the visual behind `face-default.svg`.
-
-## Feature Request
-
-Once you recreate the tree structure, try to change the orientation of the visualization for mobile devices (below an arbitrary threshold). It seems the developers behind the article have made it possible to map the data top to bottom instead of left to right, just for this scenario.
 
 ## Notes
 

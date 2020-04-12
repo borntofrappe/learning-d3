@@ -1,17 +1,4 @@
 // DATA
-/* there is definitely a better way to do this, but the idea is to
-
-1. start from an object
-{
-  isSmiling: true,
-  children: []
-}
-
-1. add a generation of five children, of which three are smiling
-
-1. add another generation for the smiling children
-1. repeat once more
-*/
 function getGeneration(children = 5, numberPositive = 3) {
   let generation = [];
   for (let i = 0; i < children; i += 1) {
@@ -51,6 +38,7 @@ function getData() {
 }
 
 const data = getData();
+
 
 // VIZ
 const main = d3.select('main');
@@ -135,6 +123,7 @@ const path = svg
   .attr('stroke-width', '2')
   .attr('fill', 'none');
 
+// mapping function
 function plotData(data, topToBottom = true) {
   const hierarchy = d3.hierarchy(data);
   const size = topToBottom ? [width, height] : [height, width];
