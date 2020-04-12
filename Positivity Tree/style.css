@@ -1,11 +1,22 @@
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&family=Share+Tech+Mono&display=swap");
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: "Ubuntu", sans-serif;
+  background: hsl(50, 25%, 95%);
+  color: hsl(0, 0%, 10%);
+  --accent: hsl(45, 90%, 85%);
+  font-family: "Share Tech Mono", monospace;
+}
+main {
+  margin: 0 auto;
+  max-width: 30rem;
+  width: 90vw;
+}
+h1 {
+  font-family: "Playfair Display", serif;
+  letter-spacing: 0.05rem;
+  font-size: 2.25rem;
 }
