@@ -52,39 +52,198 @@ function getData() {
 
 const data = getData();
 
-
 // VIZ
 const main = d3.select('main');
 main.append('h1').text('Positivity Tree');
 
-const margin = 50;
-const width = 800;
-const height = 500;
-const svg = main.append('svg').attr('viewBox', `${-margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`);
+const margin = 60;
+const width = 750;
+const height = 550;
+const svg = main
+  .append('svg')
+  .attr(
+    'viewBox',
+    `${-margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`
+  );
 
 // define the shapes to later <use> as needed
 const defs = svg.append('defs');
-const faceSmiling = defs.append('symbol').attr('viewBox', '-50 -50 100 100').attr('id', 'face-smiling');
-faceSmiling.append('circle').attr('r', '47').attr('stroke', 'currentColor').attr('stroke-width', '6').attr('fill', 'hsl(45, 90%, 85%)');
-faceSmiling.append('circle').attr('r', '5').attr('cx', '-15').attr('cy', '-6')
-faceSmiling.append('circle').attr('r', '5').attr('cx', '15').attr('cy', '-6')
-faceSmiling.append('path').attr('d', 'M -10 10 a 10 10 0 0 0 20 0').attr('stroke', 'currentColor').attr('stroke-width', '4').attr('fill', 'none');
+const faceSmiling = defs
+  .append('symbol')
+  .attr('viewBox', '-50 -50 100 100')
+  .attr('id', 'face-smiling');
+faceSmiling
+  .append('circle')
+  .attr('r', '47')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '6')
+  .attr('fill', 'hsl(45, 90%, 85%)');
+faceSmiling
+  .append('circle')
+  .attr('r', '5')
+  .attr('cx', '-15')
+  .attr('cy', '-6');
+faceSmiling
+  .append('circle')
+  .attr('r', '5')
+  .attr('cx', '15')
+  .attr('cy', '-6');
+faceSmiling
+  .append('path')
+  .attr('d', 'M -10 10 a 10 10 0 0 0 20 0')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '4')
+  .attr('fill', 'none');
 
-const faceDefault = defs.append('symbol').attr('viewBox', '-50 -50 100 100').attr('id', 'face-default');
-faceDefault.append('circle').attr('r', '47').attr('stroke', 'currentColor').attr('stroke-width', '6').attr('fill', 'hsl(45, 90%, 98%)');
-faceDefault.append('circle').attr('r', '5').attr('cx', '-15').attr('cy', '-6')
-faceDefault.append('circle').attr('r', '5').attr('cx', '15').attr('cy', '-6')
-faceDefault.append('path').attr('d', 'M -10 15 h 20').attr('stroke', 'currentColor').attr('stroke-width', '4').attr('fill', 'none');
+const faceDefault = defs
+  .append('symbol')
+  .attr('viewBox', '-50 -50 100 100')
+  .attr('id', 'face-default');
+faceDefault
+  .append('circle')
+  .attr('r', '47')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '6')
+  .attr('fill', 'hsl(45, 90%, 98%)');
+faceDefault
+  .append('circle')
+  .attr('r', '5')
+  .attr('cx', '-15')
+  .attr('cy', '-6');
+faceDefault
+  .append('circle')
+  .attr('r', '5')
+  .attr('cx', '15')
+  .attr('cy', '-6');
+faceDefault
+  .append('path')
+  .attr('d', 'M -10 15 h 20')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '4')
+  .attr('fill', 'none');
 
-const hierarchy = d3.hierarchy(data);
-const tree = d3.tree().size([width, height]);
-const dataTree = tree(hierarchy);
+const text = svg
+  .append('text')
+  .text('Happy Clam')
+  .attr('font-size', '30')
+  .attr('x', width / 2);
 
-const links = dataTree.links();
-const descendants = dataTree.descendants();
+const path = svg
+  .append('path')
+  .attr('d', `M ${width / 2} 0`)
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '2')
+  .attr('fill', 'none');
 
-const link = d3.linkVertical().x(d => d.x).y(d => d.y);
-svg.selectAll('path.highlight').data(links.filter(link => link.target.data.isSmiling)).enter().append('path').attr('class', 'highlight').attr('d', d => link(d)).attr('fill', 'none').attr('stroke', 'hsl(45, 90%, 85%)').attr('stroke-width', '25');
-svg.selectAll('path.connection').data(links).enter().append('path').attr('class', 'connection').attr('d', d => link(d)).attr('fill', 'none').attr('stroke', 'currentColor').attr('stroke-width', '2');
-const size = 50;
-svg.selectAll('use').data(descendants).enter().append('use').attr('x', d => d.x).attr('y', d => d.y).attr('width', size).attr('height', size).attr('transform', `translate(${size / 2 * -1} ${size / 2 * -1})`).attr('href', d => d.data.isSmiling ? '#face-smiling' : '#face-default');
+function plotData(data, topToBottom = true) {
+  const hierarchy = d3.hierarchy(data);
+  const size = topToBottom ? [width, height] : [height, width];
+  const tree = d3.tree().size(size);
+  const dataTree = tree(hierarchy);
+
+  const scaleSize = d3
+    .scalePow()
+    .exponent(0.5)
+    .domain([dataTree.height, 0])
+    .range([40, 120]);
+
+  const descendants = dataTree.descendants();
+  const root = descendants.find(({ depth }) => depth === 0);
+
+  text
+    .attr('x', topToBottom ? root.x + 100 : root.y - 50)
+    .attr('y', topToBottom ? root.y - 25 : root.x - 100);
+
+  path.attr(
+    'd',
+    topToBottom
+      ? `M ${root.x + 90} ${root.y - 35} h -25`
+      : `M ${root.y - 25} ${root.x - 90} v 25`
+  );
+
+  const links = dataTree.links();
+
+  const linkVertical = d3
+    .linkVertical()
+    .x(d => d.x)
+    .y(d => d.y);
+  const linkHorizontal = d3
+    .linkHorizontal()
+    .x(d => d.y)
+    .y(d => d.x);
+
+  const link = topToBottom ? linkVertical : linkHorizontal;
+
+  svg
+    .selectAll('path.highlight')
+    .data(links.filter(link => link.target.data.isSmiling))
+    .join(
+      enter =>
+        enter
+          .append('path')
+          .attr('class', 'highlight')
+          .attr('d', d => link(d))
+          .attr('fill', 'none')
+          .attr('stroke', 'hsl(45, 90%, 80%)')
+          .attr('stroke-width', '25'),
+      update => update.attr('d', d => link(d))
+    );
+
+  svg
+    .selectAll('path.connection')
+    .data(links)
+    .join(
+      enter =>
+        enter
+          .append('path')
+          .attr('class', 'connection')
+          .attr('d', d => link(d))
+          .attr('fill', 'none')
+          .attr('stroke', 'hsl(0, 0%, 80%)')
+          .attr('stroke-width', '2'),
+      update => update.attr('d', d => link(d))
+    );
+
+  svg
+    .selectAll('use')
+    .data(descendants)
+    .join(
+      enter =>
+        enter
+          .append('use')
+          .attr('x', d => (topToBottom ? d.x : d.y))
+          .attr('y', d => (topToBottom ? d.y : d.x))
+          .attr('width', d => scaleSize(d.depth))
+          .attr('height', d => scaleSize(d.depth))
+          .attr(
+            'transform',
+            d =>
+              `translate(${(scaleSize(d.depth) / 2) * -1} ${(scaleSize(
+                d.depth
+              ) /
+                2) *
+                -1})`
+          )
+          .attr('href', d =>
+            d.data.isSmiling ? '#face-smiling' : '#face-default'
+          ),
+      update =>
+        update
+          .attr('x', d => (topToBottom ? d.x : d.y))
+          .attr('y', d => (topToBottom ? d.y : d.x))
+    );
+}
+
+// WINDOW RESIZE
+const { innerWidth } = window;
+const threshold = 600;
+let topToBottom = innerWidth < threshold;
+plotData(data, topToBottom);
+
+window.addEventListener('resize', function() {
+  const { innerWidth } = this;
+  if (topToBottom !== innerWidth < threshold) {
+    topToBottom = innerWidth < threshold;
+    plotData(data, topToBottom);
+  }
+});
