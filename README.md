@@ -1,12 +1,15 @@
 # Learning D3
 
-A series of projects exploring the D3 library and its different modules.
-
----
+Projects exploring the D3 library, its features and modules.
 
 | Title               | Keys                    |
 | ------------------- | ----------------------- |
 | Data Join           | enter-update-exit, join |
-| Radial Path(s)      | lineRadial, areaRadial  |
 | Random Distribution | random, normal          |
-| Positivity Tree     | hierarchy, tree         |
+
+Projects using D3 to create interesting visualizations.
+
+| Title               | Keys                   |
+| ------------------- | ---------------------- |
+| The Seasons of 2019 | lineRadial, areaRadial |
+| Positivity Tree     | hierarchy, tree        |
