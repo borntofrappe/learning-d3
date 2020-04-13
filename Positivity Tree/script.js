@@ -1,9 +1,9 @@
 // DATA
+// create an array of objects linking each other with `id` and `parentId` attributes
+// use d3.stratify to build the necessary hierarchy
 const generations = 2;
 const data = [
   {
-    parent: '',
-    id: Math.random(),
     isSmiling: true,
   }
 ];
@@ -12,9 +12,8 @@ function getGeneration(parentId, children = 5, numberPositive = 3) {
   let generation = [];
   for (let i = 0; i < children; i += 1) {
     const point = {
-      id: Math.random(),
       isSmiling: !(i < children - numberPositive),
-      parent: parentId,
+      parentId: parentId,
     };
 
     const index = Math.round(Math.random() * generation.length);
@@ -28,13 +27,15 @@ function getGeneration(parentId, children = 5, numberPositive = 3) {
 }
 
 for(let i = 0; i < generations; i += 1) {
-  const lastGenerations = data.filter(point => point.isSmiling && !point.children);
-  lastGenerations.forEach(lastGeneration => {
-    data.push(...getGeneration(lastGeneration.id));
+  const latestGenerations = data.filter(point => point.isSmiling && !point.id);
+  latestGenerations.forEach(latestGeneration => {
+    const id = Math.random();
+    latestGeneration.id = id;
+    data.push(...getGeneration(id));
   });
 }
 
-const root = d3.stratify().id(d => d.id).parentId(d => d.parent);
+const root = d3.stratify().id(d => d.id).parentId(d => d.parentId);
 const dataRoot = root(data);
 
 // VIZ
@@ -214,10 +215,7 @@ function plotData(data, topToBottom = true) {
                 2) *
                 -1})`
           )
-          .attr('href', d => {
-            return d.data.isSmiling ? '#face-smiling' : '#face-default'
-          }
-
+          .attr('href', d => d.data.isSmiling ? '#face-smiling' : '#face-default'
           ),
       update =>
         update
@@ -237,6 +235,6 @@ window.addEventListener('resize', function() {
   const { innerWidth } = this;
   if (topToBottom !== innerWidth < threshold) {
     topToBottom = innerWidth < threshold;
-    plotData(data, topToBottom);
+    plotData(dataRoot, topToBottom);
   }
 });
