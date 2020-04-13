@@ -1,9 +1,20 @@
 // DATA
-function getGeneration(children = 5, numberPositive = 3) {
+const generations = 2;
+const data = [
+  {
+    parent: '',
+    id: Math.random(),
+    isSmiling: true,
+  }
+];
+
+function getGeneration(parentId, children = 5, numberPositive = 3) {
   let generation = [];
   for (let i = 0; i < children; i += 1) {
     const point = {
+      id: Math.random(),
       isSmiling: !(i < children - numberPositive),
+      parent: parentId,
     };
 
     const index = Math.round(Math.random() * generation.length);
@@ -16,29 +27,15 @@ function getGeneration(children = 5, numberPositive = 3) {
   return generation;
 }
 
-function getData() {
-  const data = {
-    isSmiling: true,
-    children: [],
-  };
-
-  const generation = getGeneration();
-  data.children = generation;
-
-  const nextGenerations = generation.filter(({ isSmiling }) => isSmiling);
-  nextGenerations.forEach(nextGeneration => {
-    nextGeneration.children = getGeneration();
-    const nextGenerations = generation.filter(({ isSmiling }) => isSmiling);
-    nextGenerations.forEach(nextGeneration => {
-      nextGeneration.children = getGeneration();
-    });
+for(let i = 0; i < generations; i += 1) {
+  const lastGenerations = data.filter(point => point.isSmiling && !point.children);
+  lastGenerations.forEach(lastGeneration => {
+    data.push(...getGeneration(lastGeneration.id));
   });
-
-  return data;
 }
 
-const data = getData();
-
+const root = d3.stratify().id(d => d.id).parentId(d => d.parent);
+const dataRoot = root(data);
 
 // VIZ
 const main = d3.select('main');
@@ -54,7 +51,7 @@ const svg = main
     `${-margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`
   );
 
-// define the shapes to later <use> as needed
+// define the faces to later <use> as needed
 const defs = svg.append('defs');
 const faceSmiling = defs
   .append('symbol')
@@ -110,6 +107,7 @@ faceDefault
   .attr('stroke-width', '4')
   .attr('fill', 'none');
 
+// label moved next to the root node
 const text = svg
   .append('text')
   .text('Happy Clam')
@@ -123,32 +121,19 @@ const path = svg
   .attr('stroke-width', '2')
   .attr('fill', 'none');
 
-// mapping function
+// MAPPING FUNCTION
 function plotData(data, topToBottom = true) {
-  const hierarchy = d3.hierarchy(data);
+  // MAP DATA
+  // const hierarchy = d3.hierarchy(dataRoot);
   const size = topToBottom ? [width, height] : [height, width];
   const tree = d3.tree().size(size);
-  const dataTree = tree(hierarchy);
+  const dataTree = tree(data);
 
   const scaleSize = d3
     .scalePow()
     .exponent(0.5)
     .domain([dataTree.height, 0])
     .range([40, 120]);
-
-  const descendants = dataTree.descendants();
-  const root = descendants.find(({ depth }) => depth === 0);
-
-  text
-    .attr('x', topToBottom ? root.x + 100 : root.y - 50)
-    .attr('y', topToBottom ? root.y - 25 : root.x - 100);
-
-  path.attr(
-    'd',
-    topToBottom
-      ? `M ${root.x + 90} ${root.y - 35} h -25`
-      : `M ${root.y - 25} ${root.x - 90} v 25`
-  );
 
   const links = dataTree.links();
 
@@ -162,6 +147,22 @@ function plotData(data, topToBottom = true) {
     .y(d => d.x);
 
   const link = topToBottom ? linkVertical : linkHorizontal;
+
+  const descendants = dataTree.descendants();
+  const root = descendants.find(({ depth }) => depth === 0);
+
+
+  // ADD/UPADTE VISUALS
+  text
+    .attr('x', topToBottom ? root.x + 100 : root.y - 50)
+    .attr('y', topToBottom ? root.y - 25 : root.x - 100);
+
+  path.attr(
+    'd',
+    topToBottom
+      ? `M ${root.x + 90} ${root.y - 35} h -25`
+      : `M ${root.y - 25} ${root.x - 90} v 25`
+  );
 
   svg
     .selectAll('path.highlight')
@@ -213,8 +214,10 @@ function plotData(data, topToBottom = true) {
                 2) *
                 -1})`
           )
-          .attr('href', d =>
-            d.data.isSmiling ? '#face-smiling' : '#face-default'
+          .attr('href', d => {
+            return d.data.isSmiling ? '#face-smiling' : '#face-default'
+          }
+
           ),
       update =>
         update
@@ -223,11 +226,12 @@ function plotData(data, topToBottom = true) {
     );
 }
 
-// WINDOW RESIZE
+// DIRECTION UPDATE
+// consider the width of the window to map the data top to bottom/left to right
 const { innerWidth } = window;
 const threshold = 600;
 let topToBottom = innerWidth < threshold;
-plotData(data, topToBottom);
+plotData(dataRoot, topToBottom);
 
 window.addEventListener('resize', function() {
   const { innerWidth } = this;
