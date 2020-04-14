@@ -1,8 +1,21 @@
 // D3 functions
-const { select, selectAll, scaleTime, scaleLinear, extent, max, timeParse, timeFormat, format, line, curveCatmullRom, axisBottom, axisLeft } = d3;
+const {
+  select,
+  selectAll,
+  scaleTime,
+  scaleLinear,
+  extent,
+  timeParse,
+  timeFormat,
+  format,
+  line,
+  curveCatmullRom,
+  axisBottom,
+  axisLeft,
+} = d3;
 
 // DATA
-// https://insights.stackoverflow.com/trends?tags=python
+const href = 'https://insights.stackoverflow.com/trends?tags=python';
 const data = [
   {
     date: '2018-01-01',
@@ -110,6 +123,14 @@ const data = [
   },
 ];
 
+const main = select('main');
+main.append('h1').text('Stack Overflow Trends');
+main
+  .append('p')
+  .html(
+    `The number of questions using the <mark>python</mark> tag has increased consistently throughout the years.`
+  );
+
 // VIZ
 const margin = {
   top: 50,
@@ -121,17 +142,34 @@ const strokeWidth = 15;
 const width = 500;
 const height = 300;
 
+const parseTime = timeParse('%Y-%m-%d');
+const formatTime = timeFormat('%b %Y');
+const formatValue = format('.0%');
+const xScale = scaleTime()
+  .domain(extent(data, ({ date }) => parseTime(date)))
+  .range([0, width]);
+const yScale = scaleLinear()
+  .domain(extent(data, ({ value }) => value))
+  .range([height, 0])
+  .nice();
 
-const parseTime = timeParse("%Y-%m-%d");
-const formatTime = timeFormat("%b %Y");
-const formatValue = format(".0%")
-const xScale = scaleTime().domain(extent(data, ({date}) => parseTime(date))).range([0, width]);
-const yScale = scaleLinear().domain(extent(data, ({value}) => value)).range([height, 0]).nice();
+const lineGenerator = line()
+  .x(({ date }) => xScale(parseTime(date)))
+  .y(({ value }) => yScale(value))
+  .curve(curveCatmullRom);
 
-const lineGenerator = line().x(({date}) => xScale(parseTime(date))).y(({value}) => yScale(value)).curve(curveCatmullRom)
-
-const svg = select('main').append('svg').attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`);
-const group = svg.append('g').attr('transform', `translate(${margin.left} ${margin.top})`);
+// actual elements
+const svg = main
+  .append('svg')
+  .attr(
+    'viewBox',
+    `0 0 ${width + margin.left + margin.right} ${height +
+      margin.top +
+      margin.bottom}`
+  );
+const group = svg
+  .append('g')
+  .attr('transform', `translate(${margin.left} ${margin.top})`);
 
 // marker elements
 const defs = svg.append('defs');
@@ -166,7 +204,6 @@ markerMid
   .attr('stroke-linejoin', 'round')
   .attr('stroke-linecap', 'round');
 
-
 const markerEnd = defs
   .append('marker')
   .attr('id', 'marker-end')
@@ -183,7 +220,10 @@ markerEnd
 
 markerEnd
   .append('path')
-  .attr('d', 'M 10 -10 a 20 20 0 0 1 20 -20 q 20 0 36 30 -16 30 -36 30 a 20 20 0 0 1 -20 -20 z')
+  .attr(
+    'd',
+    'M 10 -10 a 20 20 0 0 1 20 -20 q 20 0 36 30 -16 30 -36 30 a 20 20 0 0 1 -20 -20 z'
+  )
   .attr('fill', 'currentColor')
   .attr('stroke', 'currentColor')
   .attr('stroke-width', '20')
@@ -209,7 +249,74 @@ markerEnd
   .attr('stroke-linejoin', 'round')
   .attr('stroke-linecap', 'round');
 
+// axes
+const xAxis = axisBottom(xScale)
+  .tickFormat(d => formatTime(d))
+  .tickSize(0)
+  .tickPadding(15);
+const yAxis = axisLeft(yScale)
+  .ticks(6)
+  .tickFormat(d => formatValue(d))
+  .tickSize(0)
+  .tickPadding(12);
 
+group
+  .append('g')
+  .attr('class', 'axis x-axis')
+  .attr('transform', `translate(0 ${height})`)
+  .call(xAxis)
+  .selectAll('g.tick:nth-of-type(even)')
+  .remove();
+group
+  .append('g')
+  .attr('class', 'axis y-axis')
+  .call(yAxis);
+
+// grid lines
+select('.x-axis')
+  .selectAll('g.tick')
+  .append('path')
+  .attr('class', 'grid-line')
+  .attr('d', `M 0 0 v -${height}`);
+
+select('.y-axis')
+  .selectAll('g.tick')
+  .append('path')
+  .attr('class', 'grid-line')
+  .attr('d', `M 0 0 h ${width}`);
+
+selectAll('.grid-line')
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '1')
+  .attr('opacity', '0.2')
+  .attr('stroke-dasharray', '3 5')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+selectAll('.axis .domain')
+  .attr('stroke-width', '10')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round')
+  .attr('marker-end', 'url(#marker-end)');
+
+// labels
+group
+  .append('text')
+  .attr('font-weight', '700')
+  .attr('font-size', '18')
+  .text('Date')
+  .attr('text-anchor', 'middle')
+  .attr('transform', `translate(${width / 2} ${height + 50})`);
+group
+  .append('text')
+  .attr('font-weight', '700')
+  .attr('font-size', '18')
+  .text('Stack Overflow questions')
+  .attr('text-anchor', 'middle')
+  .attr('transform', `translate(${-45} ${height / 2}) rotate(-90)`);
+
+// line chart
 group
   .append('path')
   .attr('d', lineGenerator(data))
@@ -222,34 +329,7 @@ group
   .attr('stroke-linejoin', 'round')
   .attr('stroke-linecap', 'round');
 
-const xAxis = axisBottom(xScale).tickFormat(d => formatTime(d)).tickSize(0).tickPadding(15);
-const yAxis = axisLeft(yScale).ticks(6).tickFormat(d => formatValue(d)).tickSize(0).tickPadding(12);
-
-group.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0 ${height})`).call(xAxis).selectAll('g.tick:nth-of-type(even)').remove();
-group.append('g').attr('class', 'axis y-axis').call(yAxis);
-
-select('.x-axis')
-  .selectAll('g.tick')
-  .append('path')
-  .attr('class', 'grid-line')
-  .attr('d', `M 0 0 v -${height}`)
-
-select('.y-axis')
-  .selectAll('g.tick')
-  .append('path')
-  .attr('class', 'grid-line')
-  .attr('d', `M 0 0 h ${width}`)
-
-selectAll('.grid-line')
-  .attr('fill', 'none')
-  .attr('stroke', 'currentColor')
-  .attr('stroke-width', '1')
-  .attr('opacity', '0.2')
-  .attr('stroke-dasharray', '3 5')
-  .attr('stroke-linejoin', 'round')
-  .attr('stroke-linecap', 'round')
-
-selectAll('.axis .domain').attr('stroke-width', '10').attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round').attr('marker-end', 'url(#marker-end)')
-
-group.append('text').attr('font-weight', 'bold').text('Date').attr('text-anchor', 'middle').attr('transform', `translate(${width / 2} ${height + 50})`)
-group.append('text').attr('font-weight', 'bold').text('Stack Overflow questions').attr('text-anchor', 'middle').attr('transform', `translate(${-45} ${height / 2}) rotate(-90)`)
+main
+  .append('a')
+  .attr('href', href)
+  .text('Source');

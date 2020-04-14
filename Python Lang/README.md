@@ -2,6 +2,10 @@
 
 Describe the popularity of the Python language with a line chart. Customize the path elements with marker elements.
 
+## Links
+
+- [Vanilla JS](https://codepen.io/borntofrappe/full/oNjjdeZ)
+
 ## Notes
 
 This project builds on top of [this SVG demo](https://codepen.io/borntofrappe/pen/wvKKzzE) exploring the `<marker>` elements. I've created an `.svg` file in the **res** folder for further reference.

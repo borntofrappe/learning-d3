@@ -16,11 +16,27 @@ main {
   width: 90vw;
   margin: 1rem auto;
 }
-svg {
+main h1 {
+  margin-bottom: 0.4rem;
+}
+main p {
+  margin-bottom: 0.5rem;
+  line-height: 1.75;
+}
+main p mark {
+  padding: 0rem 0.25rem;
+  background: hsl(200, 20%, 25%);
+  color: hsl(200, 20%, 95%);
+  display: inline-block;
+}
+main svg {
+  color: hsl(200, 20%, 25%);
   width: 100%;
   height: auto;
   display: block;
+  margin-bottom: 1rem;
 }
+
 .axis {
   font-family: inherit;
   font-size: 14px;
