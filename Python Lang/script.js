@@ -1,5 +1,5 @@
 // D3 functions
-const { select, scaleTime, scaleLinear, extent, max, timeParse } = d3;
+const { select, selectAll, scaleTime, scaleLinear, extent, max, timeParse, timeFormat, format, line, curveCatmullRom, axisBottom, axisLeft } = d3;
 
 // DATA
 // https://insights.stackoverflow.com/trends?tags=python
@@ -111,15 +111,145 @@ const data = [
 ];
 
 // VIZ
-const margin = 20;
+const margin = {
+  top: 50,
+  bottom: 50,
+  left: 55,
+  right: 25,
+};
+const strokeWidth = 15;
 const width = 500;
-const height = 500;
+const height = 300;
 
 
 const parseTime = timeParse("%Y-%m-%d");
+const formatTime = timeFormat("%b %Y");
+const formatValue = format(".0%")
 const xScale = scaleTime().domain(extent(data, ({date}) => parseTime(date))).range([0, width]);
-const yScale = scaleLinear().domain([0, max(data, ({value}) => value)]).range([height, 0]).nice();
+const yScale = scaleLinear().domain(extent(data, ({value}) => value)).range([height, 0]).nice();
 
+const lineGenerator = line().x(({date}) => xScale(parseTime(date))).y(({value}) => yScale(value)).curve(curveCatmullRom)
 
-const svg = select('main').append('svg').attr('viewBox', `${-margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`);
+const svg = select('main').append('svg').attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`);
+const group = svg.append('g').attr('transform', `translate(${margin.left} ${margin.top})`);
+
+// marker elements
 const defs = svg.append('defs');
+const markerStart = defs
+  .append('marker')
+  .attr('id', 'marker-start')
+  .attr('viewBox', '-50 -20 50 40')
+  .attr('markerHeight', '1')
+  .attr('markerWidth', '2')
+  .attr('orient', 'auto');
+
+markerStart
+  .append('path')
+  .attr('d', 'M 0 -20 q -42 0 -50 20 8 20 50 20')
+  .attr('fill', 'currentColor')
+  .attr('stroke', 'none');
+
+const markerMid = defs
+  .append('marker')
+  .attr('id', 'marker-mid')
+  .attr('viewBox', '-5 -5 10 10')
+  .attr('markerHeight', '0.5')
+  .attr('markerWidth', '0.5')
+  .attr('orient', 'auto');
+
+markerMid
+  .append('path')
+  .attr('d', 'M -4.5 0 l 4.5 4.5 4.5 -4.5 -4.5 -4.5 z')
+  .attr('fill', 'hsl(200, 80%, 80%)')
+  .attr('stroke', 'hsl(200, 80%, 80%)')
+  .attr('stroke-width', '1')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+
+const markerEnd = defs
+  .append('marker')
+  .attr('id', 'marker-end')
+  .attr('viewBox', '0 -40 90 80')
+  .attr('markerHeight', '2')
+  .attr('markerWidth', '2.25')
+  .attr('orient', 'auto');
+
+markerEnd
+  .append('path')
+  .attr('d', 'M 70 -2 q 14 0 20 -4 -2 4 -6 6 4 2 6 6 -6 -4 -20 -4')
+  .attr('fill', 'hsl(0, 80%, 60%)')
+  .attr('stroke', 'none');
+
+markerEnd
+  .append('path')
+  .attr('d', 'M 10 -10 a 20 20 0 0 1 20 -20 q 20 0 36 30 -16 30 -36 30 a 20 20 0 0 1 -20 -20 z')
+  .attr('fill', 'currentColor')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '20')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+markerEnd
+  .append('path')
+  .attr('d', 'M 28 -20 q 12 2 18 7 c -18 0 -18 4 -18 -7 z')
+  .attr('fill', 'hsl(200, 80%, 80%)')
+  .attr('stroke', 'hsl(200, 80%, 80%)')
+  .attr('stroke-width', '6')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+markerEnd
+  .append('path')
+  .attr('transform', 'scale(1 -1)')
+  .attr('d', 'M 28 -20 q 12 2 18 7 c -18 0 -18 4 -18 -7 z')
+  .attr('fill', 'hsl(200, 80%, 80%)')
+  .attr('stroke', 'hsl(200, 80%, 80%)')
+  .attr('stroke-width', '6')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+
+group
+  .append('path')
+  .attr('d', lineGenerator(data))
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('marker-start', 'url(#marker-start)')
+  .attr('marker-mid', 'url(#marker-mid)')
+  .attr('marker-end', 'url(#marker-end)')
+  .attr('stroke-width', strokeWidth)
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round');
+
+const xAxis = axisBottom(xScale).tickFormat(d => formatTime(d)).tickSize(0).tickPadding(15);
+const yAxis = axisLeft(yScale).ticks(6).tickFormat(d => formatValue(d)).tickSize(0).tickPadding(12);
+
+group.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0 ${height})`).call(xAxis).selectAll('g.tick:nth-of-type(even)').remove();
+group.append('g').attr('class', 'axis y-axis').call(yAxis);
+
+select('.x-axis')
+  .selectAll('g.tick')
+  .append('path')
+  .attr('class', 'grid-line')
+  .attr('d', `M 0 0 v -${height}`)
+
+select('.y-axis')
+  .selectAll('g.tick')
+  .append('path')
+  .attr('class', 'grid-line')
+  .attr('d', `M 0 0 h ${width}`)
+
+selectAll('.grid-line')
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '1')
+  .attr('opacity', '0.2')
+  .attr('stroke-dasharray', '3 5')
+  .attr('stroke-linejoin', 'round')
+  .attr('stroke-linecap', 'round')
+
+selectAll('.axis .domain').attr('stroke-width', '10').attr('stroke-linejoin', 'round').attr('stroke-linecap', 'round').attr('marker-end', 'url(#marker-end)')
+
+group.append('text').attr('font-weight', 'bold').text('Date').attr('text-anchor', 'middle').attr('transform', `translate(${width / 2} ${height + 50})`)
+group.append('text').attr('font-weight', 'bold').text('Stack Overflow questions').attr('text-anchor', 'middle').attr('transform', `translate(${-45} ${height / 2}) rotate(-90)`)

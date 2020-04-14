@@ -16,3 +16,14 @@ main {
   width: 90vw;
   margin: 1rem auto;
 }
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.axis {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: -1px;
+  word-spacing: -1px;
+}

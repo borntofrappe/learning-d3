@@ -4,8 +4,7 @@
       <path d="M 0 -20 q -42 0 -50 20 8 20 50 20" fill="currentColor" stroke="none" />
     </marker>
     <marker id="marker-mid" viewBox="-5 -5 10 10" markerHeight="0.6" markerWidth="0.6" orient="auto">
-      <path fill="hsl(200, 80%, 80%)" stroke="hsl(200, 80%, 80%)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" d="M -4.5 0 l 4.5 4.5 4.5 -4.5 -4.5 -4.5 z" />
-      <path />
+      <path d="M -4.5 0 l 4.5 4.5 4.5 -4.5 -4.5 -4.5 z" fill="hsl(200, 80%, 80%)" stroke="hsl(200, 80%, 80%)" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" />
     </marker>
     <marker id="marker-end" viewBox="0 -40 90 80" markerHeight="2" markerWidth="2.25" orient="auto">
       <path d="M 70 -2 q 14 0 20 -4 -2 4 -6 6 4 2 6 6 -6 -4 -20 -4" fill="hsl(0, 80%, 60%)" stroke="none" />
