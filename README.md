@@ -13,3 +13,4 @@ Projects using D3 to create interesting visualizations.
 | ------------------- | ---------------------- |
 | The Seasons of 2019 | lineRadial, areaRadial |
 | Positivity Tree     | hierarchy, tree        |
+| Python Lang         | marker, line           |
