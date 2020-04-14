@@ -43,3 +43,8 @@ main svg {
   letter-spacing: -1px;
   word-spacing: -1px;
 }
+
+main a {
+  color: hsl(210, 60%, 20%);
+  font-weight: 700;
+}

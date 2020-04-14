@@ -2,7 +2,7 @@
 
 With this project I set out to explore the module of the D3 library responsible to produce random data and a normal distribution.
 
-## [Live Demo](https://codepen.io/borntofrappe/pen/wvKwRoB)
+## [Live Demo](https://codepen.io/borntofrappe/full/wvKwRoB)
 
 ## Links
 
