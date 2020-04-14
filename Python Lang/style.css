@@ -2,10 +2,17 @@
 
 * {
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+body {
+  font-family: "Ubuntu Mono", monospace;
+  color: hsl(0, 0%, 20%);
+  background: hsl(35, 90%, 98%);
 }
 
-body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: "Ubuntu", sans-serif;
+main {
+  max-width: 35rem;
+  width: 90vw;
+  margin: 1rem auto;
 }

@@ -1,3 +1,7 @@
+// D3 functions
+const { select, scaleTime, scaleLinear, extent, max, timeParse } = d3;
+
+// DATA
 // https://insights.stackoverflow.com/trends?tags=python
 const data = [
   {
@@ -105,3 +109,17 @@ const data = [
     value: 0.14412959476865,
   },
 ];
+
+// VIZ
+const margin = 20;
+const width = 500;
+const height = 500;
+
+
+const parseTime = timeParse("%Y-%m-%d");
+const xScale = scaleTime().domain(extent(data, ({date}) => parseTime(date))).range([0, width]);
+const yScale = scaleLinear().domain([0, max(data, ({value}) => value)]).range([height, 0]).nice();
+
+
+const svg = select('main').append('svg').attr('viewBox', `${-margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`);
+const defs = svg.append('defs');
