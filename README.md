@@ -6,6 +6,7 @@ Projects exploring the D3 library, its features and modules.
 | ------------------------------------------------------------------ | ----------------------- |
 | [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)           | enter-update-exit, join |
 | [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB) | random, normal          |
+| [Color Scales]()                                                   | scale-chromatic         |
 
 Projects using D3 to create interesting visualizations.
 
