@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital@0;1&family=Rubik:wght@500&display=swap");
 
 * {
   box-sizing: border-box;
@@ -7,27 +7,42 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: "Ubuntu", sans-serif;
+  background: hsl(0, 0%, 98%);
+  color: hsl(0, 0%, 10%);
+  font-family: "Roboto", sans-serif;
 }
 
-main {
-  box-shadow: 0 2px 5px -3px hsla(0, 0%, 5%, 0.2);
-  padding: 1.25rem 1rem;
-  background: hsl(0, 0%, 100%);
-  max-width: 35rem;
+#root {
+  max-width: 32.5rem;
   margin: 1rem auto;
   width: 90vw;
 }
+#root > * + * {
+  margin-top: 1.25rem;
+}
+header,
+article {
+  padding: 1rem 1.25rem;
+  border-radius: 0.2rem;
+  box-shadow: 0 2px 5px -3px hsla(0, 0%, 5%, 0.2);
+  background: hsl(0, 0%, 100%);
+}
+article > * + * {
+  margin-top: 0.75rem;
+}
+h1,
+h2 {
+  font-family: "Rubik", sans-serif;
+  font-weight: 500;
+}
 h1 {
-  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
 }
-p {
-  margin-bottom: 0.5rem;
+h2 {
+  font-size: 1.2rem;
 }
-main svg {
-  margin: 2rem auto 1rem;
+article svg {
+  margin: 1rem auto;
   width: 80%;
   height: auto;
   display: block;
