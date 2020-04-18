@@ -18,7 +18,7 @@ body {
   width: 90vw;
 }
 #root > * + * {
-  margin-top: 1.25rem;
+  margin-top: 1rem;
 }
 header,
 article {
@@ -27,8 +27,9 @@ article {
   box-shadow: 0 2px 5px -3px hsla(0, 0%, 5%, 0.2);
   background: hsl(0, 0%, 100%);
 }
+header > * + *,
 article > * + * {
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 h1,
 h2 {
@@ -41,9 +42,12 @@ h1 {
 h2 {
   font-size: 1.2rem;
 }
+a {
+  color: inherit;
+}
 article svg {
   margin: 1rem auto;
-  width: 80%;
+  width: 75%;
   height: auto;
   display: block;
 }
