@@ -9,6 +9,23 @@
     <title>Force Simulation</title>
   </head>
   <body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;" viewBox="-50 -50 100 100">
+      <symbol id="next" viewBox="-50 -50 100 100">
+        <g fill="currentColor" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M 12.5 -22.5 l 27.5 22.5 -27.5 22.5z" />
+          <path d="M -40 0 h 25" />
+        </g>
+      </symbol>
+
+      <symbol id="previous" viewBox="-50 -50 100 100">
+        <g transform="scale(-1 1)">
+          <g fill="currentColor" stroke="currentColor" stroke-width="20" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M 12.5 -22.5 l 27.5 22.5 -27.5 22.5z" />
+            <path d="M -40 0 h 25" />
+          </g>
+        </g>
+      </symbol>
+    </svg>
     <main></main>
     <script src="https://unpkg.com/d3@5.15.1/dist/d3.min.js"></script>
     <script src="script.js"></script>

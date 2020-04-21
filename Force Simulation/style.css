@@ -9,3 +9,61 @@ body {
   color: hsl(0, 0%, 10%);
   font-family: "Ubuntu", sans-serif;
 }
+
+main {
+  margin: 1rem auto;
+  max-width: 30rem;
+  width: 90vw;
+}
+main > svg {
+  width: 100%;
+  height: auto;
+  border: 1px solid currentColor;
+}
+.controls {
+  display: flex;
+  border: 1px solid currentColor;
+  border-top: none;
+  margin-top: -3px;
+}
+.controls > * + * {
+  border-left: 1px solid currentColor;
+}
+@supports (display: grid) {
+  main {
+    display: grid;
+  }
+  .controls {
+    margin-top: initial;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+  }
+}
+button,
+output {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: inherit;
+  padding: 0.5rem 0.5rem;
+}
+button {
+  flex-grow: 1;
+  border: none;
+  background: none;
+  outline-color: tomato;
+}
+button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button > * + * {
+  margin-left: 0.4rem;
+}
+button svg {
+  width: 1em;
+  height: auto;
+  display: block;
+  color: hsl(0, 0%, 20%);
+}
