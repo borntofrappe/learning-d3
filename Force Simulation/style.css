@@ -1,36 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@400&display=swap");
 
 * {
   box-sizing: border-box;
 }
 
 body {
-  background: hsl(0, 0%, 95%);
+  background: hsl(0, 0%, 97%);
   color: hsl(0, 0%, 10%);
   font-family: "Ubuntu", sans-serif;
 }
 
-main {
+#root {
   margin: 1rem auto;
   max-width: 30rem;
   width: 90vw;
 }
-main > svg {
+
+#root > svg {
   width: 100%;
   height: auto;
   border: 1px solid currentColor;
 }
+
 .controls {
   display: flex;
   border: 1px solid currentColor;
   border-top: none;
   margin-top: -3px;
 }
-.controls > * + * {
-  border-left: 1px solid currentColor;
-}
+
 @supports (display: grid) {
-  main {
+  #root {
     display: grid;
   }
   .controls {
@@ -40,6 +40,11 @@ main > svg {
     grid-auto-columns: 1fr;
   }
 }
+
+.controls > * + * {
+  border-left: 1px solid currentColor;
+}
+
 button,
 output {
   display: flex;
@@ -48,6 +53,7 @@ output {
   font-family: inherit;
   padding: 0.5rem 0.5rem;
 }
+
 button {
   flex-grow: 1;
   border: none;
