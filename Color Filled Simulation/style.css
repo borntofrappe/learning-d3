@@ -3,15 +3,13 @@
 }
 
 body {
-  background: hsl(0, 0%, 2%);
-  color: hsl(0, 0%, 80%);
   min-height: 100vh;
   display: grid;
   place-items: center;
+  background: hsl(210, 55%, 4%);
 }
 
 svg {
-  background: hsl(0, 0%, 0%);
   border-radius: 50%;
   clip-path: circle();
   width: 90vw;
