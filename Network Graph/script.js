@@ -1,0 +1,2 @@
+// starting point
+const data = [{}];
