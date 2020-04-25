@@ -8,4 +8,48 @@ body {
   background: hsl(0, 0%, 95%);
   color: hsl(0, 0%, 5%);
   font-family: "Ubuntu", sans-serif;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='16' viewBox='0 0 20 16'%3E%3Cg fill='%23000000' fill-opacity='0.05'%3E%3Cpath fill-rule='evenodd' d='M0 .04C2.6.22 4.99 1.1 7 2.5A13.94 13.94 0 0 1 15 0h4c.34 0 .67.01 1 .04v2A12 12 0 0 0 7.17 12h5.12A7 7 0 0 1 20 7.07V14a5 5 0 0 0-3-4.58A5 5 0 0 0 14 14H0V7.07c.86.12 1.67.4 2.4.81.75-1.52 1.76-2.9 2.98-4.05C3.79 2.83 1.96 2.2 0 2.04v-2z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100px;
+  background-position: -50px -50px;
+}
+
+main {
+  background: hsl(0, 0%, 95%);
+  max-width: 35rem;
+  padding: 0.75rem 1.25rem;
+  margin: 1rem auto;
+  box-shadow: 0 2px 10px -5px hsla(0, 0%, 5%, 0.4);
+}
+code {
+  font-family: monospace;
+  font-size: 1.25em;
+  background: hsl(40, 90%, 90%);
+}
+table {
+  table-layout: fixed;
+  width: 100%;
+  max-width: 20rem;
+  margin: 0 auto;
+  text-align: left;
+  border-collapse: collapse;
+}
+table thead tr {
+  background: hsl(40, 90%, 50%);
+}
+table tbody tr:nth-child(odd) {
+  background: hsl(40, 90%, 80%);
+}
+table tbody tr:nth-child(even) {
+  background: hsl(40, 90%, 90%);
+}
+table th,
+table td {
+  padding: 0.5rem 0.75rem;
+}
+
+svg {
+  display: block;
+  width: 350px;
+  height: 350px;
+  margin: 0 auto;
 }
