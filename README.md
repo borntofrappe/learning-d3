@@ -8,7 +8,7 @@ Projects exploring the D3 library, its features and modules.
 | [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB) | random, normal          |
 | [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)        | scale-chromatic, symbol |
 | [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)    | simulation              |
-| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)                                                  | data, table, shape      |
+| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)       | data, table, shape      |
 
 Projects using D3 to create interesting visualizations.
 
@@ -18,3 +18,4 @@ Projects using D3 to create interesting visualizations.
 | [Positivity Tree](https://codepen.io/borntofrappe/pen/eYpNRRX)         | hierarchy, tree        |
 | [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)   | marker, line           |
 | [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV) | simulation, force, on  |
+| [Row and Column Charts]()                                              | bar, pseudo-3d         |
