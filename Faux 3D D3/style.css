@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;900&family=Overpass+Mono:wght@400&display=swap");
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,32 +8,42 @@
 
 body {
   background: hsl(0, 0%, 92%);
-  color: hsl(0, 0%, 10%);
-  font-family: monospace;
+  color: hsl(0, 0%, 15%);
+  font-family: "Lato", sans-serif;
 }
 
 main {
-  margin: 1rem auto;
-  max-width: 30rem;
   width: 90vw;
-}
-main > * + * {
-  margin-top: 1rem;
+  margin: 1rem auto;
+  line-height: 1.5;
+  display: grid;
+  grid-gap: 2rem 1rem;
+  grid-template-columns: repeat(auto-fit, 28rem);
+  justify-content: center;
 }
 
-h1,
-article {
-  background: hsl(0, 0%, 100%);
-  padding: 1rem;
-  text-align: center;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 10px -8px hsla(0, 0%, 50%);
+header {
+  grid-column: 1/-1;
 }
+
 h1 {
-  display: inline-block;
+  font-weight: 900;
 }
-article svg {
-  display: block;
+
+svg {
+  align-self: center;
+  display: inline-block;
   width: 100%;
   height: auto;
+}
+
+svg text {
+  fill: inherit;
+  font-family: "Overpass Mono", monospace;
+}
+
+svg:nth-of-type(2) {
+  width: 85%;
+  align-self: center;
+  justify-self: center;
 }

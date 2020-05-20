@@ -18,4 +18,4 @@ Projects using D3 to create interesting visualizations.
 | [Positivity Tree](https://codepen.io/borntofrappe/pen/eYpNRRX)         | hierarchy, tree        |
 | [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)   | marker, line           |
 | [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV) | simulation, force, on  |
-| [Faux 3D D3]()                                                         | bar, pie               |
+| [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)              | bar, pie               |

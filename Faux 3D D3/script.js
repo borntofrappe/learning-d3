@@ -1,60 +1,58 @@
 // data copied on May 20th 2020 from this website
 // https://www.nintendo.co.jp/ir/en/finance/software/index.html
 const data = [
-    {
-      name: 'Mario Kart 8 Deluxe',
-      date: '2017-04-27',
-      value: 24.77,
-    },
-    {
-      name: 'Super Smash Bros. Ultimate',
-      date: '2018-12-07',
-      value: 18.84,
-    },
-    {
-      name: 'The Legend of Zelda: Breath of the Wild',
-      date: '2017-03-03',
-      value: 17.41,
-    },
-    {
-      name: 'Super Mario Odyssey',
-      date: '2017-10-27',
-      value: 17.41,
-    },
-    {
-      name: 'Pokémon Sword/Pokémon Shield',
-      date: '2019-11-15',
-      value: 17.37,
-    },
-    {
-      name: "Pokémon: Let's Go, Pikachu!/ Pokémon: Let's Go, Eevee!",
-      date: '2018-11-15',
-      value: 11.97,
-    },
-    {
-      name: 'Animal Crossing: New Horizons',
-      date: '2020-03-20',
-      value: 11.77,
-    },
-    {
-      name: 'Splatoon 2',
-      date: '2017-07-21',
-      value: 10.13,
-    },
-    {
-      name: 'Super Mario Party',
-      date: '2018-10-05',
-      value: 10.1,
-    },
-    {
-      name: 'New Super Mario Bros. U Deluxe',
-      date: '2019-01-10',
-      value: 6.6,
-    },
+  {
+    name: 'Mario Kart 8 Deluxe',
+    value: 24.77,
+  },
+  {
+    name: 'Super Smash Bros. Ultimate',
+    value: 18.84,
+  },
+  {
+    name: 'The Legend of Zelda: Breath of the Wild',
+    value: 17.41,
+  },
+  {
+    name: 'Super Mario Odyssey',
+    value: 17.41,
+  },
+  {
+    name: 'Pokémon Sword/Pokémon Shield',
+    value: 17.37,
+  },
+  {
+    name: "Pokémon: Let's Go, Pikachu!/ Pokémon: Let's Go, Eevee!",
+    value: 11.97,
+  },
+  {
+    name: 'Animal Crossing: New Horizons',
+    value: 11.77,
+  },
+  {
+    name: 'Splatoon 2',
+    value: 10.13,
+  },
+  {
+    name: 'Super Mario Party',
+    value: 10.1,
+  },
+  {
+    name: 'New Super Mario Bros. U Deluxe',
+    value: 6.6,
+  },
 ];
-  
+
+const names = data.map(({ name }) => name);
+const format = d3.format('2');
+const total = data.reduce((acc, curr) => acc + curr.value, 0);
+
 const main = d3.select('main');
-main.append('h1').text('Bars');
+const header = main.append('header');
+header.append('h1').text('Faux 3D');
+header
+  .append('p')
+  .text('The effect is achieved by overlapping semi-transparent SVG elements.');
 
 // scales
 const valueScale = d3
@@ -62,114 +60,153 @@ const valueScale = d3
   .domain([0, d3.max(data, d => d.value)])
   .nice();
 
-const names = data.map(({name}) => name);
 const barScale = d3
   .scaleBand()
   .domain(names)
-  .padding(0.4);
+  .padding(0.5);
 
 const colorScale = d3
   .scaleOrdinal()
   .domain(names)
   .range(d3.schemeTableau10);
 
-// row chart
-const rowChart = main.append('article');
-rowChart.append('h2').text('Horizontal');
-
-const margin = 30;
+const margin = 15;
 const size = 500;
 
 valueScale.range([0, size]);
 barScale.range([0, size]);
 const bandwidth = barScale.bandwidth();
 
-rowChart
+// faux-3d column chart
+main
   .append('svg')
-  .attr('viewBox', `-${margin} -${margin} ${size + margin * 2} ${size + margin * 2}`)
+  .attr(
+    'viewBox',
+    `-${margin} -${margin} ${size + margin * 2} ${size + margin * 2}`
+  )
   .attr('width', size)
   .attr('height', size)
   .append('g')
-  .attr('id', 'row-chart-group');
+  .attr('id', 'column-chart');
 
-d3
-  .select('#row-chart-group')
-  .selectAll('g')
-  .data(data)
-  .enter()
-  .append('g')
-  .attr('class', 'row')
-  .attr('color', ({name}) => colorScale(name))
-  .attr('transform', ({name}) => `translate(0 ${barScale(name)})`);
-
-d3
-  .selectAll('.row')
-  .append('rect')
-  .attr('fill', 'currentColor')
-  .attr('width', ({value}) => valueScale(value))
-  .attr('height', barScale.bandwidth());
-
-// column chart
-const columnChart = main.append('article');
-columnChart.append('h2').text('Vertical');
-
-columnChart
-  .append('svg')
-  .attr('viewBox', `-${margin} -${margin} ${size + margin * 2} ${size + margin * 2}`)
-  .attr('width', size)
-  .attr('height', size)
-  .append('g')
-  .attr('id', 'column-chart-group');
-
-d3
-  .select('#column-chart-group')
+d3.select('#column-chart')
   .selectAll('g')
   .data(data)
   .enter()
   .append('g')
   .attr('class', 'column')
-  .attr('color', ({name}) => colorScale(name))
-  .attr('transform', ({name}) => `translate(${barScale(name)} ${size})`);
+  .attr('color', ({ name }) => colorScale(name))
+  .attr(
+    'transform',
+    ({ name }) => `translate(${barScale(name) + bandwidth / 2} ${size})`
+  );
 
-d3
-  .selectAll('.column')
-  .append('rect')
+d3.selectAll('.column')
+  .append('path')
   .attr('fill', 'currentColor')
-  .attr('width', barScale.bandwidth())
-  .attr('y', ({value}) => valueScale(value) * -1)
-  .attr('height', ({value}) => valueScale(value));
+  .attr(
+    'd',
+    ({ value }) =>
+      `M -${bandwidth / 2} 0 0 ${bandwidth / 4} ${bandwidth / 2} 0 ${bandwidth /
+        2} -${valueScale(value)} 0 -${valueScale(value) +
+        bandwidth / 4} -${bandwidth / 2} -${valueScale(value)}`
+  );
 
-// faux-3d column chart
-const faux3dColumnChart = main.append('article');
-faux3dColumnChart.append('h2').text('Faux-3d');
+d3.selectAll('.column')
+  .append('path')
+  .attr('opacity', 0.4)
+  .attr(
+    'd',
+    ({ value }) =>
+      `M -${bandwidth / 2} 0 0 ${bandwidth / 4} 0 -${valueScale(value) -
+        bandwidth / 4} -${bandwidth / 2} -${valueScale(value)}`
+  );
 
-faux3dColumnChart
+d3.selectAll('.column')
+  .append('text')
+  .text(({ name }) => name)
+  .attr('text-anchor', 'end')
+  .style('writing-mode', 'vertical-lr')
+  .attr('font-size', 15)
+  .attr('transform', ({ value }) => `translate(${bandwidth} ${bandwidth / 4})`);
+
+const pie = d3.pie().value(d => d.value);
+const pieData = pie(data);
+const innerArc = d3
+  .arc()
+  .innerRadius(size / 6)
+  .outerRadius(size / 4);
+const arc = d3
+  .arc()
+  .innerRadius(size / 6)
+  .outerRadius(size / 2.75);
+const outerArc = d3
+  .arc()
+  .innerRadius(size / 2.5)
+  .outerRadius(size / 2);
+
+main
   .append('svg')
-  .attr('viewBox', `-${margin} -${margin} ${size + margin * 2} ${size + margin * 2}`)
+  .attr(
+    'viewBox',
+    `-${margin + size / 2} -${margin + size / 2} ${size + margin * 2} ${size +
+      margin * 2}`
+  )
   .attr('width', size)
   .attr('height', size)
   .append('g')
-  .attr('id', 'faux-3d-column-chart-group');
+  .attr('id', 'pie-chart');
 
-
-d3
-  .select('#faux-3d-column-chart-group')
+d3.select('#pie-chart')
   .selectAll('g')
-  .data(data)
+  .data(pieData)
   .enter()
   .append('g')
-  .attr('class', 'faux-3d-column')
-  .attr('color', ({name}) => colorScale(name))
-  .attr('transform', ({name}) => `translate(${barScale(name) + bandwidth/2} ${size})`);
+  .attr('class', 'slice')
+  .attr('color', d => colorScale(d.data.name));
 
-d3
-  .selectAll('.faux-3d-column')
+d3.selectAll('.slice')
   .append('path')
-  .attr('fill', 'currentColor')
-  .attr('d', ({value}) => `M -${bandwidth / 2} 0 0 ${bandwidth / 4} ${bandwidth / 2} 0 ${bandwidth / 2} -${valueScale(value)} 0 -${valueScale(value) + bandwidth / 4} -${bandwidth / 2} -${valueScale(value)}`);
+  .attr('d', arc)
+  .attr('fill', 'currentColor');
 
-d3
-  .selectAll('.faux-3d-column')
+d3.selectAll('.slice')
   .append('path')
-  .attr('opacity', 0.4)
-  .attr('d', ({value}) => `M -${bandwidth / 2} 0 0 ${bandwidth / 4} 0 -${valueScale(value) - bandwidth / 4} -${bandwidth / 2} -${valueScale(value)}`);
+  .attr('d', innerArc)
+  .attr('opacity', 0.4);
+
+d3.selectAll('.slice')
+  .append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dominant-baseline', 'middle')
+  .attr('font-size', 20)
+  .attr('transform', d => {
+    const [x, y] = outerArc.centroid(d);
+    return `translate(${x} ${y})`;
+  })
+  .text(d => d.data.value);
+
+d3.selectAll('.slice')
+  .append('path')
+  .attr('d', d => {
+    const [x1, y1] = arc.centroid(d);
+    // ! this modifies the outerArc
+    const [x2, y2] = outerArc.outerRadius(size / 2.3).centroid(d);
+    return `M ${x1} ${y1} ${x2} ${y2}`;
+  })
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '2');
+
+d3.select('#pie-chart')
+  .append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dominant-baseline', 'middle')
+  .attr('font-size', 35)
+  .attr('font-weight', 700)
+  .text(format(total))
+  .append('tspan')
+  .attr('x', 0)
+  .attr('y', 35)
+  .attr('font-size', 35)
+  .text('Ml');
