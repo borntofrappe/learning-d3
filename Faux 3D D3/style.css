@@ -14,16 +14,14 @@ body {
 
 main {
   width: 90vw;
+  max-width: 60rem;
+  text-align: center;
   margin: 1rem auto;
   line-height: 1.5;
-  display: grid;
-  grid-gap: 2rem 1rem;
-  grid-template-columns: repeat(auto-fit, 28rem);
-  justify-content: center;
 }
-
 header {
-  grid-column: 1/-1;
+  text-align: initial;
+  margin-bottom: 1.5rem;
 }
 
 h1 {
@@ -31,8 +29,7 @@ h1 {
 }
 
 svg {
-  align-self: center;
-  display: inline-block;
+  max-width: 28rem;
   width: 100%;
   height: auto;
 }
@@ -43,7 +40,5 @@ svg text {
 }
 
 svg:nth-of-type(2) {
-  width: 85%;
-  align-self: center;
-  justify-self: center;
+  width: 75%;
 }
