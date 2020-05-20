@@ -1,0 +1,37 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: hsl(0, 0%, 92%);
+  color: hsl(0, 0%, 10%);
+  font-family: monospace;
+}
+
+main {
+  margin: 1rem auto;
+  max-width: 30rem;
+  width: 90vw;
+}
+main > * + * {
+  margin-top: 1rem;
+}
+
+h1,
+article {
+  background: hsl(0, 0%, 100%);
+  padding: 1rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 10px -8px hsla(0, 0%, 50%);
+}
+h1 {
+  display: inline-block;
+}
+article svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
