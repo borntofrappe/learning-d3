@@ -1,6 +1,8 @@
 # Seasonal Data
 
-Plot the trends in Google search for the term "turnip", highlighting the searches in the timeframe of a week.
+Plot the trends for the word "turnip" in the span of the first five months of 2020, highlighting the average and a specific date.
+
+## [Live Demo](https://codepen.io/borntofrappe/pen/pojGaEZ)
 
 ## Data
 
