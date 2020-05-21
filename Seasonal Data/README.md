@@ -8,14 +8,6 @@ Following [this url](https://trends.google.com/trends/explore?date=2020-01-20%20
 
 The 20th of March is took as a frame of reference since it coincides with the release date of the Nintendo game Animal Crossing. This title has a unique impact on the searches for the particular word.
 
-## Visualizations
-
-- a line chart plotting the data on two axis
-
-- a radial chart considering the average and plotting the data above/below this defining line
-
-Tally up the values for the days of the week. Consider plotting two visualizations: before and after the week of the 20th of March. Consider using the 16th since this is a Monday.
-
 ## Inspiration
 
 - [Creating the Scientific American “Baby Spike” visual](https://www.visualcinnamon.com/2017/10/creating-baby-births-visual), an insightful article and visualization from [Nadieh Bremer](https://twitter.com/NadiehBremer).
