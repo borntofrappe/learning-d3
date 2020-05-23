@@ -6,13 +6,15 @@ Describe how interest in the word "turnip" changes in the first months of 2020.
 
 ## Data
 
-Following [this url](https://trends.google.com/trends/explore?date=2020-01-20%202020-05-17&q=turnip) consider the search interest between the 20th of January and the 17th of May. This to have the 20th of March roughly as a mid point, and consider a full week period (begins on Monday, ends on Sunday).
+Following [this url](https://trends.google.com/trends/explore?date=2020-01-20%202020-05-17&q=turnip) consider the search interest between the 20th of January and the 17th of May.
 
-The 20th of March is took as a frame of reference since it coincides with the release date of the Nintendo game Animal Crossing. This title has a unique impact on the searches for the particular word.
+The 20th of March is took as a frame of reference since it coincides with the release date of the Nintendo game Animal Crossing. The title has a unique impact on the searches for the particular word.
 
-## lineRadial
+## Visualizations
 
-Past the line chart, use a radial line chart to highlight how the interest changes in the timeframe of a week. Plot two charts to consider the values before and after the arbitrary date.
+With a line chart, plot the interest across the chosen timeframe.
+
+With a couple of radial line charts, describe how the interest varies in the timeframe of a week. Do so considering the dates before and then after the 20th of March.
 
 ## Inspiration
 
