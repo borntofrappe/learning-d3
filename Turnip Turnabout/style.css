@@ -17,13 +17,19 @@ main {
   margin: 1rem auto;
   max-width: 45rem;
   width: 90vw;
+  line-height: 1.5;
 }
 
 main > * + * {
   margin-top: 0.5rem;
 }
 
-h1 {
+main svg {
+  margin: 2rem 0 3rem;
+}
+
+h1,
+h2 {
   font-family: "Source Serif Pro", serif;
 }
 
@@ -43,7 +49,9 @@ svg {
   height: auto;
   margin: 1.75rem 0 1.25rem;
 }
-
+svg:not(:nth-of-type(1)) {
+  width: 50%;
+}
 svg text {
   font-family: "Source Code Pro", monospace;
   fill: currentColor;

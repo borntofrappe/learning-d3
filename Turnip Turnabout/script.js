@@ -1,3 +1,4 @@
+// https://trends.google.com/trends/explore?date=2020-01-20%202020-05-17&q=turnip
 const data = [
   {
     date: '2020-01-20',
@@ -486,9 +487,9 @@ const game = {
   date: '2020-03-20',
 };
 
+// line chart
+// plot the data points in the five month period
 const strokeWidth = 3;
-const average = d3.mean(data, d => d.value);
-const offset = 1 - average / d3.max(data, d => d.value);
 
 const parseDate = d3.timeParse('%Y-%m-%d');
 const formatDate = d3.timeFormat('%A %d-%m');
@@ -514,6 +515,7 @@ const height = 200;
 
 scaleValue.range([height - margin.bottom, margin.top]);
 scaleTime.range([margin.left, width - margin.right]);
+
 
 const line = d3
   .line()
@@ -545,41 +547,46 @@ main
 
 main
   .append('svg')
+  .attr('id', 'line-chart')
   .attr('viewBox', `0 0 ${width} ${height}`)
   .attr('width', width)
   .attr('height', height);
 
-d3.select('svg')
+const average = d3.mean(data, d => d.value);
+const offset = 1 - average / d3.max(data, d => d.value);
+  
+
+d3.select('svg#line-chart')
   .append('defs')
   .append('linearGradient')
   .attr('gradientUnits', 'userSpaceOnUse')
-  .attr('id', 'gradient')
+  .attr('id', 'linear-gradient')
   .attr('x1', 0)
   .attr('x2', 0)
   .attr('y1', margin.top)
   .attr('y2', height - margin.bottom);
 
-d3.select('#gradient')
+d3.select('#linear-gradient')
   .append('stop')
   .attr('stop-color', 'hsl(0, 100%, 25%)')
   .attr('offset', 0);
 
-d3.select('#gradient')
+d3.select('#linear-gradient')
   .append('stop')
   .attr('stop-color', 'hsl(35, 100%, 50%)')
   .attr('offset', offset);
 
-d3.select('#gradient')
+d3.select('#linear-gradient')
   .append('stop')
   .attr('stop-color', 'hsl(145, 50%, 75%)')
   .attr('offset', offset);
 
-d3.select('#gradient')
+d3.select('#linear-gradient')
   .append('stop')
   .attr('stop-color', 'hsl(205, 80%, 30%)')
   .attr('offset', 1);
 
-d3.select('svg')
+d3.select('svg#line-chart')
   .append('g')
   .attr('class', 'axes');
 
@@ -627,6 +634,7 @@ d3.select('#axis-time')
   .attr('stroke', 'currentColor')
   .attr('opacity', 0.2)
   .attr('stroke-dasharray', '2 5');
+
 
 d3.select('svg')
   .append('g')
@@ -676,7 +684,235 @@ d3.select('svg')
   .append('path')
   .attr('id', 'line')
   .attr('fill', 'none')
-  .attr('stroke', 'url(#gradient)')
+  .attr('stroke', 'url(#linear-gradient)')
   .attr('stroke-width', strokeWidth)
   .attr('stroke-linecap', 'round')
   .attr('d', line(data));
+
+// radial line chart(s)
+// highlight the data points in the timeframe of a week, before and after the release date
+// consider the data before and after the release date
+
+const dataBefore = [];
+const dataAfter = [];
+const formatDay = d3.timeFormat('%A');
+
+data.forEach(datum => {
+  const date = parseDate(datum.date);
+  const day = formatDay(date);
+  if(date < parseDate(game.date)) {
+    if(dataBefore[day]) {
+      dataBefore[day].push(datum.value);
+    } else {
+      dataBefore[day] = [datum.value];
+    }
+  } else {
+    if(dataAfter[day]) {
+      dataAfter[day].push(datum.value);
+    } else {
+      dataAfter[day] = [datum.value];
+    }
+  }
+});
+
+const averageBefore = Object.entries(dataBefore).map(([day, values]) => ({
+  day,
+  average: d3.mean(values)
+}));
+
+const averageAfter = Object.entries(dataAfter).map(([day, values]) => ({
+  day,
+  average: d3.mean(values)
+}));
+
+const days = averageBefore.map(({day}) => day);
+
+const size = 500;
+const padding = 100;
+const radius = (size - padding) / 2;
+
+const scaleAngle = d3
+  .scalePoint()
+  .domain([...days, ""])
+  .range([0, Math.PI * 2]);
+
+const scaleRadius = d3
+  .scaleLinear()
+  .range([0, radius]);
+
+const lineRadial = d3
+  .lineRadial()
+  .angle(d => scaleAngle(d.day))
+  .radius(d => scaleRadius(d.average))
+  .curve(d3.curveCatmullRomClosed);
+
+main
+  .append('h2')
+  .text("Over the week");
+
+main
+  .append('p')
+  .text("Prior to the release date, interest in turnips increases toward the end of the week, without varying excessively from the average.");
+
+
+const averageDaysBefore = d3.mean(averageBefore, d => d.average);
+const maxDaysBefore = d3.max(averageBefore, d => d.average);
+const offsetBefore = averageDaysBefore / maxDaysBefore;
+
+scaleRadius
+  .domain([0, maxDaysBefore]);
+
+main
+  .append('svg')
+  .attr('id', 'radial-chart-before')
+  .attr('viewBox', `${-size / 2} ${-size / 2} ${size} ${size}`)
+  .attr('width', size)
+  .attr('height', size);
+
+d3.select('svg#radial-chart-before')
+  .append('defs')
+  .append('radialGradient')
+  .attr('gradientUnits', 'userSpaceOnUse')
+  .attr('id', 'radial-gradient-before')
+  .attr('r', radius)
+  .attr('cx', 0)
+  .attr('cy', 0);
+
+
+  d3.select('#radial-gradient-before')
+  .append('stop')
+  .attr('stop-color', 'hsl(205, 80%, 30%)')
+  .attr('offset', 0);
+
+d3.select('#radial-gradient-before')
+  .append('stop')
+  .attr('stop-color', 'hsl(145, 50%, 75%)')
+  .attr('offset', offsetBefore);
+
+  d3.select('#radial-gradient-before')
+  .append('stop')
+  .attr('stop-color', 'hsl(35, 100%, 50%)')
+  .attr('offset', offsetBefore);
+
+  d3.select('#radial-gradient-before')
+  .append('stop')
+  .attr('stop-color', 'hsl(0, 100%, 25%)')
+  .attr('offset', 1);
+
+
+  d3
+  .select('svg#radial-chart-before')
+  .selectAll('text')
+  .data(days)
+  .enter()
+  .append('text')
+  .text(d => d)
+  .attr('fill', 'currentColor')
+  .attr('opacity', 0.4)
+  .attr('font-size', 20)
+  .attr('text-anchor', 'middle')
+  .attr('transform', d => `rotate(${scaleAngle(d) * 180 / Math.PI}) translate(0 -${radius}) rotate(-${scaleAngle(d) * 180 / Math.PI})`);
+
+d3
+  .select('svg#radial-chart-before')
+  .append('circle')
+  .attr('fill', 'none')
+  .attr('stroke', "currentColor")
+  .attr('stroke-width', strokeWidth)
+  .attr('opacity', 0.1)
+  .attr('r', scaleRadius(averageDaysBefore));
+
+d3
+  .select('svg#radial-chart-before')
+  .append('path')
+  .attr('fill', 'none')
+  .attr('stroke', "url(#radial-gradient-before)")
+  .attr('stroke-width', strokeWidth)
+  .attr('d', lineRadial(averageBefore));
+
+
+
+main
+  .append('p')
+  .text("Following the title's launch, interest increases in the weekend and spikes on Sunday.");
+
+  const averageDaysAfter = d3.mean(averageAfter, d => d.average);
+const maxDaysAfter = d3.max(averageAfter, d => d.average);
+const offsetAfter = averageDaysAfter / maxDaysAfter;
+
+
+scaleRadius
+  .domain([0, maxDaysAfter]);
+  
+main
+  .append('svg')
+  .attr('id', 'radial-chart-after')
+  .attr('viewBox', `${-size / 2} ${-size / 2} ${size} ${size}`)
+  .attr('width', size)
+  .attr('height', size);
+
+
+  d3.select('svg#radial-chart-after')
+  .append('defs')
+  .append('radialGradient')
+  .attr('gradientUnits', 'userSpaceOnUse')
+  .attr('id', 'radial-gradient-after')
+  .attr('r', radius)
+  .attr('cx', 0)
+  .attr('cy', 0);
+
+
+  d3.select('#radial-gradient-after')
+  .append('stop')
+  .attr('stop-color', 'hsl(205, 80%, 30%)')
+  .attr('offset', 0);
+
+d3.select('#radial-gradient-after')
+  .append('stop')
+  .attr('stop-color', 'hsl(145, 50%, 75%)')
+  .attr('offset', offsetAfter);
+
+  d3.select('#radial-gradient-after')
+  .append('stop')
+  .attr('stop-color', 'hsl(35, 100%, 50%)')
+  .attr('offset', offsetAfter);
+
+  d3.select('#radial-gradient-after')
+  .append('stop')
+  .attr('stop-color', 'hsl(0, 100%, 25%)')
+  .attr('offset', 1);
+
+
+  d3
+  .select('svg#radial-chart-after')
+  .selectAll('text')
+  .data(days)
+  .enter()
+  .append('text')
+  .text(d => d)
+  .attr('fill', 'currentColor')
+  .attr('opacity', 0.4)
+  .attr('font-size', 20)
+  .attr('text-anchor', 'middle')
+  .attr('transform', d => `rotate(${scaleAngle(d) * 180 / Math.PI}) translate(0 -${radius}) rotate(-${scaleAngle(d) * 180 / Math.PI})`);
+
+
+  d3
+  .select('svg#radial-chart-after')
+  .append('circle')
+  .attr('fill', 'none')
+  .attr('stroke', "currentColor")
+  .attr('stroke-width', strokeWidth)
+  .attr('opacity', 0.1)
+  .attr('r', scaleRadius(averageDaysAfter));
+
+
+d3
+  .select('svg#radial-chart-after')
+  .append('path')
+  .attr('fill', 'none')
+  .attr('stroke', "url(#radial-gradient-after)")
+  .attr('stroke-width', strokeWidth)
+  .attr('d', lineRadial(averageAfter));
+
+  
