@@ -537,9 +537,9 @@ main.append('h1').text('Seasonal data');
 main
   .append('p')
   .html(
-    `<a href="${url}">Interest</a> for the word <strong>turnip</strong> proves to be highly volatile. <a href="${
+    `<a href="${url}">Interest</a> for the word <strong>turnip</strong> proves to be highly volatile, and <a href="${
       game.href
-    }">A certain video game</a> might be responsible for the cyclical spike.`
+    }">a certain video game</a> might be responsible for the drastic change.`
   );
 
 main
@@ -648,7 +648,7 @@ d3.select('#average')
   .append('text')
   .attr('x', '5')
   .attr('y', '-5')
-  .style('font-size', '10')
+  .style('font-size', 12)
   .text(`Average ${formatValue(average)}`);
 
 d3.select('svg')
@@ -672,7 +672,7 @@ d3.select('#release-date')
   .attr('x', '-5')
   .attr('y', '10')
   .attr('text-anchor', 'end')
-  .style('font-size', '10')
+  .style('font-size', 12)
   .text(`Animal Crossing Release`);
 
 d3.select('svg')
@@ -741,7 +741,7 @@ main.append('h2').text('Over the week');
 
 main
   .append('p')
-  .text('Prior to the release date, interest in turnips increases toward the end of the week, without varying excessively from the average.');
+  .text('Prior to the release date, searches for the ruond vegetable increase toward the end of the week, without varying excessively from the average.');
 
 const averageDaysBefore = d3.mean(averageBefore, d => d.average);
 const maxDaysBefore = d3.max(averageBefore, d => d.average);
@@ -820,7 +820,7 @@ d3.select('svg#radial-chart-before')
 main
   .append('p')
   .text(
-    "Following the title's launch, interest spikes on Sunday, and goes back to its average in the week which follows."
+    "Following the title's launch however, interest spikes on Sunday. In this day the game features a periodic event, where turnips are traded in a similarly volatile stock market."
   );
 
 const averageDaysAfter = d3.mean(averageAfter, d => d.average);
@@ -896,3 +896,9 @@ d3.select('svg#radial-chart-after')
   .attr('stroke', 'url(#radial-gradient-after)')
   .attr('stroke-width', strokeWidth * 2)
   .attr('d', lineRadial(averageAfter));
+
+main
+  .append('p')
+  .text(
+    "The change is so important to continue in the days which follow, exceeding the newfound average up until Wednesday."
+  );

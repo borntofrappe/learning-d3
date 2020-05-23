@@ -53,7 +53,8 @@ svg {
   margin: 1.75rem 0 1.25rem;
 }
 svg:not(:nth-of-type(1)) {
-  width: 50%;
+  max-width: 25rem;
+  width: 90%;
 }
 svg text {
   color: hsl(0, 0%, 25%);
