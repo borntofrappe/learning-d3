@@ -1,0 +1,24 @@
+{
+  "name": "learning-d3",
+  "version": "1.0.0",
+  "description": "Projects exploring the D3 library, its features and modules.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node script"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borntofrappe/learning-d3.git"
+  },
+  "keywords": [
+    "learning",
+    "d3",
+    "data visualization"
+  ],
+  "author": "borntofrappe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/borntofrappe/learning-d3/issues"
+  },
+  "homepage": "https://github.com/borntofrappe/learning-d3#readme"
+}
