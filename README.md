@@ -23,7 +23,7 @@ I need to sort the visualizations better, but here it goes:
 | [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)        | scale-chromatic, symbol |
 | [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)    | simulation              |
 | [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)       | data, table, shape      |
-| [Spider Chart]()                                                   | spider, lineRadial      |
+| [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)        | spider, lineRadial      |
 
 - projects using D3 to create interesting visualizations.
 
