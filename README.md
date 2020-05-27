@@ -24,6 +24,7 @@ I need to sort the visualizations better, but here it goes:
 | [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)    | simulation              |
 | [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)       | data, table, shape      |
 | [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)        | spider, lineRadial      |
+| [Percent Stacked Area Chart]()                                     | random, area            |
 
 - projects using D3 to create interesting visualizations.
 

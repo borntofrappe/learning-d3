@@ -1,0 +1,24 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 5%);
+  font-family: sans-serif;
+}
+
+main {
+  max-width: 40rem;
+  width: 90vw;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
