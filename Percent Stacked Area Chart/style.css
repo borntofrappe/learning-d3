@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,22 +7,76 @@
 }
 
 body {
-  background: #fafffa;
-  color: hsl(0, 0%, 5%);
-  font-family: sans-serif;
+  background: hsl(0, 0%, 99%);
+  color: hsl(0, 0%, 35%);
+  font-family: 'Open Sans', sans-serif;
 }
 
 main {
-  max-width: 40rem;
+  max-width: 50rem;
   width: 90vw;
   margin: 1rem auto;
   padding: 1rem;
-  border: 1px solid red;
 }
 
-svg {
-  border: 1px solid red;
+main ul {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+main > * + * {
+  margin-top: 1rem;
+}
+
+@supports (display: grid) {
+  @media screen and (min-width: 50rem) {
+    main {
+      display: grid;
+      grid-template-areas: 'p ul' 'svg ul';
+      grid-gap: 1rem;
+    }
+    main > * + * {
+      margin-top: initial;
+    }
+    main p {
+      grid-area: p;
+    }
+    main > svg {
+      grid-area: svg;
+    }
+    main ul {
+      grid-area: ul;
+      display: initial;
+      flex-wrap: initial;
+    }
+  }
+}
+
+main > svg {
   display: block;
   width: 100%;
   height: auto;
+  align-self: end;
+}
+
+main > svg text {
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+
+main ul {
+  line-height: 1.5;
+  list-style: none;
+  float: right;
+}
+
+main ul li {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  margin: 0.25rem;
+}
+
+main ul li > * + * {
+  margin-left: 0.25rem;
 }

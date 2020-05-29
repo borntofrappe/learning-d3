@@ -1,11 +1,13 @@
 const main = d3.select('main');
-main.append('p').text('What the average web developer spends time thinking about. 1990-2020');
+main.append('p').html('What the average web developer spends time thinking about. 1990-2020<br/>Feel Free to make your own legend.');
 
-const colors = ["#7b3634","#a43838","#d13835","#df7d7a","#e7a6a0","#8b7833","#bf9e34","#eec650","#fcde7a","#f9f4cc","#4c693e","#568544","#7db16b","#9bca88","#9bca88","#3f70d0", "#5a8cdc", "#7ca8e9", "#acc6f2", "#564884", "#796aad", "#d4d0e2"];
+const colors = ['#7b3634', '#a43838', '#d13835', '#df7d7a', '#e7a6a0', '#8b7833', '#bf9e34', '#eec650', '#fadc78', '#fae7a3', '#f9f4cc', '#4c693e', '#568544', '#7db16b', '#9bca88', '#426592', '#3f70d0', '#5a8cdc', '#7ca8e9', '#acc6f2', '#564884', '#796aad'];
+
 const randomBeta = ({alpha = 2.5, beta = 2.5} = {}) => d3.randomBeta(alpha, beta)();
 const rangeAlpha = [0.5, 4.5];
 const rangeBeta = [3.5, 0.5];
 const ticks = 10;
+
 const scaleValues = d3.scaleLinear().domain([0, 1]);
 const bin = d3.bin().domain(scaleValues.domain()).thresholds(scaleValues.ticks(ticks))
 const dataPoints = 1000;
@@ -44,10 +46,10 @@ const stack = d3
 const series = stack(dataStack);
 
 const margin = {
-    top: 20,
-    left: 20,
-    right: 20,
-    bottom: 20,
+    top: 15,
+    left: 35,
+    right: 0,
+    bottom: 15,
 }
 const width = 500;
 const height = 350;
@@ -62,7 +64,7 @@ main
   .attr('width', width)
   .attr('height', height);
 
-const scaleX = d3.scalePoint().domain(d3.range(ticks)).range([margin.left, width - margin.right]);
+const scaleX = d3.scaleLinear().domain([0, ticks - 1]).range([margin.left, width - margin.right]);
 const scaleY = scaleValues.range([height - margin.bottom, margin.top]);
 
 const area = d3
@@ -78,7 +80,9 @@ d3.select('svg')
     .attr('y', margin.top)
     .attr('width', (width - (margin.left + margin.right)))
     .attr('height', (height - (margin.top + margin.bottom)))
-    .attr('fill', '#e6e3f0');
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1);
 
 d3
     .select('svg')
@@ -90,3 +94,18 @@ d3
     .attr('d', d => area(d))
     .attr('fill', d => d.key)
     .attr('stroke', d => d.key);
+
+const formatValues = d3.format(".0%");
+const scaleTime = d3.scaleTime().domain([new Date('1990'), new Date('2020')]).range([0, ticks - 2]);
+const formatDate = d3.timeFormat('%Y');
+
+const xAxis = d3.axisBottom(scaleX).ticks(4).tickFormat(d => formatDate(scaleTime.invert(d))).tickSize(0).tickPadding(5);
+const yAxis = d3.axisLeft(scaleY).ticks(2).tickFormat(d => formatValues(d)).tickSize(0).tickPadding(5);
+
+d3.select('svg').append('g').attr('class', 'axis').attr('transform', `translate(${margin.left} ${height - margin.bottom})`).call(xAxis);
+d3.select('svg').append('g').attr('class', 'axis').attr('transform', `translate(${margin.left} 0)`).call(yAxis);
+d3.selectAll('.axis').selectAll('path').remove();
+
+d3.select('main').append('ul').selectAll('li').data([...colors].reverse()).enter().append('li');
+d3.selectAll('main ul li').append('svg').attr('viewBox', '-5 -5 10 10').attr('width', '1em').attr('height', '1em').append('circle').attr('r', 5).attr('fill', d => d);
+d3.selectAll('main ul li').append('span').text(d => d)
