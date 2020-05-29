@@ -28,11 +28,12 @@ I need to sort the visualizations better, but here it goes:
 
 - projects using D3 to create interesting visualizations.
 
-| Title                                                                  | Keys                   |
-| ---------------------------------------------------------------------- | ---------------------- |
-| [The Seasons of 2019](https://codepen.io/borntofrappe/pen/jOPeKZp)     | lineRadial, areaRadial |
-| [Positivity Tree](https://codepen.io/borntofrappe/pen/eYpNRRX)         | hierarchy, tree        |
-| [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)   | marker, line           |
-| [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV) | simulation, force, on  |
-| [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)              | bar, pie               |
-| [Turnip Turnabout](https://codepen.io/borntofrappe/pen/pojGaEZ)        | line, lineRadial       |
+| Title                                                                         | Keys                   |
+| ----------------------------------------------------------------------------- | ---------------------- |
+| [The Seasons of 2019](https://codepen.io/borntofrappe/pen/jOPeKZp)            | lineRadial, areaRadial |
+| [Positivity Tree](https://codepen.io/borntofrappe/pen/eYpNRRX)                | hierarchy, tree        |
+| [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)          | marker, line           |
+| [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV)        | simulation, force, on  |
+| [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)                     | bar, pie               |
+| [Turnip Turnabout](https://codepen.io/borntofrappe/pen/pojGaEZ)               | line, lineRadial       |
+| [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | stack, random          |

@@ -7,16 +7,19 @@
 }
 
 body {
-  background: hsl(0, 0%, 99%);
-  color: hsl(0, 0%, 35%);
+  background: hsl(0, 0%, 96%);
+  color: hsl(0, 0%, 20%);
   font-family: 'Open Sans', sans-serif;
 }
 
 main {
-  max-width: 50rem;
+  background: hsl(0, 0%, 98%);
+  box-shadow: 0 1px 10px -8px hsl(0, 0%, 20%);
+  padding: 1rem;
+  border-radius: 0.25rem;
+  max-width: 48rem;
   width: 90vw;
   margin: 1rem auto;
-  padding: 1rem;
 }
 
 main ul {
@@ -29,11 +32,12 @@ main > * + * {
 }
 
 @supports (display: grid) {
-  @media screen and (min-width: 50rem) {
+  @media screen and (min-width: 48rem) {
     main {
       display: grid;
       grid-template-areas: 'p ul' 'svg ul';
-      grid-gap: 1rem;
+      grid-template-columns: 1fr auto;
+      grid-gap: 1rem 2rem;
     }
     main > * + * {
       margin-top: initial;
@@ -46,10 +50,16 @@ main > * + * {
     }
     main ul {
       grid-area: ul;
+      justify-self: end;
+      align-self: end;
       display: initial;
       flex-wrap: initial;
     }
   }
+}
+
+main p {
+  line-height: 1.5;
 }
 
 main > svg {
@@ -61,19 +71,18 @@ main > svg {
 
 main > svg text {
   font-family: inherit;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
 main ul {
   line-height: 1.5;
   list-style: none;
-  float: right;
 }
 
 main ul li {
   display: flex;
   align-items: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   margin: 0.25rem;
 }
 
