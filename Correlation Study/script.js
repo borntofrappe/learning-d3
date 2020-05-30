@@ -839,5 +839,54 @@ const data = [{
 	js: 41
 }];
 
+const parseDate = d3.timeParse('%Y-%m-%dT%H')
+const formatDate = d3.timeFormat('%d %b')
+const values = data.reduce((acc, curr) => [...acc, curr.css, curr.js] ,[]);
+
 const main = d3.select('main');
-main.append('h1').text('Bonne chance');
+main.append('h1').text('CSS in JS');
+
+const scaleTime = d3.scaleTime().domain(d3.extent(data, d => parseDate(d.date)));
+const scaleValues = d3.scaleLinear().domain([0, d3.max(values)]);
+
+const margin = {
+    top: 20,
+    right: 20,
+    bottom: 20,
+    left: 20
+};
+
+const width = 500;
+const height = 100;
+
+main.append('svg').attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
+d3.select('svg').append('g').attr('id', 'viz').attr('transform', `translate(${margin.left} ${margin.top})`)
+
+scaleTime.range([0, width]);
+scaleValues.range([height, 0])
+
+const axisTime = d3.axisBottom(scaleTime).tickSize(0).tickPadding(10).ticks(5).tickFormat(d => formatDate(d));
+const axisValues = d3.axisLeft(scaleValues).tickSize(0).tickPadding(5).ticks(5);
+
+d3.select('#viz').append('g').attr('class', 'axis').call(axisTime).attr('transform', `translate(0 ${height})`);
+d3.select('#viz').append('g').attr('class', 'axis').call(axisValues);
+
+const line = d3.line().x(d => scaleTime(parseDate(d.date))).y(d => scaleValues(d.value));
+
+const dataCSS = data.map(({date, css}) => ({date, value: css}));
+const dataJS = data.map(({date, js}) => ({date, value: js}));
+d3
+    .select('#viz')
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'red')
+    .attr('stroke-width', 2)
+    .attr('d', line(dataCSS));
+
+d3
+    .select('#viz')
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'blue')
+    .attr('stroke-width', 2)
+    .attr('d', line(dataJS));
