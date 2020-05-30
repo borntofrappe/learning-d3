@@ -37,3 +37,4 @@ I need to sort the visualizations better, but here it goes:
 | [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)                     | bar, pie               |
 | [Turnip Turnabout](https://codepen.io/borntofrappe/pen/pojGaEZ)               | line, lineRadial       |
 | [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | stack, random          |
+| [Correlation Study](https://codepen.io/borntofrappe/pen/VwvodeX)              | line                   |

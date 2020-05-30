@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,7 +7,73 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: monospace;
+  background: hsl(225, 30%, 92%);
+  color: hsl(229, 17%, 25%);
+  font-family: 'Lato', sans-serif;
+}
+
+main {
+  margin: 1rem auto;
+  max-width: 45rem;
+  width: 90vw;
+  background: #f8f8fa;
+  padding: 1.5rem 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 30px -8px hsl(229, 17%, 25%, 0.2);
+  position: relative;
+}
+
+main h1 {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: initial;
+}
+
+main p {
+  float: right;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+main > svg {
+  margin: 1.5rem 0;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+main ul {
+  background: inherit;
+  box-shadow: inherit;
+  border-radius: inherit;
+  list-style: none;
+  font-size: 1.1rem;
+}
+
+main ul {
+  padding: 1rem 1.5rem;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+}
+
+main ul li {
+  display: flex;
+  align-items: baseline;
+}
+
+main ul > * + * {
+  margin-left: 1.25rem;
+}
+main ul li > * + * {
+  margin-left: 0.3em;
+}
+
+main ul li svg {
+  width: 0.8em;
+  height: auto;
+  display: block;
 }
