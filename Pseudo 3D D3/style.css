@@ -11,6 +11,7 @@ body {
   color: hsl(220, 90%, 98%);
   font-family: 'Ubuntu', sans-serif;
 }
+
 main {
   max-width: 35rem;
   width: 90vw;
@@ -18,22 +19,26 @@ main {
   display: flex;
   flex-direction: column;
 }
+
 main canvas {
   align-self: center;
 }
+
 main > * + * {
   margin-top: 1rem;
 }
+
 main p {
   line-height: 1.5;
 }
+
 main table {
   table-layout: fixed;
-  /* border-collapse: collapse; */
   max-width: 30rem;
   width: 100%;
   align-self: center;
 }
+
 main table th {
   text-align: initial;
   font-weight: initial;
@@ -41,17 +46,27 @@ main table th {
   font-size: 0.8rem;
   padding: 1rem 0.5rem;
 }
+
 main table td {
   font-size: 1.1rem;
   padding: 0.5rem;
 }
+
 main table thead tr {
   background: hsl(210, 50%, 20%);
 }
+
 main table tbody tr {
   background: hsl(210, 50%, 13%);
 }
 
 main table tbody tr:nth-of-type(even) {
   background: hsl(210, 50%, 16%);
+}
+
+main p:last-of-type {
+  align-self: flex-end;
+}
+main a {
+  color: inherit;
 }
