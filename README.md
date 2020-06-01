@@ -25,6 +25,7 @@ I need to sort the visualizations better, but here it goes:
 | [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)       | data, table, shape      |
 | [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)        | spider, lineRadial      |
 | [Percent Stacked Area Chart]()                                     | random, area            |
+| [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)         | area, marker            |
 
 - projects using D3 to create interesting visualizations.
 

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,6 +8,36 @@
 
 body {
   background: hsl(0, 0%, 98%);
-  color: hsl(0, 0%, 10%);
-  font-family: monospace;
+  color: hsl(0, 0%, 20%);
+  font-family: 'Overpass', sans-serif;
+}
+
+main {
+  max-width: 55rem;
+  margin: 1rem auto;
+  width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main h1 {
+  text-transform: capitalize;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+main > svg {
+  margin: 1rem 0 1.5rem;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+main > svg text {
+  font-family: inherit;
+}
+
+main a {
+  color: inherit;
 }
