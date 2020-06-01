@@ -16,16 +16,16 @@ I need to sort the visualizations better, but here it goes:
 
 - projects exploring the D3 library, its features and modules
 
-| Title                                                              | Keys                    |
-| ------------------------------------------------------------------ | ----------------------- |
-| [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)           | enter-update-exit, join |
-| [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB) | random, normal          |
-| [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)        | scale-chromatic, symbol |
-| [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)    | simulation              |
-| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)       | data, table, shape      |
-| [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)        | spider, lineRadial      |
-| [Percent Stacked Area Chart]()                                     | random, area            |
-| [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)         | area, marker            |
+| Title                                                                         | Keys                    |
+| ----------------------------------------------------------------------------- | ----------------------- |
+| [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)                      | enter-update-exit, join |
+| [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)            | random, normal          |
+| [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)                   | scale-chromatic, symbol |
+| [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)               | simulation              |
+| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)                  | data, table, shape      |
+| [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)                   | spider, lineRadial      |
+| [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | random, area            |
+| [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                    | area, marker            |
 
 - projects using D3 to create interesting visualizations.
 
