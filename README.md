@@ -26,6 +26,7 @@ I need to sort the visualizations better, but here it goes:
 | [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)                   | spider, lineRadial      |
 | [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | random, area            |
 | [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                    | area, marker            |
+| [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
 
 - projects using D3 to create interesting visualizations.
 

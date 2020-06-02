@@ -1,6 +1,6 @@
 # Chord Diagram
 
-<!-- ## [Live Demo]() -->
+## [Live Demo](https://codepen.io/borntofrappe/full/gOPObrL)
 
 Based on the network structure highlighted in [this project](https://codepen.io/borntofrappe/pen/qQZyor) create a diagram connecting the nodes in a circular pattern and through a series of ribbons.
 
