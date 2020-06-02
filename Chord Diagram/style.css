@@ -8,8 +8,6 @@ body {
   background: hsl(210, 60%, 90%);
   color: hsl(214, 100%, 10%);
   font-family: monospace;
-  --accent: hsl(185, 95%, 50%);
-  --accent: hsl(340, 75%, 85%);
 }
 
 main {
@@ -18,5 +16,11 @@ main {
   margin: 1rem auto;
   padding: 1.25rem;
   border-radius: 0.5rem;
-  background: hsl(210, 20%, 95%);
+  background: hsl(210, 20%, 98%);
+}
+
+main > svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
