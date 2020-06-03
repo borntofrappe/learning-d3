@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Biryani:wght@400;900&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,7 +7,28 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 10%);
-  font-family: monospace;
+  background: hsl(240, 20%, 10%);
+  font-family: 'Biryani', sans-serif;
+}
+
+main {
+  max-width: 40rem;
+  width: 95vw;
+  margin: 1rem auto;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  color: hsl(0, 0%, 100%);
+  background: hsl(240, 15%, 20%);
+  box-shadow: 0 2px 15px hsl(240, 20%, 10%);
+}
+
+main h1 {
+  font-size: 1.75rem;
+}
+
+main > svg {
+  margin-top: 1rem;
+  width: 100%;
+  height: auto;
+  display: block;
 }

@@ -27,6 +27,7 @@ I need to sort the visualizations better, but here it goes:
 | [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | random, area            |
 | [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                    | area, marker            |
 | [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
+| [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
 
 - projects using D3 to create interesting visualizations.
 
