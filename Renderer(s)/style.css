@@ -6,6 +6,28 @@
 
 body {
   background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
+  color: hsl(0, 0%, 10%);
   font-family: monospace;
+}
+
+main {
+  max-width: 42rem;
+  margin: 1rem auto;
+  width: 95vw;
+}
+main h1 {
+  font-weight: 500;
+  font-size: 1.25rem;
+  text-align: center;
+}
+main > svg {
+  margin-top: 1rem;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+main > svg text {
+  font-family: inherit;
+  font-size: 0.75rem;
 }

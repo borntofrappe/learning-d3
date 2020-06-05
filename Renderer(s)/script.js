@@ -1989,3 +1989,47 @@ const data = [
         value: 0.6268,
     }];
 
+    const main = d3.select('main');
+    main.append('h1').text('Monthly global surface air temperature anomalies');
+    
+    
+    const margin = {
+        top: 10,
+        right: 10,
+        bottom: 30,
+        left: 50,
+    };
+    const width = 500;
+    const height = 150;
+    
+    const max = d3.max(data, d => d.value);
+    const min = d3.min(data, d => d.value);
+    const extreme = d3.max([Math.abs(max), Math.abs(min)]);
+    
+    main
+        .append('svg')
+        .attr('viewBox', `-${margin.left} -${margin.top} ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
+        .attr('width', width + (margin.left + margin.right))
+        .attr('height', height + (margin.top + margin.bottom));
+    
+    const timeParse = d3.timeParse('%Y %m');
+    const xScale = d3.scaleTime().domain(d3.extent(data, d => timeParse(d.date))).range([0, width]);
+    const yScale = d3.scaleLinear().domain([extreme * -1, extreme]).range([height, 0]).nice();
+    
+    const xAxis = d3.axisBottom(xScale).ticks(10).tickSize(0).tickPadding(10);
+    const yAxis = d3.axisLeft(yScale).ticks(5).tickSize(0);
+    
+    d3.select('svg').append('g').attr('class', 'axes');
+    d3.select('.axes').append('g').attr('transform', `translate(0 ${height})`).call(xAxis);
+    d3.select('.axes').append('g').call(yAxis);
+    d3.select('.axes').append('path').attr('d', `M 0 0 h ${width} v ${height}`).attr('fill', 'none').attr('stroke', 'currentColor').attr('stroke-width');
+    d3.select('.axes').append('path').attr('d', `M 0 ${yScale(0)} h ${width}`).attr('fill', 'none').attr('stroke', 'currentColor').attr('stroke-width');
+    d3.select('.axes').append('text').text('°C').attr('transform', `translate(-${margin.left} ${yScale(0)})`)
+
+    d3.select('svg').append('g').attr('class', 'viz');
+    d3.select('.viz').selectAll('rect').data(data).enter().append('rect')
+    .attr('fill', d => d.value > 0 ? 'red' : 'blue')
+    .attr('x', d => xScale(timeParse(d.date)))
+    .attr('y', d => d.value > 0 ? yScale(d.value) : yScale(0))
+    .attr('width', width / data.length)
+    .attr('height', d => d.value > 0 ? yScale(0) - yScale(d.value) : yScale(d.value) - yScale(0))
