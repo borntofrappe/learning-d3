@@ -28,6 +28,7 @@ I need to sort the visualizations better, but here it goes:
 | [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                    | area, marker            |
 | [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
 | [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
+| [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                    | d3, react               |
 
 - projects using D3 to create interesting visualizations.
 

@@ -1,12 +1,11 @@
 import React from 'react';
 import { href, data } from './data.js';
 import * as d3 from 'd3';
-import { timeFormat } from 'd3';
 
 function App() {
   const margin = {
     top: 10,
-    right: 10,
+    right: 15,
     bottom: 30,
     left: 50,
   };
@@ -22,11 +21,13 @@ function App() {
 
   const timeParse = d3.timeParse('%Y %m');
   const timeFormat = d3.timeFormat('%Y');
+  const valueFormat = d3.format('.1f');
 
   const xScale = d3
     .scaleTime()
     .domain(d3.extent(data, (d) => timeParse(d.date)))
     .range([padding, width - padding]);
+
   const yScale = d3
     .scaleLinear()
     .domain([extreme * -1, extreme])
@@ -41,12 +42,17 @@ function App() {
     return value > 0 ? '#FF300F' : '#4E98CA';
   };
 
-  const yAxis = d3.ticks(extreme * -1, extreme, 5);
-  const xAxis = d3.ticks(
-    timeParse(data[0].date),
-    timeParse(data[data.length - 1].date),
-    8
-  );
+  const xTicks = 6;
+  const xAxis = Array(xTicks - 1)
+    .fill()
+    .map((v, index, { length }) => (index * width) / length);
+  xAxis.push(width);
+
+  const yTicks = 6;
+  const yAxis = Array(yTicks - 1)
+    .fill()
+    .map((v, index, { length }) => (index * height) / length);
+  yAxis.push(height);
 
   return (
     <main>
@@ -88,20 +94,25 @@ function App() {
             fill="none"
             stroke="currentColor"
           />
-          {xAxis.map((tick) => (
-            <g key={tick} transform={`translate(${xScale(tick)} ${height})`}>
-              <text y="15" textAnchor="middle">
-                {timeFormat(tick)}
-              </text>
-            </g>
-          ))}
-          {yAxis.map((tick) => (
-            <g key={tick} transform={`translate(0 ${yScale(tick)})`}>
-              <text x="-5" textAnchor="end" dominantBaseline="middle">
-                {tick}
-              </text>
-            </g>
-          ))}
+          <g class="axis axis-x" transform={`translate(0 ${height + 20})`}>
+            {xAxis.map((tick) => (
+              <g key={tick} transform={`translate(${tick} 0)`}>
+                <text textAnchor="middle">
+                  {timeFormat(xScale.invert(tick))}
+                </text>
+              </g>
+            ))}
+          </g>
+
+          <g class="axis axis-y" transform="translate(-5 0)">
+            {yAxis.map((tick) => (
+              <g key={tick} transform={`translate(0 ${tick})`}>
+                <text textAnchor="end" dominantBaseline="middle">
+                  {valueFormat(yScale.invert(tick))}
+                </text>
+              </g>
+            ))}
+          </g>
           <text x={-margin.left} y={yScale(0)}>
             °C
           </text>
