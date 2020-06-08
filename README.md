@@ -29,6 +29,7 @@ I need to sort the visualizations better, but here it goes:
 | [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
 | [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
 | [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                    | d3, react               |
+| Bins                                                                          | bin, random             |
 
 - projects using D3 to create interesting visualizations.
 
