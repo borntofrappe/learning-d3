@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Mono&family=Roboto+Slab:wght@700&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,7 +7,105 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: monospace;
+  background:#dfe0e3;
+  color: #1c1c1e;
+  font-family: 'Roboto', sans-serif;
+}
+
+main {
+  padding: 1rem;
+  max-width: 50rem;
+  width: 90vw;
+  margin: 1rem auto;
+  background: #f3f4f8;
+  box-shadow: 0 2px 10px #dfe0e3;  
+}
+
+main > * {
+  padding: 1rem;
+  background: #ffffff;
+}
+
+main > * + * {
+  margin-top: 0.5rem;
+}
+
+@supports (display: grid) {
+  main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-gap: 1rem;
+  }
+
+  main > * + * {
+    margin-top: initial;
+  }
+
+  header {
+    grid-column: 1/-1;
+  }
+
+  main article {
+  justify-self: center;
+
+  }
+}
+
+header {
+  margin: -1rem;
+  margin-bottom: 0.5rem;
+}
+
+main article {
+  display: flex;
+  flex-direction: column;
+}
+
+main article:nth-of-type(2) {
+  max-width: 20rem;
+}
+
+svg {
+  margin-top: auto;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+h1, h2 {
+  font-family: 'Roboto Slab', serif;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+p, dl {
+  font-size: 1.2rem;
+}
+
+dt {
+  margin-bottom: 0.35rem;
+}
+
+dd {
+  margin-left: 1em;
+  position: relative;
+  margin-bottom: 0.75rem;
+}
+
+dd:before {
+  content:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10' width='1em' height='1em'%3E%3Cpath fill='none' stroke='currentColor' stroke-width='1' d='M 2.5 0 a 5 5 0 0 0 5 5 l -2 -2 2 2 -2 2' /%3E%3C/svg%3E");
+}
+
+code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1em;
+  border-bottom: 2px solid #dfe0e3;
+  padding: 0.1rem 0;
 }
