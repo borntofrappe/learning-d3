@@ -44,3 +44,4 @@ I need to sort the visualizations better, but here it goes:
 | [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | stack, random          |
 | [Correlation Study](https://codepen.io/borntofrappe/pen/VwvodeX)              | line                   |
 | [Pseudo 3D D3](https://codepen.io/borntofrappe/pen/yLeBLYX)                   | zdog                   |
+| Football Stats                                                                | squares, hexagons      |
