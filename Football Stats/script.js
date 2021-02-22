@@ -150,19 +150,29 @@ const data = [
   },
 ];
 
+const tooltip = d3
+  .select('body')
+  .append('div')
+  .attr('id', 'tooltip');
+
 const main = d3.select('body').append('main');
 main.append('h1').text('Football Stats');
 
 const section = main.append('section');
-const tooltip = d3.select('body').append('div').attr('id', 'tooltip');
 section
   .append('h2')
   .text(
-    'In the European League competition, the success of French teams has been minimal.'
+    `Since ${
+      data[0].year
+    }, French teams have reached the final stage of the European League ${
+      data.filter(
+        ({ stage }) => stage.replace(/\W+/g, '').toLowerCase() == 'final'
+      ).length
+    } times, losing each match.`
   );
 
 const width = 800;
-const height = 90;
+const height = 100;
 const margin = {
   top: 20,
   right: 20,
@@ -170,12 +180,21 @@ const margin = {
   left: 100,
 };
 
-const svg = section.append('svg').attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`);
-const svgGroup = svg.append('g').attr('transform', `translate(${margin.left} ${margin.top})`)
+const svg = section
+  .append('svg')
+  .attr(
+    'viewBox',
+    `0 0 ${width + margin.left + margin.right} ${height +
+      margin.top +
+      margin.bottom}`
+  );
+const svgGroup = svg
+  .append('g')
+  .attr('transform', `translate(${margin.left} ${margin.top})`);
 
 const xScale = d3
   .scaleBand()
-  .domain(data.map(({year}) => year))
+  .domain(data.map(({ year }) => year))
   .range([0, width]);
 
 const yScale = d3
@@ -183,41 +202,98 @@ const yScale = d3
   .domain(stages)
   .range([height, 0]);
 
-const padding = 0.25;
-const size = d3.min([xScale.bandwidth(), yScale.bandwidth()]) * (1 - padding)
-
 const yAxis = d3
   .axisLeft(yScale)
   .tickSize(5)
   .tickSizeOuter(0);
 
-const yAxisGroup =  svgGroup.append('g').call(yAxis);
-
-yAxisGroup.selectAll('text').style('font-weight', '700').style('font-size', '14');
+// show the stages on the y axis
+const yAxisGroup = svgGroup.append('g').call(yAxis);
+yAxisGroup
+  .selectAll('text')
+  .style('font-weight', '700')
+  .style('font-size', '14');
 yAxisGroup.selectAll('line').attr('stroke-width', '0.5');
 yAxisGroup.selectAll('path').attr('stroke-width', '0.5');
 
+// wrap the data in a <g> element
 const dataGroup = svgGroup.append('g');
-const dataYearGroups = dataGroup.selectAll('g').data(data).enter().append('g').attr('transform', ({year}) => `translate(${xScale(year)} ${height})`)
-const dataStageGroups = dataYearGroups.selectAll('g').data(({stage}) => [...stages.slice(0, stages.indexOf(stage) + 1)]).enter().append('g').attr('class', d => d.replace(/\W+/g, '').toLowerCase()).attr('transform', (d, i) => `translate(${xScale.bandwidth() / 2} ${(i * yScale.bandwidth() + yScale.bandwidth() / 2) * -1})`);
-dataStageGroups.append('rect').attr('transform', `translate(${size / 2 * -1} ${size / 2 * -1})`).attr('width', size).attr('height', size).attr('fill', 'currentColor')
+// include one group for each year and on the x axis
+const dataYearGroups = dataGroup
+  .selectAll('g')
+  .data(data)
+  .enter()
+  .append('g')
+  .attr('transform', ({ year }) => `translate(${xScale(year)} ${height})`);
 
-dataYearGroups.selectAll('.final').style('color', '#ff3232')
-dataYearGroups.append('rect').attr('transform', `translate(0 ${-height})`).attr('width', xScale.bandwidth()).attr('height', height).attr('opacity', 0)
-dataYearGroups.on('mouseenter', function(d) {
-  d3.select(this).selectAll('g').attr('class', 'hover');
+// include one group for each stage reached in the year (consider the stages in order)
+const dataStageGroups = dataYearGroups
+  .selectAll('g')
+  .data(({ stage }) => [...stages.slice(0, stages.indexOf(stage) + 1)])
+  .enter()
+  .append('g')
+  .attr('class', d => d.replace(/\W+/g, '').toLowerCase())
+  .attr(
+    'transform',
+    (d, i) =>
+      `translate(${xScale.bandwidth() / 2} ${(i * yScale.bandwidth() +
+        yScale.bandwidth() / 2) *
+        -1})`
+  );
 
-  tooltip.style('left', `${d3.event.x + xScale.bandwidth()}px`);
-  tooltip.style('top', `${d3.event.y}px`);
+// include a square for each stage, picking from the smallest band width
+const squarePadding = 0.125;
+const squareSize =
+  d3.min([xScale.bandwidth(), yScale.bandwidth()]) * (1 - squarePadding * 2);
+    
+dataStageGroups
+  .append('rect')
+  .attr(
+    'transform',
+    `translate(${(squareSize / 2) * -1} ${(squareSize / 2) * -1})`
+  )
+  .attr('width', squareSize)
+  .attr('height', squareSize)
+  .attr('fill', 'currentColor');
+
+// update the rectangles nested in the .final <g> elements to have a reddish hue
+dataYearGroups.selectAll('.final').style('color', '#ff3232');
+
+// include transparent rectangles spanning the height of each year to ease mouse interaction
+dataYearGroups
+  .append('rect')
+  .attr('transform', `translate(0 ${height * -1})`)
+  .attr('width', xScale.bandwidth())
+  .attr('height', height)
+  .attr('opacity', 0);
+
+// show the tooltip on hover
+dataYearGroups.on('mouseenter', (event, d) => {
+  d3.select(event.currentTarget)
+    .selectAll('g')
+    .attr('class', 'hover');
+
+  const { stage, year, teams } = d;
+
+  tooltip.style('left', `${event.x + xScale.bandwidth()}px`);
+  tooltip.style('top', `${event.y}px`);
   tooltip.style('display', 'block');
-  tooltip.append('p').text(d.stage);
+  tooltip.append('p').text(`${stage} in ${year}`);
   tooltip.append('ul');
-  tooltip.select('ul').selectAll('li').data(d.teams).enter().append('li').text(d => d);
-})
+  tooltip
+    .select('ul')
+    .selectAll('li')
+    .data(teams)
+    .enter()
+    .append('li')
+    .text(d => d);
+});
 
-dataYearGroups.on('mouseleave', function() {
-  d3.select(this).selectAll('g').attr('class', '')
+dataYearGroups.on('mouseleave', ({ currentTarget }) => {
+  d3.select(currentTarget)
+    .selectAll('g')
+    .attr('class', '');
   tooltip.style('display', 'none');
   tooltip.select('p').remove();
   tooltip.select('ul').remove();
-})
+});

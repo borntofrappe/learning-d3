@@ -12,14 +12,32 @@ A first visualization replicates the graph proposed in the article, where a seri
 
 A second visualization, however, presents the same information with a different visual. Here the goal is to focus on individual years, showing the different stages of the competition with a more artsy `<svg>` element.
 
-## Layered squares
+## D3 V6
 
-The goal is to highlight
+One considerable (and breaking) change introduced with the most recent version of D3 relates to how the library manages events. Version 6 deprecates `d3.event`, in favour of an `event` received as the first argument of the callback function. The datum for the selected element is now described by the second argument.
 
-```txt
-Final
-Semi-finals                 o
-Quarter-finals              o     o     o
-Second round                o     o  o  o
-Group stage or first round  o  o  o  o  o  o  o
+```js
+// v5
+dataYearGroups.on('mouseenter', function(d) {
+  d3.event.x;
+  d3.event.y;
+}
+
+// v6
+dataYearGroups.on('mouseenter', function(event, d) {
+  event.x;
+  event.y;
+}
+```
+
+It is also possible to use an arrow function and have access to `this` through `event.currentTarget`, which provides an alternative way to select the element.
+
+```js
+dataYearGroups.on('mouseenter', function(event, d) {
+  d3.select(this);
+}
+
+dataYearGroups.on('mouseenter', (event, d) => {
+  d3.select(event.currentTarget);
+}
 ```
