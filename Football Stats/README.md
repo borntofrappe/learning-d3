@@ -4,11 +4,17 @@
 
 ## Notes
 
-Here I set out to create a couple of visualizations connected to football. The first analyzes the lackluster success of French teams in the European League competition, while the second wants to show the contribution of the players of the Paris-Saint-Germain team, and in the context of the Champions League competition. The first visualization is set to replicate the visual from [this article from lemonde.fr](https://www.lemonde.fr/les-decodeurs/article/2018/05/04/marseille-club-francais-recordman-des-finales-europeennes-depuis-1980_5294581_4355770.html), while the second is loosely inspired by [this other article from lemonde.fr](https://www.lemonde.fr/les-decodeurs/article/2021/02/16/en-un-graphique-le-parcours-du-psg-en-ligue-des-champions_6070145_4355770.html).
+A more apt title would be _the lackluster success of French teams in the European League competition_.
 
-## Squares
+Inspired by [this article from lemonde.fr](https://www.lemonde.fr/les-decodeurs/article/2018/05/04/marseille-club-francais-recordman-des-finales-europeennes-depuis-1980_5294581_4355770.html), I set out to highlight the highest stage of competition reached by any French team in the European League.
 
-The goal is to highlight the highest stage of competition reached by any French team in the European League. This with a series of squares layered on top of each other.
+A first visualization replicates the graph proposed in the article, where a series of squares a layered on top of one another to highlight the different stages year by year. I took the liberty of expanding the dataset, but substantially, the visual is the same.
+
+A second visualization, however, presents the same information with a different visual. Here the goal is to focus on individual years, showing the different stages of the competition with a more artsy `<svg>` element.
+
+## Layered squares
+
+The goal is to highlight
 
 ```txt
 Final
