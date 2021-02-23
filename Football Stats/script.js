@@ -297,3 +297,192 @@ dataYearGroups.on('mouseleave', ({ currentTarget }) => {
   tooltip.select('p').remove();
   tooltip.select('ul').remove();
 });
+
+const sectionYear = main.append('section');
+sectionYear
+  .append('h2')
+  .style('display', 'inline')
+  .text(
+    'Select a year to highlight a specific round: '
+  );
+  
+const select = sectionYear
+    .append('select')
+    .attr('name', 'year')
+    .attr('id', 'year-select');
+
+  select
+    .selectAll('option')
+    .data(data.map(({year}) => year)).enter()
+    .append('option')
+    .attr('value', d => d).text(d => d);
+
+const svgYear = sectionYear
+  .append('svg')
+  .attr('viewBox', '0 0 480 200');
+    
+
+const trophyGroup = svgYear
+  .append('g')
+  .attr('id', 'year-trophy')
+  .attr('transform', 'translate(428 93)')
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 4);
+
+trophyGroup
+  .append('rect')
+  .attr('y', -8)
+  .attr('width', 32)
+  .attr('height', 8)
+  .attr('rx', 4)
+
+trophyGroup
+  .append('rect')
+  .attr('x', 4)
+  .attr('y', -14)
+  .attr('width', 24)
+  .attr('height', 6)
+  .attr('rx', 3)
+
+  trophyGroup
+  .append('path')
+  .attr('d', "M 16 -14 v -5 a 18 18 0 0 1 -18 -18 v -20 h 36 v 20 a 18 18 0 0 1 -18 18")
+
+  trophyGroup
+  .append('rect')
+  .attr('x', -8)
+  .attr('y', -67)
+  .attr('width', 48)
+  .attr('height', 10)
+  .attr('rx', 5)
+
+  trophyGroup
+  .append('path')
+  .attr('d', "M 0 -34 h -2 a 8 8 0 0 1 0 -16 h 2")
+
+
+  trophyGroup
+  .append('path')
+  .attr('d', "M 32 -34 h 2 a 8 8 0 0 0 0 -16 h -2")
+
+const pathsGroup = svgYear
+.append('g')
+.attr('transform', 'translate(0 197.5)')
+.attr('fill', 'none')
+.attr('stroke', 'currentColor')
+.attr('stroke-width', '5')
+
+pathsGroup
+.append('path')
+.attr('opacity', 0.2)
+.attr('d', 'M 0 0 h 40 c 20 0 20 -20 40 -20 h 40 c 20 0 20 -20 40 -20 h 40 c 20 0 20 -20 40 -20 h 40 c 20 0 20 -20 40 -20 h 40 c 20 0 20 -20 40 -20 h 80')
+
+const pathsStagesGroup = pathsGroup
+  .append('g')
+  .attr('id', 'year-stages')
+
+pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 0 0 h 40')
+  pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 40 0 c 20 0 20 -20 40 -20 h 40')
+
+  pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 120 -20 c 20 0 20 -20 40 -20 h 40')
+  pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 200 -40 c 20 0 20 -20 40 -20 h 40')
+  pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 280 -60 c 20 0 20 -20 40 -20 h 40')
+  pathsStagesGroup
+  .append('path')
+  .attr('d', 'M 360 -80 c 20 0 20 -20 40 -20 h 80')
+
+const textGroup = svgYear
+.append('g')
+.attr('id', 'year-text')
+.attr('transform', 'translate(0 26)')
+.attr('fill', 'currentColor')
+.attr('stroke', 'none')
+.attr('font-family', 'inherit')
+
+textGroup
+  .append('text')
+  .attr('font-weight', '700')
+  .attr('font-size', 24)
+
+
+const groupTextTeams = textGroup
+  .append('text')
+  .attr('y', 24)
+  .attr('font-size', 14);
+
+
+  d3.select('g#year-text text')
+  .text(`${data[0].stage} in ${data[0].year}`)
+
+  d3.select('g#year-text text:nth-of-type(2)')
+  .selectAll('tspan')
+  .data(data[0].teams)
+  .enter()
+  .append('tspan')
+  .text(d => d)
+      .attr('x', 0)
+      .attr('dy', (d, i) => i === 0 ? 0 : 24)
+
+
+
+d3
+  .select('#year-trophy').attr('opacity', data[0].stage.replace(/\W+/g, '').toLowerCase() === 'trophy' ? 1 : 0.2)
+
+
+  d3
+    .selectAll('g#year-stages path')
+    .attr('stroke-dasharray', function() {
+      return this.getTotalLength();
+    })
+    .attr('stroke-dashoffset', function(d, i) {
+      return i === 0 ? 0 : this.getTotalLength();
+    })
+
+
+
+select
+  .on('input', handleSelect);
+
+function handleSelect(e) {
+  const {value: year} = e.target;
+  const datum = data.find(d => d.year == year);
+  d3.select('g#year-trophy')
+    .attr('opacity', datum.stage.replace(/\W+/g, '').toLowerCase() == 'trophy' ? 1 : 0.2)
+
+  d3
+    .selectAll('g#year-stages path')
+    .attr('stroke-dashoffset', function(d, i) {
+      const index = stages.indexOf(datum.stage);
+      return index >= i || index === -1 ? 0 : this.getTotalLength();
+    });
+
+    d3
+      .select('g#year-text text')
+      .text(`${datum.stage} in ${datum.year}`)
+
+      d3
+      .select('g#year-text text:nth-of-type(2)')
+      .selectAll('tspan')
+      .remove()
+
+      d3
+      .select('g#year-text text:nth-of-type(2)')
+      .selectAll('tspan')
+      .data(datum.teams)
+      .enter()
+      .append('tspan')
+      .text(d => d)
+      .attr('x', 0)
+      .attr('dy', (d, i) => i === 0 ? 0 : 24)
+}

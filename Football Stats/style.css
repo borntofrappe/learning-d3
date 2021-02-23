@@ -19,7 +19,7 @@ main {
 }
 
 main > * + * {
-  margin-top: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 h1 {
@@ -80,4 +80,11 @@ svg .hover {
 #tooltip ul {
   font-size: 1rem;
   list-style: inside;
+}
+
+select {
+  padding: 0.1rem 0.2rem;
+  border: none;
+  font-family: inherit;
+  font-weight: bold;
 }
