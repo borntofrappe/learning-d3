@@ -1,6 +1,6 @@
 # Football Stats
 
-<!-- ## [Live Demo]() -->
+## [Live Demo](https://codepen.io/borntofrappe/full/eYBeJjL)
 
 ## Notes
 

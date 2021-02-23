@@ -14,7 +14,7 @@ const data = [
   },
   {
     year: '1973',
-    stage: 'Trophy',
+    stage: 'Earlier stages',
     teams: ['Nîmes Olympique SC', 'FC Sochaux'],
   },
   { year: '1974', stage: 'Eight-finals', teams: ['OGC Nice'] },
@@ -150,6 +150,15 @@ const data = [
   },
 ];
 
+/* FIRST VISUALIZATION
+layer a series of shapes to highlight the highest stage reached in a given year
+
+ ^           o
+stage        oo   o     
+ |        o ooo  oo     
+        oooooooooooo   
+          -year>
+*/
 const tooltip = d3
   .select('body')
   .append('div')
@@ -298,6 +307,19 @@ dataYearGroups.on('mouseleave', ({ currentTarget }) => {
   tooltip.select('ul').remove();
 });
 
+/* SECOND VISUALIZATION
+detail a specific year through text and a series of path elements
+
+STAGE in YEAR
+TEAM
+TEAM
+                  ... TROPHY
+            ----
+          /
+      ---
+    /
+---
+*/
 const sectionYear = main.append('section');
 sectionYear
   .append('h2')
@@ -412,6 +434,7 @@ textGroup
   .attr('y', 24)
   .attr('font-size', 14);
 
+// default the visual to match the first data point
 d3.select('g#year-text text').text(`${data[0].stage} in ${data[0].year}`);
 
 d3.select('g#year-text text:nth-of-type(2)')
@@ -436,7 +459,9 @@ d3.selectAll('g#year-stages path')
     return i === 0 ? 0 : this.getTotalLength();
   });
 
+// update the visual with the selected year
 function handleSelect(e) {
+  const transitionDuration = 200;
   const { value: year } = e.target;
 
   const datum = data.find(d => d.year === year);
@@ -444,7 +469,7 @@ function handleSelect(e) {
     .transition()
     .delay(
       datum.stage.replace(/\W+/g, '').toLowerCase() === 'trophy'
-        ? 200 * (stages.length + 1)
+        ? transitionDuration * (stages.length + 1)
         : 0
     )
     .attr(
@@ -453,12 +478,12 @@ function handleSelect(e) {
     );
 
   d3.selectAll('g#year-stages path')
-    .transition(200)
+    .transition(transitionDuration)
     .attr('stroke-dashoffset', function() {
       return this.getTotalLength();
     })
-    .transition(200)
-    .delay((d, i) => i * 200)
+    .transition(transitionDuration)
+    .delay((d, i) => i * transitionDuration)
     .attr('stroke-dashoffset', function(d, i) {
       const index = stages.indexOf(datum.stage);
       return index >= i || index === -1 ? 0 : this.getTotalLength();
