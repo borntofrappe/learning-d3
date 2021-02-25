@@ -1,10 +1,11 @@
-/* data collected from the [WHO Influenza Surveillance Outputs](https://www.who.int/influenza/resources/charts/en/)
+/* DATASET
+data collected from the [WHO Influenza Surveillance Outputs](https://www.who.int/influenza/resources/charts/en/)
 - Australia
 - week 14 to 31 (mid-autumn to winter)
 - years 2017 to 2020
-- positive and negative tests (all subtypes)
+- positive and negative tests (all subtypes combined)
 */
-const data = [
+const dataset = [
   {
     year: 2020,
     tests: [
@@ -98,3 +99,23 @@ const data = [
     ],
   },
 ];
+
+/* DATA
+compute the total number of tests and the percentage of positive values
+each week should be described by the following object
+{
+  week,
+  positive,
+  negative,
+  total,
+  percentage
+}
+*/
+const format = d3.format('.2f');
+const data = dataset.map(({year, tests}) => ({
+  year,
+  tests: tests.map(test => Object.assign({}, test, {
+    percentage: format(test.positive / (test.positive + test.negative))
+  }))
+}))
+
