@@ -101,21 +101,214 @@ const dataset = [
 ];
 
 /* DATA
-compute the total number of tests and the percentage of positive values
 each week should be described by the following object
 {
   week,
   positive,
   negative,
-  total,
   percentage
 }
-*/
-const format = d3.format('.2f');
-const data = dataset.map(({year, tests}) => ({
-  year,
-  tests: tests.map(test => Object.assign({}, test, {
-    percentage: format(test.positive / (test.positive + test.negative))
-  }))
-}))
 
+round the percentage to have 3 numbers after the decimal point
+*/
+const data = dataset.map(({ year, tests }, i, { length }) => ({
+  year,
+  color: `hsl(${(i * 360) / length}, 70%, 50%)`,
+  tests: tests.map(test =>
+    Object.assign({}, test, {
+      percentage: parseFloat(
+        d3.format('.3f')(test.positive / (test.positive + test.negative))
+      ),
+    })
+  ),
+}));
+
+/* VISUALIZATION */
+const margin = {
+  top: 80,
+  right: 20,
+  bottom: 80,
+  left: 80,
+};
+
+const width = 600;
+const height = 300;
+
+const div = d3.select('body').append('div');
+div
+  .append('h2')
+  .text(
+    'Health measures result in a considerable decline in influenza activity'
+  );
+div
+  .append('p')
+  .text(
+    'Percentage of positive tests for influenza, for Australia, the winter season, and the years 2017 to 2020.'
+  );
+
+const viz = div
+  .append('svg')
+  .attr('viewBox', [
+    0,
+    0,
+    width + margin.left + margin.right,
+    height + margin.top + margin.bottom,
+  ])
+  .append('g')
+  .attr('transform', `translate(${margin.left} ${margin.top})`);
+
+/* SCALES */
+const xScale = d3
+  .scaleBand()
+  .domain(data[0].tests.map(({ week }) => week))
+  .range([0, width]);
+
+// the upper threshold rounds up the maximum percentage to the nearest tenth
+const percentageMax = d3.max(
+  data.map(({ tests }) => d3.max(tests, ({ percentage }) => percentage))
+);
+const upperThreshold = d3.format('.1f')(Math.min(1, percentageMax + 0.05));
+const yScale = d3
+  .scaleLinear()
+  .domain([0, upperThreshold])
+  .range([height, 0]);
+
+/* AXES */
+const xAxis = d3
+  .axisBottom(xScale)
+  .tickSizeOuter(0)
+  .tickSize(0)
+  .tickPadding(5);
+
+viz
+  .append('g')
+  .attr('id', 'x-axis')
+  .attr('transform', `translate(0 ${height})`)
+  .call(xAxis);
+
+d3.select('#x-axis')
+  .selectAll('line')
+  .attr('stroke-width', '0.5');
+d3.select('#x-axis')
+  .selectAll('g.tick text')
+  .attr('font-size', 12);
+d3.select('#x-axis')
+  .append('text')
+  .attr('transform', `translate(${width / 2} ${margin.bottom / 2})`)
+  .text('Week')
+  .attr('fill', 'currentColor')
+  .attr('font-size', 16)
+  .style('text-transform', 'uppercase');
+
+const yAxis = d3
+  .axisLeft(yScale)
+  .tickSizeOuter(0)
+  .ticks(6)
+  .tickPadding(0);
+
+viz
+  .append('g')
+  .attr('id', 'y-axis')
+  .call(yAxis);
+
+d3.select('#y-axis')
+  .selectAll('g.tick:nth-of-type(odd)')
+  .append('path')
+  .attr('d', `M 0 0 h ${width}`)
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', '0.5')
+  .attr('opacity', 0.5);
+d3.select('#y-axis')
+  .selectAll('g.tick:nth-of-type(even)')
+  .attr('opacity', 0);
+d3.select('#y-axis')
+  .selectAll('line')
+  .attr('opacity', 0);
+d3.select('#y-axis')
+  .select('path')
+  .attr('opacity', 0);
+d3.select('#y-axis')
+  .selectAll('g.tick text')
+  .attr('font-size', 12);
+d3.select('#y-axis')
+  .append('text')
+  .attr('transform', `translate(-${margin.left / 2} ${height / 2}) rotate(-90)`)
+  .text('Percentage positive')
+  .attr('fill', 'currentColor')
+  .attr('font-size', 16)
+  .attr('text-anchor', 'middle')
+  .style('text-transform', 'uppercase');
+
+/* LEGEND */
+const groupLegend = viz
+  .append('g')
+  .selectAll('g')
+  .data([...data].reverse())
+  .enter()
+  .append('g')
+  .style('color', d => d.color)
+  .attr(
+    'transform',
+    (d, i, { length }) =>
+      `translate(${((i + 1) * width) / (length + 1)} -${margin.top / 2})`
+  );
+
+groupLegend
+  .append('circle')
+  .attr('cx', -10)
+  .attr('cy', -1)
+  .attr('r', 4)
+  .attr('fill', 'currentColor')
+  .attr('stroke', 'none');
+
+groupLegend
+  .append('text')
+  .text(({ year }) => year)
+  .attr('font-size', 20)
+  .attr('dominant-baseline', 'middle');
+
+/* LINES */
+const line = d3
+  .line()
+  .x(({ week }) => xScale(week) + xScale.bandwidth() / 2)
+  .y(({ percentage }) => yScale(percentage))
+  .curve(d3.curveBasis);
+
+const groupLines = viz
+  .append('g')
+  .selectAll('g')
+  .data(data)
+  .enter()
+  .append('g')
+  .style('color', d => d.color);
+
+groupLines
+  .append('path')
+  .attr('d', d => line(d.tests))
+  .attr('fill', 'none')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 3);
+
+groupLines
+  .append('circle')
+  .attr('fill', '#fff')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 2)
+  .attr('r', 4)
+  .attr('cx', d => xScale(d.tests[0].week) + xScale.bandwidth() / 2)
+  .attr('cy', d => yScale(d.tests[0].percentage));
+
+groupLines
+  .append('circle')
+  .attr('fill', '#fff')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 2)
+  .attr('r', 4)
+  .attr('cx', d => xScale(d.tests[d.tests.length - 1].week) + xScale.bandwidth() / 2)
+  .attr('cy', d => yScale(d.tests[d.tests.length - 1].percentage));
+
+div
+  .append('a')
+  .text('Source')
+  .attr('href', 'https://www.who.int/influenza/resources/charts/en/');

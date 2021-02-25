@@ -35,3 +35,48 @@ _Please note:_ creating a different variable is ultimately a preference, and it 
 ```js
 dataset.forEach(...)
 ```
+
+## Visualization
+
+The visualization is render in an `<svg>` element with an arbitray width and height.
+
+### Scales
+
+The first step to create the scale mapping the data horizontally and vertically.
+
+Horizontally, the graph is set to describe the numbered weeks, so that is useful to rely on a `scaleBand`.
+
+```js
+const xScale = d3
+  .scaleBand()
+  .domain(data[0].tests.map(({ week }) => week))
+  .range([0, width]);
+```
+
+The scale divides the `[0, width]` space in sections of equal width.
+
+Vertically, the chart displays the percentages of positive tests, and it would be possible to consider a `[0, 1]` range. Ultimately though, I decided to use the maximum percentage. This choice is bound to influence how data is perceived, but it is helpful to show smaller differences (it also allows additional practice with array functions and `d3.max`).
+
+```js
+const percentageMax = d3.max(
+  data.map(({ tests }) => d3.max(tests, ({ percentage }) => percentage))
+);
+```
+
+To leave enough whitespace above the tallest percentage, I decided to then round the number up to the nearest tenth. A percentage of `0.43` would create an upper threshold of `0.5`.
+
+```js
+d3.format('.1f')(percentageMax + 0.05);
+```
+
+While the specific dataset doesn't include a percentage greater than `0.95`, it is finally helpful to cap the value at `1`.
+
+```js
+d3.format('.1f')(Math.min(1, percentageMax + 0.05));
+```
+
+### Axes
+
+### Legend
+
+### Lines
