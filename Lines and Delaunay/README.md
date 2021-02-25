@@ -22,7 +22,7 @@ Data is collected from the [WHO Influenza Surveillance Outputs](https://www.who.
 
 ## Data
 
-Before creating the line chart, it is necessary to massage the data to compute the percentage of positive cases, shown on the `y` axis. To this end, I decided to store the dateset in a `dataset` variable, and create `data` with the new value.
+Before creating the line chart, it is necessary to update the data to compute the percentage of positive cases, which is then shown on the `y` axis. To this end, I decided to store the tests in a `dataset` variable, and create `data` with the new value.
 
 ```js
 const data = dataset.map(...)
@@ -30,19 +30,46 @@ const data = dataset.map(...)
 
 `d3.format` is useful to limit the numbers after the decimal point, while `Object.asssign` helps to extend the object describing each week with the new property.
 
-_Please note:_ creating a different variable is ultimately a preference, and it is very well possible to modify the original set of values.
+_Please note:_ creating a different variable is ultimately a preference, and it is very well possible to modify the original set.
 
 ```js
 dataset.forEach(...)
 ```
 
-## Visualization
+## Line Chart
 
-The visualization is render in an `<svg>` element with an arbitray width and height.
+The visualization is created in an `<svg>` element with an arbitray width and height.
+
+With a rectangle element `<rect>`, the goal is to provide a solid backround.
+
+```js
+svg
+  .append('rect')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .attr('fill', '#fff');
+```
+
+This works as a quick, rough way to ultimately mask element, as any shape using the matching color would effectively hide the elements drawn before it.
+
+With a series of group elements `<g>` then, the idea is to create containers for the different parts of the chart.
+
+```js
+const axesGroup = group.append('g');
+const legendGroup = group.append('g');
+const linesGroup = group.append('g');
+```
+
+In this manner it is also possible to modify the order of the different parts, just by changing the order of execution. To draw the lines behind the axes, for instance.
+
+```js
+const linesGroup = group.append('g');
+const axesGroup = group.append('g');
+```
 
 ### Scales
 
-The first step to create the scale mapping the data horizontally and vertically.
+Scale are essential to map the data horizontally and vertically.
 
 Horizontally, the graph is set to describe the numbered weeks, so that is useful to rely on a `scaleBand`.
 
@@ -75,8 +102,23 @@ While the specific dataset doesn't include a percentage greater than `0.95`, it 
 d3.format('.1f')(Math.min(1, percentageMax + 0.05));
 ```
 
-### Axes
+### Axes and Legend
 
-### Legend
+On the basis of the scales, the chart includes the axes on the left and to the bottom of the chart. The idea is to show the labels without ticks, and a series of grid lines spanning the chart's width. It is worth mentioning that the `<path>` element describing the axis itself is modified so to have the line match the size of these grid lines.
+
+Past the axes, a basic legend includes the years and the accompanying color. The color is actually set in the `data` variable, so to use the `hsl` code later in the visualization as well.
 
 ### Lines
+
+`d3.line` maps the data for each year, considering the week for the `x` coordinate, and the percentage for the `y` dimension.
+
+```js
+const line = d3
+  .line()
+  .x(({ week }) => xScale(week) + xScale.bandwidth() / 2)
+  .y(({ percentage }) => yScale(percentage));
+```
+
+Incrementing the `x` coordinate by half the band width of the scale is but a choice to center each point of the line in the respective band.
+
+The function receives the object for the different lines, and produces the syntax necessary to the `d` attribute of the path elements `<path>`.

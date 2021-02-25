@@ -100,7 +100,7 @@ const dataset = [
   },
 ];
 
-/* DATA
+/* DATA MASSAGING
 each week should be described by the following object
 {
   week,
@@ -123,14 +123,9 @@ const data = dataset.map(({ year, tests }, i, { length }) => ({
   ),
 }));
 
-/* VISUALIZATION */
-const margin = {
-  top: 80,
-  right: 20,
-  bottom: 80,
-  left: 80,
-};
-
+/* VISUALIZATION
+preface the vector graphic with a heading and a short paragraph
+*/
 const width = 600;
 const height = 300;
 
@@ -146,16 +141,39 @@ div
     'Percentage of positive tests for influenza, for Australia, the winter season, and the years 2017 to 2020.'
   );
 
-const viz = div
+const margin = {
+  top: 30,
+  right: 20,
+  bottom: 20,
+  left: 40,
+};
+
+const svg = div
   .append('svg')
   .attr('viewBox', [
     0,
     0,
     width + margin.left + margin.right,
     height + margin.top + margin.bottom,
-  ])
+  ]);
+
+// a quick way to mask elements is to add a solid background to have the color of the shapes match
+// a circle with fill #fff would "hide" the previous shapes 
+svg
+  .append('rect')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .attr('fill', '#fff')
+
+const group = svg
   .append('g')
   .attr('transform', `translate(${margin.left} ${margin.top})`);
+
+// structure the SVG elements in groups
+// the order describes how the visual overlap
+const axesGroup = group.append('g');
+const legendGroup = group.append('g');
+const linesGroup = group.append('g');
 
 /* SCALES */
 const xScale = d3
@@ -178,71 +196,59 @@ const xAxis = d3
   .axisBottom(xScale)
   .tickSizeOuter(0)
   .tickSize(0)
-  .tickPadding(5);
+  .tickPadding(10);
 
-viz
+const xAxisGroup = axesGroup
   .append('g')
-  .attr('id', 'x-axis')
   .attr('transform', `translate(0 ${height})`)
   .call(xAxis);
 
-d3.select('#x-axis')
-  .selectAll('line')
-  .attr('stroke-width', '0.5');
-d3.select('#x-axis')
-  .selectAll('g.tick text')
+xAxisGroup
+  .selectAll('text')
   .attr('font-size', 12);
-d3.select('#x-axis')
-  .append('text')
-  .attr('transform', `translate(${width / 2} ${margin.bottom / 2})`)
-  .text('Week')
-  .attr('fill', 'currentColor')
-  .attr('font-size', 16)
-  .style('text-transform', 'uppercase');
+
+xAxisGroup
+  .select('path.domain')
+  .attr('d', `M -${margin.left} 0 h ${width + margin.left}`)
+
 
 const yAxis = d3
   .axisLeft(yScale)
   .tickSizeOuter(0)
   .ticks(6)
-  .tickPadding(0);
+  .tickSize(0)
+  .tickPadding(0)
+  .tickFormat(d => `${d * 100}%`);
 
-viz
+const yAxisGroup = axesGroup
   .append('g')
-  .attr('id', 'y-axis')
   .call(yAxis);
 
-d3.select('#y-axis')
+yAxisGroup
   .selectAll('g.tick:nth-of-type(odd)')
   .append('path')
-  .attr('d', `M 0 0 h ${width}`)
+  .attr('d', `M -${margin.left} 0 h ${width + margin.left}`)
   .attr('fill', 'none')
   .attr('stroke', 'currentColor')
   .attr('stroke-width', '0.5')
-  .attr('opacity', 0.5);
-d3.select('#y-axis')
+  .attr('opacity', 0.2);
+
+yAxisGroup
   .selectAll('g.tick:nth-of-type(even)')
   .attr('opacity', 0);
-d3.select('#y-axis')
-  .selectAll('line')
-  .attr('opacity', 0);
-d3.select('#y-axis')
+
+yAxisGroup
   .select('path')
   .attr('opacity', 0);
-d3.select('#y-axis')
-  .selectAll('g.tick text')
+
+yAxisGroup
+  .selectAll('text')
+  .attr('text-anchor', 'end')
+  .attr('transform', 'translate(0 -10)')
   .attr('font-size', 12);
-d3.select('#y-axis')
-  .append('text')
-  .attr('transform', `translate(-${margin.left / 2} ${height / 2}) rotate(-90)`)
-  .text('Percentage positive')
-  .attr('fill', 'currentColor')
-  .attr('font-size', 16)
-  .attr('text-anchor', 'middle')
-  .style('text-transform', 'uppercase');
 
 /* LEGEND */
-const groupLegend = viz
-  .append('g')
+const legendGroups = legendGroup
   .selectAll('g')
   .data([...data].reverse())
   .enter()
@@ -254,7 +260,7 @@ const groupLegend = viz
       `translate(${((i + 1) * width) / (length + 1)} -${margin.top / 2})`
   );
 
-groupLegend
+legendGroups
   .append('circle')
   .attr('cx', -10)
   .attr('cy', -1)
@@ -262,20 +268,22 @@ groupLegend
   .attr('fill', 'currentColor')
   .attr('stroke', 'none');
 
-groupLegend
+legendGroups
   .append('text')
   .text(({ year }) => year)
-  .attr('font-size', 20)
+  .attr('font-size', 16)
   .attr('dominant-baseline', 'middle');
 
-/* LINES */
+/* LINES
+for each datapoint draw a line and two circles describing the extremes
+*/
 const line = d3
   .line()
   .x(({ week }) => xScale(week) + xScale.bandwidth() / 2)
   .y(({ percentage }) => yScale(percentage))
   .curve(d3.curveBasis);
 
-const groupLines = viz
+const linesGroups = linesGroup
   .append('g')
   .selectAll('g')
   .data(data)
@@ -283,14 +291,14 @@ const groupLines = viz
   .append('g')
   .style('color', d => d.color);
 
-groupLines
+linesGroups
   .append('path')
   .attr('d', d => line(d.tests))
   .attr('fill', 'none')
   .attr('stroke', 'currentColor')
   .attr('stroke-width', 3);
 
-groupLines
+linesGroups
   .append('circle')
   .attr('fill', '#fff')
   .attr('stroke', 'currentColor')
@@ -299,7 +307,7 @@ groupLines
   .attr('cx', d => xScale(d.tests[0].week) + xScale.bandwidth() / 2)
   .attr('cy', d => yScale(d.tests[0].percentage));
 
-groupLines
+linesGroups
   .append('circle')
   .attr('fill', '#fff')
   .attr('stroke', 'currentColor')
