@@ -113,7 +113,7 @@ round the percentage to have 3 numbers after the decimal point
 */
 const data = dataset.map(({ year, tests }, i, { length }) => ({
   year,
-  color: `hsl(${(i * 360) / length}, 70%, 50%)`,
+  color: `hsl(${i * (360 / length)}, 70%, 50%)`,
   tests: tests.map(test =>
     Object.assign({}, test, {
       percentage: parseFloat(
@@ -129,7 +129,7 @@ preface the vector graphic with a heading and a short paragraph
 const width = 600;
 const height = 300;
 
-const div = d3.select('body').append('div');
+const div = d3.select('body').append('div').attr('id', 'visualization');
 div
   .append('h2')
   .text(
@@ -138,7 +138,7 @@ div
 div
   .append('p')
   .text(
-    'Percentage of positive tests for influenza, for Australia, the winter season, and the years 2017 to 2020.'
+    'Percentage of positive tests performed for influenza, in Australia, the winter season, and the years 2017 to 2020.'
   );
 
 const margin = {
@@ -174,6 +174,7 @@ const group = svg
 const axesGroup = group.append('g');
 const legendGroup = group.append('g');
 const linesGroup = group.append('g');
+const delaunayGroup = group.append('g');
 
 /* SCALES */
 const xScale = d3
@@ -281,7 +282,7 @@ const line = d3
   .line()
   .x(({ week }) => xScale(week) + xScale.bandwidth() / 2)
   .y(({ percentage }) => yScale(percentage))
-  .curve(d3.curveBasis);
+  .curve(d3.curveCatmullRom);
 
 const linesGroups = linesGroup
   .append('g')
@@ -316,7 +317,88 @@ linesGroups
   .attr('cx', d => xScale(d.tests[d.tests.length - 1].week) + xScale.bandwidth() / 2)
   .attr('cy', d => yScale(d.tests[d.tests.length - 1].percentage));
 
+linesGroup
+  .append('circle')
+  .attr('id', 'highlight')
+  .attr('fill', '#fff')
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 3)
+
+linesGroup
+    .append('text')
+    .attr('id', 'title')
+    .attr('font-weight', 600)
+    .attr('x', 20)
+    .attr('y', 45)
+
+linesGroup
+    .append('text')
+    .attr('id', 'description')
+    .attr('x', 20)
+    .attr('y', 70)
+
 div
   .append('a')
   .text('Source')
   .attr('href', 'https://www.who.int/influenza/resources/charts/en/');
+
+
+/* DELAUNAY */
+const dataDelaunay = data.reduce((acc, {year, color, tests}) => [...acc, ...tests.map((test) => Object.assign({}, test, {year, color}))],[]);
+const delaunay = d3.Delaunay.from(dataDelaunay, d => xScale(d.week), d => yScale(d.percentage))
+const voronoi = delaunay.voronoi([0, 0, width, height])
+
+// delaunayGroup
+//   .append('g')
+//   .append('path')
+//   .attr('d', voronoi.render())
+//   .attr('fill', 'none')
+//   .attr('stroke', 'currentColor')
+//   .attr('stroke-width', 1)
+
+// delaunayGroup
+//   .append('path')
+//   .attr('d', voronoi.renderBounds())
+//   .attr('fill', 'none')
+//   .attr('stroke', 'currentColor')
+//   .attr('stroke-width', 1)
+
+delaunayGroup
+  .append('g')
+  .selectAll('path')  
+  .data(dataDelaunay)
+  .enter()
+  .append('path')
+  .attr('opacity', 0)
+  .attr('d', (d, i) => voronoi.renderCell(i))
+  .on('mouseenter', (event, {year, week, percentage, positive, negative, color}) => {
+    d3
+    .select('#highlight')
+    .attr('cx', xScale(week) + xScale.bandwidth() / 2)
+    .attr('cy', yScale(percentage))
+    .attr('r', 6)
+    .attr('stroke', color)
+
+    d3
+      .select('#title')
+      .text(`Week ${week} of ${year}: ${d3.format('.2f')(percentage * 100)}%`)
+
+    d3
+      .select('#description')
+      .text(`Out of ${positive + negative} tests, ${positive} resulted positive for influenza`)
+})
+.on('mouseleave', () => {
+  d3
+  .select('#highlight')
+  .attr('r', 0)
+
+  d3
+    .select('#title')
+    .text('')
+
+  d3
+    .select('#description')
+    .text('')
+})
+
+

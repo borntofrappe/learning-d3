@@ -122,3 +122,9 @@ const line = d3
 Incrementing the `x` coordinate by half the band width of the scale is but a choice to center each point of the line in the respective band.
 
 The function receives the object for the different lines, and produces the syntax necessary to the `d` attribute of the path elements `<path>`.
+
+## Delaunay
+
+### Outlines, boundaries, cells
+
+### Highlight and not tooltip
