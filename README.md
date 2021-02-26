@@ -30,8 +30,9 @@ I need to sort the visualizations better, but here it goes:
 | [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
 | [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                    | d3, react               |
 | Bins                                                                          | bin, random             |
-| [Lines and Delaunay]()                                                        | mouse, delaunay         |
-| Bins                                                                          | bin, random             |
+| [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)             | mouse, delaunay         |
+
+|
 
 - projects using D3 to create interesting visualizations.
 

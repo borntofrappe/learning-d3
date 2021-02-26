@@ -1,3 +1,16 @@
+const {
+  select,
+  format,
+  scaleBand,
+  scaleLinear,
+  max,
+  axisBottom,
+  axisLeft,
+  line,
+  curveCatmullRom,
+  Delaunay,
+} = d3;
+
 /* DATASET
 data collected from the [WHO Influenza Surveillance Outputs](https://www.who.int/influenza/resources/charts/en/)
 - Australia
@@ -110,14 +123,15 @@ each week should be described by the following object
 }
 
 round the percentage to have 3 numbers after the decimal point
+assign a distinct color to a year through hsl values
 */
 const data = dataset.map(({ year, tests }, i, { length }) => ({
-  year,
   color: `hsl(${i * (360 / length)}, 70%, 50%)`,
+  year,
   tests: tests.map(test =>
     Object.assign({}, test, {
       percentage: parseFloat(
-        d3.format('.3f')(test.positive / (test.positive + test.negative))
+        format('.3f')(test.positive / (test.positive + test.negative))
       ),
     })
   ),
@@ -129,7 +143,10 @@ preface the vector graphic with a heading and a short paragraph
 const width = 600;
 const height = 300;
 
-const div = d3.select('body').append('div').attr('id', 'visualization');
+const div = select('body')
+  .append('div')
+  .attr('id', 'visualization');
+
 div
   .append('h2')
   .text(
@@ -142,7 +159,7 @@ div
   );
 
 const margin = {
-  top: 30,
+  top: 20,
   right: 20,
   bottom: 20,
   left: 40,
@@ -158,43 +175,43 @@ const svg = div
   ]);
 
 // a quick way to mask elements is to add a solid background to have the color of the shapes match
-// a circle with fill #fff would "hide" the previous shapes 
+// a circle with fill #fff would "hide" the previous shapes
 svg
   .append('rect')
   .attr('width', width + margin.left + margin.right)
   .attr('height', height + margin.top + margin.bottom)
-  .attr('fill', '#fff')
+  .attr('fill', '#fff');
 
 const group = svg
   .append('g')
   .attr('transform', `translate(${margin.left} ${margin.top})`);
 
-// structure the SVG elements in groups
-// the order describes how the visual overlap
+/* structure the visualization in groups 
+the order describes how the shapes overlap
+*/
 const axesGroup = group.append('g');
 const legendGroup = group.append('g');
 const linesGroup = group.append('g');
+const highlightGroup = group.append('g');
 const delaunayGroup = group.append('g');
 
 /* SCALES */
-const xScale = d3
-  .scaleBand()
+const xScale = scaleBand()
   .domain(data[0].tests.map(({ week }) => week))
   .range([0, width]);
 
 // the upper threshold rounds up the maximum percentage to the nearest tenth
-const percentageMax = d3.max(
-  data.map(({ tests }) => d3.max(tests, ({ percentage }) => percentage))
+const percentageMax = max(
+  data.map(({ tests }) => max(tests, ({ percentage }) => percentage))
 );
-const upperThreshold = d3.format('.1f')(Math.min(1, percentageMax + 0.05));
-const yScale = d3
-  .scaleLinear()
+const upperThreshold = format('.1f')(Math.min(1, percentageMax + 0.05));
+
+const yScale = scaleLinear()
   .domain([0, upperThreshold])
   .range([height, 0]);
 
 /* AXES */
-const xAxis = d3
-  .axisBottom(xScale)
+const xAxis = axisBottom(xScale)
   .tickSizeOuter(0)
   .tickSize(0)
   .tickPadding(10);
@@ -204,26 +221,20 @@ const xAxisGroup = axesGroup
   .attr('transform', `translate(0 ${height})`)
   .call(xAxis);
 
-xAxisGroup
-  .selectAll('text')
-  .attr('font-size', 12);
+xAxisGroup.selectAll('text').attr('font-size', 12);
 
 xAxisGroup
   .select('path.domain')
-  .attr('d', `M -${margin.left} 0 h ${width + margin.left}`)
+  .attr('d', `M -${margin.left} 0 h ${width + margin.left}`);
 
-
-const yAxis = d3
-  .axisLeft(yScale)
+const yAxis = axisLeft(yScale)
   .tickSizeOuter(0)
   .ticks(6)
   .tickSize(0)
   .tickPadding(0)
   .tickFormat(d => `${d * 100}%`);
 
-const yAxisGroup = axesGroup
-  .append('g')
-  .call(yAxis);
+const yAxisGroup = axesGroup.append('g').call(yAxis);
 
 yAxisGroup
   .selectAll('g.tick:nth-of-type(odd)')
@@ -234,13 +245,9 @@ yAxisGroup
   .attr('stroke-width', '0.5')
   .attr('opacity', 0.2);
 
-yAxisGroup
-  .selectAll('g.tick:nth-of-type(even)')
-  .attr('opacity', 0);
+yAxisGroup.selectAll('g.tick:nth-of-type(even)').attr('opacity', 0);
 
-yAxisGroup
-  .select('path')
-  .attr('opacity', 0);
+yAxisGroup.select('path').attr('opacity', 0);
 
 yAxisGroup
   .selectAll('text')
@@ -278,11 +285,10 @@ legendGroups
 /* LINES
 for each datapoint draw a line and two circles describing the extremes
 */
-const line = d3
-  .line()
+const lineGenerator = line()
   .x(({ week }) => xScale(week) + xScale.bandwidth() / 2)
   .y(({ percentage }) => yScale(percentage))
-  .curve(d3.curveCatmullRom);
+  .curve(curveCatmullRom);
 
 const linesGroups = linesGroup
   .append('g')
@@ -294,7 +300,7 @@ const linesGroups = linesGroup
 
 linesGroups
   .append('path')
-  .attr('d', d => line(d.tests))
+  .attr('d', d => lineGenerator(d.tests))
   .attr('fill', 'none')
   .attr('stroke', 'currentColor')
   .attr('stroke-width', 3);
@@ -314,40 +320,68 @@ linesGroups
   .attr('stroke', 'currentColor')
   .attr('stroke-width', 2)
   .attr('r', 4)
-  .attr('cx', d => xScale(d.tests[d.tests.length - 1].week) + xScale.bandwidth() / 2)
+  .attr(
+    'cx',
+    d => xScale(d.tests[d.tests.length - 1].week) + xScale.bandwidth() / 2
+  )
   .attr('cy', d => yScale(d.tests[d.tests.length - 1].percentage));
 
-linesGroup
+/* HIGHLIGHT
+show the datapoint with a circle and two text labels
+*/
+highlightGroup
   .append('circle')
   .attr('id', 'highlight')
   .attr('fill', '#fff')
   .attr('stroke', 'currentColor')
-  .attr('stroke-width', 3)
+  .attr('stroke-width', 3);
 
-linesGroup
-    .append('text')
-    .attr('id', 'title')
-    .attr('font-weight', 600)
-    .attr('x', 20)
-    .attr('y', 45)
+highlightGroup
+  .append('text')
+  .attr('id', 'title')
+  .attr('font-weight', 600)
+  .attr('x', 20)
+  .attr('y', 45);
 
-linesGroup
-    .append('text')
-    .attr('id', 'description')
-    .attr('x', 20)
-    .attr('y', 70)
+highlightGroup
+  .append('text')
+  .attr('id', 'description')
+  .attr('x', 20)
+  .attr('y', 70);
 
 div
   .append('a')
   .text('Source')
   .attr('href', 'https://www.who.int/influenza/resources/charts/en/');
 
+/* DELAUNAY 
+Delaunay works with a 1 dimensional array
+[
+{ year, week, percentage },
+{ year, week, percentage },
+...
+]
 
-/* DELAUNAY */
-const dataDelaunay = data.reduce((acc, {year, color, tests}) => [...acc, ...tests.map((test) => Object.assign({}, test, {year, color}))],[]);
-const delaunay = d3.Delaunay.from(dataDelaunay, d => xScale(d.week), d => yScale(d.percentage))
-const voronoi = delaunay.voronoi([0, 0, width, height])
+year is necessary to later identify the selected data point
+week and percentage for delaunay points
+*/
+const dataDelaunay = data.reduce(
+  (acc, { year, tests }) => [
+    ...acc,
+    ...tests.map(({ week, percentage }) =>
+      Object.assign({}, { year }, { week, percentage })
+    ),
+  ],
+  []
+);
+const delaunay = Delaunay.from(
+  dataDelaunay,
+  d => xScale(d.week),
+  d => yScale(d.percentage)
+);
+const voronoi = delaunay.voronoi([0, 0, width, height]);
 
+// // helper visuals to highlight the delaunay triangulation
 // delaunayGroup
 //   .append('g')
 //   .append('path')
@@ -363,42 +397,36 @@ const voronoi = delaunay.voronoi([0, 0, width, height])
 //   .attr('stroke', 'currentColor')
 //   .attr('stroke-width', 1)
 
+// path elements describing Delaunay cell
+// opacity is set to 0 to hide the overlay
 delaunayGroup
   .append('g')
-  .selectAll('path')  
+  .selectAll('path')
   .data(dataDelaunay)
   .enter()
   .append('path')
   .attr('opacity', 0)
   .attr('d', (d, i) => voronoi.renderCell(i))
-  .on('mouseenter', (event, {year, week, percentage, positive, negative, color}) => {
-    d3
-    .select('#highlight')
-    .attr('cx', xScale(week) + xScale.bandwidth() / 2)
-    .attr('cy', yScale(percentage))
-    .attr('r', 6)
-    .attr('stroke', color)
+  .on('mouseenter', (event, { year, week }) => {
+    const { color } = data.find(d => d.year === year);
+    const { positive, negative, percentage } = data
+      .find(d => d.year === year)
+      .tests.find(test => test.week === week);
 
-    d3
-      .select('#title')
-      .text(`Week ${week} of ${year}: ${d3.format('.2f')(percentage * 100)}%`)
+    // update the position of the overlay circle and its color
+    select('#highlight')
+      .attr('cx', xScale(week) + xScale.bandwidth() / 2)
+      .attr('cy', yScale(percentage))
+      .attr('r', 6)
+      .attr('stroke', color);
 
-    d3
-      .select('#description')
-      .text(`Out of ${positive + negative} tests, ${positive} resulted positive for influenza`)
-})
-.on('mouseleave', () => {
-  d3
-  .select('#highlight')
-  .attr('r', 0)
+    // update the text of the highlight area to show the detailed observation
+    select('#title').text(
+      `Week ${week} of ${year}: ${format('.2f')(percentage * 100)}%`
+    );
 
-  d3
-    .select('#title')
-    .text('')
-
-  d3
-    .select('#description')
-    .text('')
-})
-
-
+    select('#description').text(
+      `Out of ${positive +
+        negative} tests, ${positive} resulted positive for influenza`
+    );
+  });
