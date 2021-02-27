@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@400;600&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,6 +8,25 @@
 
 body {
   background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
+  color: hsl(0, 0%, 10%);
   font-family: monospace;
+  font-family: 'Mukta', sans-serif;
+}
+
+#wrapper {
+  max-width: 600px;
+  margin: 1rem auto;
+}
+
+#wrapper > * + * {
+  margin-top: 0.75rem;
+}
+
+svg {
+  display: block;
+  color: hsl(0, 0%, 20%);
+}
+
+svg text {
+  font-family: 'Mukta', sans-serif;
 }

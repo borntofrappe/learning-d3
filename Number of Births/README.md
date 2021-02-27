@@ -10,6 +10,14 @@ Following the progress achieved with the _Lines and Delaunay_ demo, then, the id
 
 ## Data
 
-[The values](https://www.insee.fr/fr/statistiques/serie/000436391) are retrieved from the national institute of statistics and economic studies, Insee, again between the years 2000 and 2021.
+Data is collected from the [Insee](https://www.insee.fr/fr/statistiques/serie/000436391) to describe the metric between the years 2000 and 2020 and on a monthly basis.
 
-`dataset` describes an array of objects, detailing the number of borths for each month in the given interval. The structure is immediately useful to plot a line describing the evolution through the years, but needs to be revisited as the project considers one line for each year.
+In the script, `data` stores the information in an array of objects, detailing the date and value of each observation.
+
+## Line
+
+## Lines
+
+## Radial Lines
+
+## Delaunay
