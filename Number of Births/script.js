@@ -3,6 +3,7 @@ const {
   timeFormat,
   format,
   select,
+  selectAll,
   scaleTime,
   scaleLinear,
   extent,
@@ -10,6 +11,7 @@ const {
   axisLeft,
   line,
   scaleBand,
+  Delaunay,
 } = d3;
 
 /* DATA
@@ -563,8 +565,10 @@ function lineChartMonths(data) {
   const width = 500;
   const height = 280;
   const tickPadding = 5;
+  const yTicks = 8;
   const gridLinesOpacity = 0.2;
   const fontSize = 15;
+  const linesOpacity = 0.1;
   const lineStrokeWidth = 3;
 
   const margin = {
@@ -609,7 +613,7 @@ function lineChartMonths(data) {
 
   const yAxis = axisLeft()
     .scale(yScale)
-    .ticks(8)
+    .ticks(yTicks)
     .tickSize(0)
     .tickPadding(tickPadding);
 
@@ -651,7 +655,7 @@ function lineChartMonths(data) {
     .attr('class', 'line')
     .attr('id', ({ year }) => `line-${year}`)
     .attr('opacity', ({ year }) =>
-      year === years[years.length - 1] ? 1 : 0.1
+      year === years[years.length - 1] ? 1 : linesOpacity
     );
 
   linesGroups
@@ -669,6 +673,37 @@ function lineChartMonths(data) {
     .attr('x', width)
     .attr('y', ({ values }) => yScale(values[values.length - 1].value))
     .text(({ year }) => year);
+
+  const dataDelaunay = dataYear.reduce((acc, curr) => {
+    const values = curr.values.map(({ month, value }) => ({
+      month,
+      value,
+      year: curr.year,
+    }));
+    return [...acc, ...values];
+  }, []);
+
+  const delaunay = Delaunay.from(
+    dataDelaunay,
+    d => xScale(d.month),
+    d => yScale(d.value)
+  );
+
+  const voronoi = delaunay.voronoi([0, 0, width, height]);
+
+  group
+    .append('g')
+    .selectAll('path')
+    .data(dataDelaunay)
+    .enter()
+    .append('path')
+    .attr('opacity', 0)
+    .attr('d', (d, i) => voronoi.renderCell(i))
+    .on('mouseenter', (event, { year }) => {
+      selectAll('#line-chart-months .line').attr('opacity', linesOpacity);
+
+      select(`#line-chart-months #line-${year}`).attr('opacity', 1);
+    });
 }
 
 lineChartYears(data);
