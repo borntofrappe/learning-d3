@@ -12,6 +12,8 @@ const {
   line,
   scaleBand,
   Delaunay,
+  lineRadial,
+  curveLinearClosed,
 } = d3;
 
 /* DATA
@@ -535,7 +537,7 @@ function lineChartMonths(data) {
   section
     .append('p')
     .style('font-size', '0.9rem')
-    .text('Hover on the chart to focus on a specific year.');
+    .text('Hover on the charts to focus on a specific year.');
 
   const dateParser = timeParse('%Y-%m');
   const dateFormatterYear = timeFormat('%Y');
@@ -564,6 +566,7 @@ function lineChartMonths(data) {
 
   const width = 500;
   const height = 280;
+  const borderRadius = 5;
   const tickPadding = 5;
   const yTicks = 8;
   const gridLinesOpacity = 0.2;
@@ -591,6 +594,7 @@ function lineChartMonths(data) {
     .append('rect')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
+    .attr('rx', borderRadius)
     .attr('fill', backgroundColor);
 
   const group = svg
@@ -704,7 +708,97 @@ function lineChartMonths(data) {
 
       select(`#line-chart-months #line-${year}`).attr('opacity', 1);
     });
+
+  const widthRadial = 500;
+  const heightRadial = 500;
+  const marginRadial = 20;
+
+  const svgRadial = section
+    .append('svg')
+    .attr('viewBox', [
+      0,
+      0,
+      widthRadial + marginRadial * 2,
+      heightRadial + marginRadial * 2,
+    ]);
+
+  svgRadial
+    .append('rect')
+    .attr('width', widthRadial + marginRadial * 2)
+    .attr('height', heightRadial + marginRadial * 2)
+    .attr('rx', borderRadius)
+    .attr('fill', backgroundColor);
+
+  groupRadial = svgRadial
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${marginRadial + widthRadial / 2} ${marginRadial +
+        heightRadial / 2})`
+    );
+
+  const angleScale = scaleBand()
+    .domain(xScale.domain())
+    .range([0, Math.PI * 2]);
+
+  const radiusScale = scaleLinear()
+    .domain(yScale.domain())
+    .range([0, Math.floor(widthRadial / 2)]);
+
+  const lineGeneratorRadial = lineRadial()
+    .angle(d => angleScale(d.month))
+    .radius(d => radiusScale(d.value))
+    .curve(curveLinearClosed);
+
+  const linesGroupsRadial = groupRadial
+    .append('g')
+    .selectAll('g')
+    .data(dataYear)
+    .enter()
+    .append('g')
+    .attr('class', 'line-radial')
+    .attr('id', ({ year }) => `line-radial-${year}`)
+    .attr('opacity', ({ year }) =>
+      year === years[years.length - 1] ? 1 : linesOpacity
+    );
+
+  linesGroupsRadial
+    .append('path')
+    .attr('d', ({ values }) => lineGeneratorRadial(values))
+    .attr('fill', 'none')
+    .attr('stroke', highlightColor)
+    .attr('stroke-width', lineStrokeWidth);
+
+  const delaunayRadial = Delaunay.from(
+    dataDelaunay,
+    d => Math.cos(angleScale(d.month)) * radiusScale(d.value),
+    d => Math.sin(angleScale(d.month)) * radiusScale(d.value)
+  );
+
+  const voronoiRadial = delaunayRadial.voronoi([
+    -widthRadial / 2,
+    -heightRadial / 2,
+    widthRadial / 2,
+    heightRadial / 2,
+  ]);
+
+  groupRadial
+    .append('g')
+    .selectAll('path')
+    .data(dataDelaunay)
+    .enter()
+    .append('path')
+    .attr('opacity', 0)
+    .attr('d', (d, i) => voronoiRadial.renderCell(i))
+    .on('mouseenter', (event, { year }) => {
+      selectAll('#line-chart-months .line-radial').attr(
+        'opacity',
+        linesOpacity
+      );
+
+      select(`#line-chart-months #line-radial-${year}`).attr('opacity', 1);
+    });
 }
 
-lineChartYears(data);
+// lineChartYears(data);
 lineChartMonths(data);
