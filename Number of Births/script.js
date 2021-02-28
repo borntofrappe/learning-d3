@@ -1,3 +1,16 @@
+const {
+  timeParse,
+  timeFormat,
+  select,
+  scaleTime,
+  scaleLinear,
+  extent,
+  axisBottom,
+  axisLeft,
+  line,
+  Delaunay,
+} = d3;
+
 /* DATA
 child birth between the years 2000 and 2020
 for reference visit the French institute of statistics and economic studies 
@@ -259,114 +272,211 @@ const data = [
 ];
 
 /* INTRODUCTORY MARKUP */
-const dateParser = d3.timeParse('%Y-%m');
-const dateFormatter = d3.timeFormat('%B %Y');
+const dateParser = timeParse('%Y-%m');
+const dateFormatter = timeFormat('%B %Y');
 const xAccessor = d => dateParser(d.date);
 const yAccessor = d => d.value;
 
-const div = d3
-  .select('body')
+const div = select('body')
   .append('div')
   .attr('id', 'wrapper');
 
 div.append('h1').text('Number of  births');
 
 /* VIZ #1: line chart spanning the entire timeframe */
-const width = 500;
-const height = 280;
+function lineChart() {
+  const width = 500;
+  const height = 280;
 
-const margin = {
-  top: 20,
-  right: 20,
-  bottom: 80,
-  left: 50,
-};
+  const margin = {
+    top: 20,
+    right: 20,
+    bottom: 40,
+    left: 60,
+  };
 
-const svg = div
-  .append('svg')
-  .attr('viewBox', [
-    0,
-    0,
-    width + margin.left + margin.right,
-    height + margin.top + margin.bottom,
-  ]);
+  const svg = div
+    .append('svg')
+    .attr('id', 'line-chart')
+    .attr('viewBox', [
+      0,
+      0,
+      width + margin.left + margin.right,
+      height + margin.top + margin.bottom,
+    ]);
 
-const group = svg
-  .append('g')
-  .attr('transform', `translate(${margin.left} ${margin.top})`);
+  svg
+    .append('rect')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .attr('fill', '#fff');
 
-const xScale = d3
-  .scaleTime()
-  .domain(d3.extent(data, xAccessor))
-  .range([0, width]);
+  const group = svg
+    .append('g')
+    .attr('transform', `translate(${margin.left} ${margin.top})`);
 
-const yScale = d3
-  .scaleLinear()
-  .domain(d3.extent(data, yAccessor))
-  .range([height, 0])
-  .nice();
+  const xScale = scaleTime()
+    .domain(extent(data, xAccessor))
+    .range([0, width]);
 
-const xAxis = d3
-  .axisBottom()
-  .scale(xScale)
-  .ticks(5)
-  .tickSize(0)
-  .tickPadding(5)
-  .tickFormat(d => dateFormatter(d));
+  const yScale = scaleLinear()
+    .domain(extent(data, yAccessor))
+    .range([height, 0])
+    .nice();
 
-const yAxis = d3
-  .axisLeft()
-  .scale(yScale)
-  .ticks(8)
-  .tickSize(0)
-  .tickPadding(5);
+  const xAxis = axisBottom()
+    .scale(xScale)
+    .ticks(5)
+    .tickSize(0)
+    .tickPadding(5)
+    .tickFormat(d => dateFormatter(d));
 
-const axisGroup = group.append('g');
-axisGroup
-  .append('g')
-  .attr('id', 'x-axis')
-  .call(xAxis)
-  .attr('transform', `translate(0 ${height})`);
+  const yAxis = axisLeft()
+    .scale(yScale)
+    .ticks(8)
+    .tickSize(0)
+    .tickPadding(5);
 
-axisGroup
-  .append('g')
-  .attr('id', 'y-axis')
-  .call(yAxis);
+  const axisGroup = group.append('g');
+  axisGroup
+    .append('g')
+    .attr('class', 'axis x-axis')
+    .call(xAxis)
+    .attr('transform', `translate(0 ${height})`);
 
-d3.select('#y-axis')
-  .select('path')
-  .remove();
+  const yAxisGroup = axisGroup.append('g').call(yAxis);
 
-d3.select('#y-axis')
-  .selectAll('g.tick:nth-of-type(even)')
-  .remove();
+  yAxisGroup.select('path').remove();
 
-d3.select('#y-axis')
-  .selectAll('g.tick:nth-of-type(1)')
-  .remove();
+  yAxisGroup.selectAll('g.tick:nth-of-type(even)').remove();
 
-d3.select('#y-axis')
-  .selectAll('g.tick')
-  .append('path')
-  .attr('d', `M 0 0 h ${width}`)
-  .attr('fill', 'none')
-  .attr('stroke', 'currentColor')
-  .attr('stroke-width', 1)
-  .attr('opacity', 0.25);
+  yAxisGroup.selectAll('g.tick:nth-of-type(1)').remove();
 
-axisGroup
-  .selectAll('text')
-  .attr('font-size', 14)
+  yAxisGroup
+    .selectAll('g.tick')
+    .append('path')
+    .attr('d', `M 0 0 h ${width}`)
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1)
+    .attr('opacity', 0.25);
 
-const lineGenerator = d3
-  .line()
-  .x(d => xScale(xAccessor(d)))
-  .y(d => yScale(yAccessor(d)));
+  axisGroup.selectAll('text').attr('font-size', 14);
 
-group
-  .append('g')
-  .append('path')
-  .attr('d', lineGenerator(data))
-  .attr('fill', 'none')
-  .attr('stroke', 'currentColor')
-  .attr('stroke-width', 3);
+  const lineGenerator = line()
+    .x(d => xScale(xAccessor(d)))
+    .y(d => yScale(yAccessor(d)));
+
+  group
+    .append('g')
+    .append('path')
+    .attr('d', lineGenerator(data))
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 3);
+
+  const highlightGroup = group.append('g').attr('class', 'highlight');
+
+  const highlightX = highlightGroup.append('g').attr('class', 'highlight-x');
+
+  highlightX
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', 4);
+
+  highlightX.append('rect').attr('fill', '#fff');
+
+  highlightX
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('text-anchor', 'middle')
+    .style('font-weight', 600);
+
+  const highlightY = highlightGroup.append('g').attr('class', 'highlight-y');
+
+  highlightY
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 2)
+    .attr('stroke-dasharray', 4);
+
+  highlightY.append('rect').attr('fill', '#fff');
+
+  highlightY
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('text-anchor', 'end')
+    .attr('dominant-baseline', 'middle')
+    .style('font-weight', 600);
+
+  highlightGroup
+    .append('circle')
+    .attr('fill', '#fff')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 2);
+
+  const delaunay = Delaunay.from(
+    data,
+    d => xScale(xAccessor(d)),
+    d => yScale(yAccessor(d))
+  );
+
+  const voronoi = delaunay.voronoi([0, 0, width, height]);
+
+  group
+    .append('g')
+    .selectAll('path')
+    .data(data)
+    .enter()
+    .append('path')
+    .attr('opacity', 0)
+    .attr('d', (d, i) => voronoi.renderCell(i))
+    .on('mouseenter', (event, d) => {
+      const x = xScale(xAccessor(d));
+      const y = yScale(yAccessor(d));
+      select('#line-chart .highlight circle')
+        .attr('r', 6)
+        .attr('cx', x)
+        .attr('cy', y);
+
+      select('#line-chart .highlight-y text')
+        .text(yAccessor(d))
+        .attr('x', -5)
+        .attr('y', y);
+
+      const { height: yLabelHeight } = select('#line-chart .highlight-y text')
+        .node()
+        .getBoundingClientRect();
+      select('#line-chart .highlight-y rect')
+        .attr('x', -margin.left)
+        .attr('y', y - 5 - yLabelHeight / 2)
+        .attr('width', margin.left - 1)
+        .attr('height', yLabelHeight);
+
+      select('#line-chart .highlight-y path').attr('d', `M -5 ${y} H ${x}`);
+
+      select('#line-chart .highlight-x text')
+        .text(dateFormatter(xAccessor(d)))
+        .attr('x', x)
+        .attr('y', height + 12 + 5);
+
+      const { width: xLabelWidth } = select('#line-chart .highlight-x text')
+        .node()
+        .getBoundingClientRect();
+      select('#line-chart .highlight-x rect')
+        .attr('x', x - xLabelWidth / 2)
+        .attr('y', height + 1)
+        .attr('width', xLabelWidth)
+        .attr('height', margin.bottom - 1);
+
+      select('#line-chart .highlight-x path').attr(
+        'd',
+        `M ${x} ${height} V ${y}`
+      );
+    });
+}
+
+lineChart();
