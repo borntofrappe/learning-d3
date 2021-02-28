@@ -1,6 +1,7 @@
 const {
   timeParse,
   timeFormat,
+  format,
   select,
   scaleTime,
   scaleLinear,
@@ -280,7 +281,7 @@ div.append('h1').text('Number of  births');
 div
   .append('p')
   .html(
-    'Data from the French institute of statistics and economic studies, <a href="https://www.insee.fr/fr/statistiques/serie/000436391">Insee</a>, shows the number of births for mainland France.'
+    '<a href="https://www.insee.fr/fr/statistiques/serie/000436391">Data</a> from the <abbr title="Institute of statistics and economic studies">Insee</abbr> shows the number of births for mainland France, on a monthly basis and since 1946.'
   );
 
 /* VIZ #1: analyze the trend through the years */
@@ -297,22 +298,30 @@ function lineChartYears(data) {
   section
     .append('p')
     .style('font-size', '0.9rem')
-    .text('Hover on the chart to higlight a specific month.');
+    .text('Hover on the chart to higlight the value of a specific month.');
 
   const dateParser = timeParse('%Y-%m');
   const dateFormatter = timeFormat('%B %Y');
 
-  const xAccessor = d => dateParser(d.date);
-  const yAccessor = d => d.value;
-
   const backgroundColor = '#fff';
+  const highlightColor = '#8652ca';
+  const tickPadding = 5;
+  const borderRadius = 5;
+  const fontSize = 15;
+  const axisStrokeWidth = 1;
+  const lineStrokeWidth = 3;
+  const highlightStrokeWidth = 3;
+  const highlightStrokeDasharray = 4;
+  const highlightRadius = 6;
+  const highlightPadding = 8;
+  const gridLinesOpacity = 0.2;
 
   const width = 500;
   const height = 280;
 
   const margin = {
-    top: 20,
-    right: 20,
+    top: 30,
+    right: 30,
     bottom: 40,
     left: 60,
   };
@@ -330,18 +339,19 @@ function lineChartYears(data) {
     .append('rect')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
-    .attr('fill', backgroundColor);
+    .attr('fill', backgroundColor)
+    .attr('rx', borderRadius);
 
   const group = svg
     .append('g')
     .attr('transform', `translate(${margin.left} ${margin.top})`);
 
   const xScale = scaleTime()
-    .domain(extent(data, xAccessor))
+    .domain(extent(data, ({ date }) => dateParser(date)))
     .range([0, width]);
 
   const yScale = scaleLinear()
-    .domain(extent(data, yAccessor))
+    .domain(extent(data, ({ value }) => value))
     .range([height, 0])
     .nice();
 
@@ -349,14 +359,14 @@ function lineChartYears(data) {
     .scale(xScale)
     .ticks(5)
     .tickSize(0)
-    .tickPadding(5)
+    .tickPadding(tickPadding)
     .tickFormat(d => dateFormatter(d));
 
   const yAxis = axisLeft()
     .scale(yScale)
     .ticks(8)
     .tickSize(0)
-    .tickPadding(5);
+    .tickPadding(tickPadding);
 
   const axisGroup = group.append('g');
   axisGroup
@@ -378,24 +388,27 @@ function lineChartYears(data) {
     .attr('d', `M 0 0 h ${width}`)
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 1)
-    .attr('opacity', 0.25);
+    .attr('stroke-width', axisStrokeWidth)
+    .attr('opacity', gridLinesOpacity);
 
-  axisGroup.selectAll('text').attr('font-size', 14);
+  axisGroup.selectAll('text').attr('font-size', fontSize);
 
   const lineGenerator = line()
-    .x(d => xScale(xAccessor(d)))
-    .y(d => yScale(yAccessor(d)));
+    .x(({ date }) => xScale(dateParser(date)))
+    .y(({ value }) => yScale(value));
 
   group
     .append('g')
     .append('path')
     .attr('d', lineGenerator(data))
     .attr('fill', 'none')
-    .attr('stroke', 'currentColor')
-    .attr('stroke-width', 3);
+    .attr('stroke', highlightColor)
+    .attr('stroke-width', lineStrokeWidth);
 
-  const highlightGroup = group.append('g').attr('class', 'highlight');
+  const highlightGroup = group
+    .append('g')
+    .attr('class', 'highlight')
+    .style('color', highlightColor);
 
   const highlightX = highlightGroup.append('g').attr('class', 'highlight-x');
 
@@ -403,8 +416,8 @@ function lineChartYears(data) {
     .append('path')
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 2)
-    .attr('stroke-dasharray', 4);
+    .attr('stroke-width', highlightStrokeWidth)
+    .attr('stroke-dasharray', highlightStrokeDasharray);
 
   highlightX.append('rect').attr('fill', backgroundColor);
 
@@ -412,7 +425,7 @@ function lineChartYears(data) {
     .append('text')
     .attr('fill', 'currentColor')
     .attr('text-anchor', 'middle')
-    .style('font-weight', 600);
+    .style('font-weight', 'bold');
 
   const highlightY = highlightGroup.append('g').attr('class', 'highlight-y');
 
@@ -420,8 +433,8 @@ function lineChartYears(data) {
     .append('path')
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 2)
-    .attr('stroke-dasharray', 4);
+    .attr('stroke-width', highlightStrokeWidth)
+    .attr('stroke-dasharray', highlightStrokeDasharray);
 
   highlightY.append('rect').attr('fill', backgroundColor);
 
@@ -430,13 +443,13 @@ function lineChartYears(data) {
     .attr('fill', 'currentColor')
     .attr('text-anchor', 'end')
     .attr('dominant-baseline', 'middle')
-    .style('font-weight', 600);
+    .style('font-weight', 'bold');
 
   highlightGroup
     .append('circle')
     .attr('fill', backgroundColor)
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', highlightStrokeWidth);
 
   group
     .append('g')
@@ -444,24 +457,47 @@ function lineChartYears(data) {
     .data(data)
     .enter()
     .append('rect')
-    .attr('x', d => xScale(xAccessor(d)))
+    .attr('x', ({ date }) => xScale(dateParser(date)))
     .attr(
       'width',
       xScale(dateParser(data[1].date)) - xScale(dateParser(data[0].date))
     )
     .attr('height', height)
     .attr('opacity', 0)
-    .on('mousemove', (event, d) => {
-      const x = xScale(xAccessor(d));
-      const y = yScale(yAccessor(d));
+    .on('mousemove', (event, { date, value }) => {
+      const x = xScale(dateParser(date));
+      const y = yScale(value);
+
       select('#line-chart-years .highlight circle')
-        .attr('r', 6)
+        .attr('r', highlightRadius)
         .attr('cx', x)
         .attr('cy', y);
 
+      select('#line-chart-years .highlight-x text')
+        .text(dateFormatter(dateParser(date)))
+        .attr('x', x)
+        .attr('y', height + fontSize + 1);
+
+      const { width: xLabelWidth } = select(
+        '#line-chart-years .highlight-x text'
+      )
+        .node()
+        .getBoundingClientRect();
+
+      select('#line-chart-years .highlight-x rect')
+        .attr('x', x - xLabelWidth / 2 - highlightPadding)
+        .attr('y', height + 1)
+        .attr('width', xLabelWidth + highlightPadding * 2)
+        .attr('height', margin.bottom - 1);
+
+      select('#line-chart-years .highlight-x path').attr(
+        'd',
+        `M ${x} ${height} V ${y}`
+      );
+
       select('#line-chart-years .highlight-y text')
-        .text(yAccessor(d))
-        .attr('x', -5)
+        .text(format(',')(value))
+        .attr('x', -2)
         .attr('y', y);
 
       const { height: yLabelHeight } = select(
@@ -471,34 +507,13 @@ function lineChartYears(data) {
         .getBoundingClientRect();
       select('#line-chart-years .highlight-y rect')
         .attr('x', -margin.left)
-        .attr('y', y - 5 - yLabelHeight / 2)
+        .attr('y', y - yLabelHeight / 2 - highlightPadding)
         .attr('width', margin.left - 1)
-        .attr('height', yLabelHeight);
+        .attr('height', yLabelHeight + highlightPadding * 2);
 
       select('#line-chart-years .highlight-y path').attr(
         'd',
         `M -5 ${y} H ${x}`
-      );
-
-      select('#line-chart-years .highlight-x text')
-        .text(dateFormatter(xAccessor(d)))
-        .attr('x', x)
-        .attr('y', height + 12 + 5);
-
-      const { width: xLabelWidth } = select(
-        '#line-chart-years .highlight-x text'
-      )
-        .node()
-        .getBoundingClientRect();
-      select('#line-chart-years .highlight-x rect')
-        .attr('x', x - xLabelWidth / 2 - 5)
-        .attr('y', height + 1)
-        .attr('width', xLabelWidth + 10)
-        .attr('height', margin.bottom - 1);
-
-      select('#line-chart-years .highlight-x path').attr(
-        'd',
-        `M ${x} ${height} V ${y}`
       );
     });
 }
@@ -515,10 +530,10 @@ function lineChartMonths(data) {
       'Every year shows a similar trend, with a considerable increase between the months of April and July.'
     );
 
-  // section
-  //   .append('p')
-  //   .style('font-size', '0.9rem')
-  //   .text('Hover on the chart to focus on a specific year.')
+  section
+    .append('p')
+    .style('font-size', '0.9rem')
+    .text('Hover on the chart to focus on a specific year.');
 
   const dateParser = timeParse('%Y-%m');
   const dateFormatterYear = timeFormat('%Y');
@@ -543,8 +558,14 @@ function lineChartMonths(data) {
   }));
 
   const backgroundColor = '#fff';
+  const highlightColor = '#8652ca';
+
   const width = 500;
   const height = 280;
+  const tickPadding = 5;
+  const gridLinesOpacity = 0.2;
+  const fontSize = 15;
+  const lineStrokeWidth = 3;
 
   const margin = {
     top: 20,
@@ -584,13 +605,13 @@ function lineChartMonths(data) {
   const xAxis = axisBottom()
     .scale(xScale)
     .tickSize(0)
-    .tickPadding(5);
+    .tickPadding(tickPadding);
 
   const yAxis = axisLeft()
     .scale(yScale)
     .ticks(8)
     .tickSize(0)
-    .tickPadding(5);
+    .tickPadding(tickPadding);
 
   const axisGroup = group.append('g');
   axisGroup
@@ -613,9 +634,9 @@ function lineChartMonths(data) {
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 1)
-    .attr('opacity', 0.25);
+    .attr('opacity', gridLinesOpacity);
 
-  axisGroup.selectAll('text').attr('font-size', 14);
+  axisGroup.selectAll('text').attr('font-size', fontSize);
 
   const lineGenerator = line()
     .x(d => xScale(d.month) + xScale.bandwidth() / 2)
@@ -637,13 +658,13 @@ function lineChartMonths(data) {
     .append('path')
     .attr('d', ({ values }) => lineGenerator(values))
     .attr('fill', 'none')
-    .attr('stroke', 'currentColor')
-    .attr('stroke-width', 3);
+    .attr('stroke', highlightColor)
+    .attr('stroke-width', lineStrokeWidth);
 
   linesGroups
     .append('text')
     .attr('fill', 'currentColor')
-    .attr('font-size', 14)
+    .attr('font-size', fontSize)
     .attr('dominant-baseline', 'middle')
     .attr('x', width)
     .attr('y', ({ values }) => yScale(values[values.length - 1].value))
