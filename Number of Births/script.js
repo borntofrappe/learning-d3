@@ -17,7 +17,7 @@ const {
 } = d3;
 
 /* DATA
-child birth between the years 2000 and 2020
+number of child born between the years 2000 and 2020 in mainland France
 for reference visit the French institute of statistics and economic studies 
 https://www.insee.fr/fr/statistiques/serie/000436391
 */
@@ -288,9 +288,14 @@ div
     '<a href="https://www.insee.fr/fr/statistiques/serie/000436391">Data</a> from the <abbr title="Institute of statistics and economic studies">Insee</abbr> shows the number of births for mainland France, on a monthly basis and since 1946.'
   );
 
-/* VIZ #1: analyze the trend through the years */
+/* VIZ #1: line chart showing the number of childs between 2000 and 2020 */
 function lineChartYears(data) {
+  /* SETUP MARKUP
+  include the visualization in a <section> element
+  preface with a short heading and paragraph
+  */
   const section = div.append('section').attr('id', 'line-chart-years');
+
   section.append('h2').text('Through the years');
 
   section
@@ -312,6 +317,8 @@ function lineChartYears(data) {
   const tickPadding = 5;
   const fontSize = 15;
   const axisStrokeWidth = 1;
+  const xAxisTicks = 5;
+  const yAxisTicks = 8;
   const lineStrokeWidth = 3;
   const highlightStrokeWidth = 3;
   const highlightStrokeDasharray = 4;
@@ -329,6 +336,15 @@ function lineChartYears(data) {
     left: 60,
   };
 
+  /* VISUALIZATION MARKUP
+  svg
+    rect to create a solid background
+    g to add whitespace in the form of margin
+      g for the axes
+      g for the line
+      g for the elements highlighting a specific value
+      g for the invisible overlay
+  */
   const svg = section
     .append('svg')
     .attr('viewBox', [
@@ -348,6 +364,14 @@ function lineChartYears(data) {
     .append('g')
     .attr('transform', `translate(${margin.left} ${margin.top})`);
 
+  const axisGroup = group.append('g');
+
+  const lineGroup = group.append('g');
+
+  const highlightGroup = group.append('g').attr('class', 'highlight');
+
+  const overlayGroup = group.append('g').attr('opacity', 0);
+
   const xScale = scaleTime()
     .domain(extent(data, ({ date }) => dateParser(date)))
     .range([0, width]);
@@ -359,18 +383,17 @@ function lineChartYears(data) {
 
   const xAxis = axisBottom()
     .scale(xScale)
-    .ticks(5)
+    .ticks(xAxisTicks)
     .tickSize(0)
     .tickPadding(tickPadding)
     .tickFormat(d => dateFormatter(d));
 
   const yAxis = axisLeft()
     .scale(yScale)
-    .ticks(8)
+    .ticks(yAxisTicks)
     .tickSize(0)
     .tickPadding(tickPadding);
 
-  const axisGroup = group.append('g');
   axisGroup
     .append('g')
     .call(xAxis)
@@ -399,18 +422,15 @@ function lineChartYears(data) {
     .x(({ date }) => xScale(dateParser(date)))
     .y(({ value }) => yScale(value));
 
-  group
-    .append('g')
+  lineGroup
     .append('path')
     .attr('d', lineGenerator(data))
     .attr('fill', 'none')
     .attr('stroke', highlightColor)
     .attr('stroke-width', lineStrokeWidth);
 
-  const highlightGroup = group
-    .append('g')
-    .attr('class', 'highlight');
-
+  // higlight with two text labels and a circle
+  // include <rect> elements to create a solid background
   const highlightX = highlightGroup.append('g').attr('class', 'highlight-x');
 
   highlightX
@@ -452,8 +472,8 @@ function lineChartYears(data) {
     .attr('stroke', 'currentColor')
     .attr('stroke-width', highlightStrokeWidth);
 
-  group
-    .append('g')
+  // overlay one rectangle for each data point to focus on a specific month
+  overlayGroup
     .selectAll('rect')
     .data(data)
     .enter()
@@ -464,7 +484,6 @@ function lineChartYears(data) {
       xScale(dateParser(data[1].date)) - xScale(dateParser(data[0].date))
     )
     .attr('height', height)
-    .attr('opacity', 0)
     .on('mousemove', (event, { date, value }) => {
       const x = xScale(dateParser(date));
       const y = yScale(value);
@@ -506,6 +525,7 @@ function lineChartYears(data) {
       )
         .node()
         .getBoundingClientRect();
+
       select('#line-chart-years .highlight-y rect')
         .attr('x', -margin.left)
         .attr('y', y - yLabelHeight / 2 - highlightPadding)
@@ -519,8 +539,11 @@ function lineChartYears(data) {
     });
 }
 
-/* VIZ #2: analyse the trend through the months */
+/* VIZ #2: line chart and radial line chart detailing the trend between the months
+the years overlap
+*/
 function lineChartMonths(data) {
+  /* SETUP MARKUP */
   const section = div.append('section').attr('id', 'line-chart-months');
 
   section.append('h2').text('Through the months');
@@ -540,6 +563,9 @@ function lineChartMonths(data) {
   const dateFormatterYear = timeFormat('%Y');
   const dateFormatterMonth = timeFormat('%b');
 
+  /* DATA MASSAGING
+  massage the data to have an array of objects, one for each year
+  */
   const years = data
     .map(({ date }) => dateFormatterYear(dateParser(date)))
     .reduce(
@@ -564,7 +590,8 @@ function lineChartMonths(data) {
   const width = 500;
   const height = 280;
   const tickPadding = 5;
-  const yTicks = 8;
+  const axisStrokeWidth = 1;
+  const yAxisTicks = 8;
   const gridLinesOpacity = 0.2;
   const fontSize = 15;
   const linesOpacity = 0.1;
@@ -578,6 +605,15 @@ function lineChartMonths(data) {
     bottom: 40,
     left: 60,
   };
+
+  /* VISUALIZATION MARKUP - lines
+  svg
+    rect to create a solid background
+    g to add whitespace in the form of margin
+      g for the axes
+      g for the line
+      g for the delaunay's overlay
+  */
 
   const svg = section
     .append('svg')
@@ -598,12 +634,19 @@ function lineChartMonths(data) {
     .append('g')
     .attr('transform', `translate(${margin.left} ${margin.top})`);
 
+  const axisGroup = group.append('g');
+
+  const lineGroup = group.append('g');
+
+  const delaunayGroup = group.append('g');
+
+  const months = dataYear[0].values.map(({ month }) => month);
   const xScale = scaleBand()
-    .domain(dataYear[0].values.map(({ month }) => month))
+    .domain(months)
     .range([0, width]);
 
   const yScale = scaleLinear()
-    .domain(extent(data, d => d.value))
+    .domain(extent(data, ({ value }) => value))
     .range([height, 0])
     .nice();
 
@@ -614,11 +657,10 @@ function lineChartMonths(data) {
 
   const yAxis = axisLeft()
     .scale(yScale)
-    .ticks(yTicks)
+    .ticks(yAxisTicks)
     .tickSize(0)
     .tickPadding(tickPadding);
 
-  const axisGroup = group.append('g');
   axisGroup
     .append('g')
     .call(xAxis)
@@ -638,26 +680,24 @@ function lineChartMonths(data) {
     .attr('d', `M 0 0 h ${width}`)
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 1)
+    .attr('stroke-width', axisStrokeWidth)
     .attr('opacity', gridLinesOpacity);
 
   axisGroup.selectAll('text').attr('font-size', fontSize);
 
   const lineGenerator = line()
-    .x(d => xScale(d.month) + xScale.bandwidth() / 2)
-    .y(d => yScale(d.value));
+    .x(({ month }) => xScale(month) + xScale.bandwidth() / 2)
+    .y(({ value }) => yScale(value));
 
-  const linesGroups = group
-    .append('g')
+  // higlight the 2020 year by reducing the opacity of the other years
+  const linesGroups = lineGroup
     .selectAll('g')
     .data(dataYear)
     .enter()
     .append('g')
     .attr('class', 'line')
     .attr('id', ({ year }) => `line-${year}`)
-    .attr('opacity', ({ year }) =>
-      year === years[years.length - 1] ? 1 : linesOpacity
-    );
+    .attr('opacity', ({ year }) => (year === '2020' ? 1 : linesOpacity));
 
   linesGroups
     .append('path')
@@ -675,6 +715,7 @@ function lineChartMonths(data) {
     .attr('y', ({ values }) => yScale(values[values.length - 1].value))
     .text(({ year }) => year);
 
+  // delaunay's triangulation is based on a 1d array describing the value for each month
   const dataDelaunay = dataYear.reduce((acc, curr) => {
     const values = curr.values.map(({ month, value }) => ({
       month,
@@ -686,14 +727,14 @@ function lineChartMonths(data) {
 
   const delaunay = Delaunay.from(
     dataDelaunay,
-    d => xScale(d.month),
-    d => yScale(d.value)
+    ({ month }) => xScale(month),
+    ({ value }) => yScale(value)
   );
 
   const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-  group
-    .append('g')
+  // on hover change the opacity of the lines to highlight the selected one
+  delaunayGroup
     .selectAll('path')
     .data(dataDelaunay)
     .enter()
@@ -706,9 +747,19 @@ function lineChartMonths(data) {
       select(`#line-chart-months #line-${year}`).attr('opacity', 1);
     });
 
+  /* VISUALIZATION MARKUP - radial
+  svg
+    rect to create a solid background
+    g to center the elements
+      g for the axes
+      g for the line
+      g for the highlight elements
+      g for the delaunay's overlay
+  */
   const widthRadial = 500;
   const heightRadial = 500;
   const marginRadial = 65;
+  const highlightFontSize = fontSize * 2;
 
   const svgRadial = section
     .append('svg')
@@ -733,6 +784,12 @@ function lineChartMonths(data) {
         heightRadial / 2})`
     );
 
+  const axisGroupRadial = groupRadial.append('g');
+
+  const lineGroupRadial = groupRadial.append('g');
+
+  const delaunayGroupRadial = groupRadial.append('g');
+
   const angleScale = scaleBand()
     .domain(xScale.domain())
     .range([0, Math.PI * 2]);
@@ -741,6 +798,8 @@ function lineChartMonths(data) {
     .domain(yScale.domain())
     .range([0, Math.floor(widthRadial / 2)]);
 
+  // for the axis the idea is to draw a line from the smallest value outwards
+  // draw a straight line, and rotate according to the angle
   const dataAxis = dataYear[0].values.map(({ month }) => {
     const values = dataYear.map(
       year => year.values.find(d => d.month === month).value
@@ -751,14 +810,13 @@ function lineChartMonths(data) {
     };
   });
 
-  const axisGroups = groupRadial
-    .append('g')
+  const axisGroupsRadial = axisGroupRadial
     .selectAll('g')
     .data(dataAxis)
     .enter()
     .append('g');
 
-  axisGroups
+  axisGroupsRadial
     .append('path')
     .attr('opacity', 0.1)
     .attr(
@@ -773,7 +831,8 @@ function lineChartMonths(data) {
       ({ month }) => `rotate(${(angleScale(month) / Math.PI) * 180})`
     );
 
-  axisGroups
+  // describe the month at the end of the lines describing the axes
+  axisGroupsRadial
     .append('text')
     .text(({ month }) => month)
     .attr('text-anchor', 'middle')
@@ -787,21 +846,18 @@ function lineChartMonths(data) {
     });
 
   const lineGeneratorRadial = lineRadial()
-    .angle(d => angleScale(d.month))
-    .radius(d => radiusScale(d.value))
+    .angle(({ month }) => angleScale(month))
+    .radius(({ value }) => radiusScale(value))
     .curve(curveLinearClosed);
 
-  const linesGroupsRadial = groupRadial
-    .append('g')
+  const linesGroupsRadial = lineGroupRadial
     .selectAll('g')
     .data(dataYear)
     .enter()
     .append('g')
     .attr('class', 'line-radial')
     .attr('id', ({ year }) => `line-radial-${year}`)
-    .attr('opacity', ({ year }) =>
-      year === years[years.length - 1] ? 1 : linesOpacity
-    );
+    .attr('opacity', ({ year }) => (year === '2020' ? 1 : linesOpacity));
 
   linesGroupsRadial
     .append('path')
@@ -810,6 +866,7 @@ function lineChartMonths(data) {
     .attr('stroke', highlightColor)
     .attr('stroke-width', lineStrokeWidth);
 
+  // overlay a circle on the line describing each year
   linesGroupsRadial
     .selectAll('circle')
     .data(({ values }) => values)
@@ -827,6 +884,7 @@ function lineChartMonths(data) {
       return `translate(${x} ${y})`;
     });
 
+  // highlight the selected year (2020 by default) with a text labels and adding the values at the bottom of each month label
   const highlightGroupRadial = groupRadial
     .append('g')
     .attr('class', 'highlight');
@@ -837,7 +895,7 @@ function lineChartMonths(data) {
     .attr('text-anchor', 'middle')
     .attr('dominant-baseline', 'middle')
     .attr('y', 3)
-    .attr('font-size', fontSize * 2)
+    .attr('font-size', highlightFontSize)
     .attr('font-weight', 'bold')
     .attr('fill', 'currentColor');
 
@@ -860,10 +918,13 @@ function lineChartMonths(data) {
       return `translate(${x} ${y + 18})`;
     });
 
+  // for delaunay's tringulation use the polar coordinates for each value
   const delaunayRadial = Delaunay.from(
     dataDelaunay,
-    d => Math.cos(angleScale(d.month) - Math.PI / 2) * radiusScale(d.value),
-    d => Math.sin(angleScale(d.month) - Math.PI / 2) * radiusScale(d.value)
+    ({ month, value }) =>
+      Math.cos(angleScale(month) - Math.PI / 2) * radiusScale(value),
+    ({ month, value }) =>
+      Math.sin(angleScale(month) - Math.PI / 2) * radiusScale(value)
   );
 
   const voronoiRadial = delaunayRadial.voronoi([
@@ -873,8 +934,8 @@ function lineChartMonths(data) {
     heightRadial / 2,
   ]);
 
-  groupRadial
-    .append('g')
+  // on hover change the opacity of the lines, but also the text describing the year and values
+  delaunayGroupRadial
     .selectAll('path')
     .data(dataDelaunay)
     .enter()
@@ -888,7 +949,9 @@ function lineChartMonths(data) {
       );
 
       select(`#line-chart-months #line-radial-${year}`).attr('opacity', 1);
+
       select('#line-chart-months .highlight text').text(year);
+
       selectAll('#line-chart-months .highlight g text').text((datum, i) =>
         format(',')(dataYear.find(d => d.year === year).values[i].value)
       );
