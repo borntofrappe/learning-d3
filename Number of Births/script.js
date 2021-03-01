@@ -310,7 +310,6 @@ function lineChartYears(data) {
   const backgroundColor = '#fff';
   const highlightColor = '#8652ca';
   const tickPadding = 5;
-  const borderRadius = 5;
   const fontSize = 15;
   const axisStrokeWidth = 1;
   const lineStrokeWidth = 3;
@@ -343,8 +342,7 @@ function lineChartYears(data) {
     .append('rect')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
-    .attr('fill', backgroundColor)
-    .attr('rx', borderRadius);
+    .attr('fill', backgroundColor);
 
   const group = svg
     .append('g')
@@ -411,8 +409,7 @@ function lineChartYears(data) {
 
   const highlightGroup = group
     .append('g')
-    .attr('class', 'highlight')
-    .style('color', highlightColor);
+    .attr('class', 'highlight');
 
   const highlightX = highlightGroup.append('g').attr('class', 'highlight-x');
 
@@ -566,13 +563,14 @@ function lineChartMonths(data) {
 
   const width = 500;
   const height = 280;
-  const borderRadius = 5;
   const tickPadding = 5;
   const yTicks = 8;
   const gridLinesOpacity = 0.2;
   const fontSize = 15;
   const linesOpacity = 0.1;
   const lineStrokeWidth = 3;
+  const highlightRadius = 6;
+  const highlightStrokeWidth = 4;
 
   const margin = {
     top: 20,
@@ -594,7 +592,6 @@ function lineChartMonths(data) {
     .append('rect')
     .attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
-    .attr('rx', borderRadius)
     .attr('fill', backgroundColor);
 
   const group = svg
@@ -711,7 +708,7 @@ function lineChartMonths(data) {
 
   const widthRadial = 500;
   const heightRadial = 500;
-  const marginRadial = 20;
+  const marginRadial = 65;
 
   const svgRadial = section
     .append('svg')
@@ -726,10 +723,9 @@ function lineChartMonths(data) {
     .append('rect')
     .attr('width', widthRadial + marginRadial * 2)
     .attr('height', heightRadial + marginRadial * 2)
-    .attr('rx', borderRadius)
     .attr('fill', backgroundColor);
 
-  groupRadial = svgRadial
+  const groupRadial = svgRadial
     .append('g')
     .attr(
       'transform',
@@ -744,6 +740,51 @@ function lineChartMonths(data) {
   const radiusScale = scaleLinear()
     .domain(yScale.domain())
     .range([0, Math.floor(widthRadial / 2)]);
+
+  const dataAxis = dataYear[0].values.map(({ month }) => {
+    const values = dataYear.map(
+      year => year.values.find(d => d.month === month).value
+    );
+    return {
+      month,
+      value: Math.min(...values),
+    };
+  });
+
+  const axisGroups = groupRadial
+    .append('g')
+    .selectAll('g')
+    .data(dataAxis)
+    .enter()
+    .append('g');
+
+  axisGroups
+    .append('path')
+    .attr('opacity', 0.1)
+    .attr(
+      'd',
+      ({ value }) => `M 0 -${radiusScale(value)} V -${widthRadial / 2}`
+    )
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 2)
+    .attr(
+      'transform',
+      ({ month }) => `rotate(${(angleScale(month) / Math.PI) * 180})`
+    );
+
+  axisGroups
+    .append('text')
+    .text(({ month }) => month)
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .attr('transform', ({ month }) => {
+      const angle = angleScale(month) - Math.PI / 2;
+      const radius = widthRadial / 2 + 30;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      return `translate(${x} ${y})`;
+    });
 
   const lineGeneratorRadial = lineRadial()
     .angle(d => angleScale(d.month))
@@ -769,10 +810,60 @@ function lineChartMonths(data) {
     .attr('stroke', highlightColor)
     .attr('stroke-width', lineStrokeWidth);
 
+  linesGroupsRadial
+    .selectAll('circle')
+    .data(({ values }) => values)
+    .enter()
+    .append('circle')
+    .attr('r', highlightRadius)
+    .attr('fill', highlightColor)
+    .attr('stroke', backgroundColor)
+    .attr('stroke-width', highlightStrokeWidth)
+    .attr('transform', ({ month, value }) => {
+      const angle = angleScale(month) - Math.PI / 2;
+      const radius = radiusScale(value);
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      return `translate(${x} ${y})`;
+    });
+
+  const highlightGroupRadial = groupRadial
+    .append('g')
+    .attr('class', 'highlight');
+
+  highlightGroupRadial
+    .append('text')
+    .text('2020')
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .attr('y', 3)
+    .attr('font-size', fontSize * 2)
+    .attr('font-weight', 'bold')
+    .attr('fill', 'currentColor');
+
+  highlightGroupRadial
+    .append('g')
+    .selectAll('text')
+    .data(dataYear.find(({ year }) => year === '2020').values)
+    .enter()
+    .append('text')
+    .text(({ value }) => format(',')(value))
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'middle')
+    .attr('font-size', fontSize)
+    .attr('fill', 'currentColor')
+    .attr('transform', ({ month }) => {
+      const angle = angleScale(month) - Math.PI / 2;
+      const radius = widthRadial / 2 + 30;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      return `translate(${x} ${y + 18})`;
+    });
+
   const delaunayRadial = Delaunay.from(
     dataDelaunay,
-    d => Math.cos(angleScale(d.month)) * radiusScale(d.value),
-    d => Math.sin(angleScale(d.month)) * radiusScale(d.value)
+    d => Math.cos(angleScale(d.month) - Math.PI / 2) * radiusScale(d.value),
+    d => Math.sin(angleScale(d.month) - Math.PI / 2) * radiusScale(d.value)
   );
 
   const voronoiRadial = delaunayRadial.voronoi([
@@ -797,8 +888,12 @@ function lineChartMonths(data) {
       );
 
       select(`#line-chart-months #line-radial-${year}`).attr('opacity', 1);
+      select('#line-chart-months .highlight text').text(year);
+      selectAll('#line-chart-months .highlight g text').text((datum, i) =>
+        format(',')(dataYear.find(d => d.year === year).values[i].value)
+      );
     });
 }
 
-// lineChartYears(data);
+lineChartYears(data);
 lineChartMonths(data);
