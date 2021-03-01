@@ -301,7 +301,7 @@ function lineChartYears(data) {
   section
     .append('p')
     .text(
-      'While oscillating between months, the overall trend since 2000 shows an overall decline.'
+      'While oscillating between months, the number has declined in recent years.'
     );
 
   section
@@ -312,8 +312,8 @@ function lineChartYears(data) {
   const dateParser = timeParse('%Y-%m');
   const dateFormatter = timeFormat('%B %Y');
 
-  const backgroundColor = '#fff';
-  const highlightColor = '#8652ca';
+  const backgroundColor = 'hsl(0, 0%, 100%)';
+  const highlightColor = 'hsl(266, 53%, 56%)';
   const tickPadding = 5;
   const fontSize = 15;
   const axisStrokeWidth = 1;
@@ -557,7 +557,7 @@ function lineChartMonths(data) {
   section
     .append('p')
     .style('font-size', '0.9rem')
-    .text('Hover on the charts to focus on a specific year.');
+    .text('Hover on the charts to highlight a specific year.');
 
   const dateParser = timeParse('%Y-%m');
   const dateFormatterYear = timeFormat('%Y');
@@ -584,8 +584,8 @@ function lineChartMonths(data) {
       })),
   }));
 
-  const backgroundColor = '#fff';
-  const highlightColor = '#8652ca';
+  const backgroundColor = 'hsl(0, 0%, 100%)';
+  const highlightColor = 'hsl(266, 53%, 56%)';
 
   const width = 500;
   const height = 280;
