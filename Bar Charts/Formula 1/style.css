@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Playfair+Display:wght@900&display=swap');
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,7 +7,11 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: monospace;
+  color: hsl(204, 64%, 23%);
+  background: hsl(33, 82%, 94%);
+  font-family: 'Noto Sans', sans-serif;
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
 }
