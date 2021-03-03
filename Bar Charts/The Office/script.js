@@ -53,3 +53,69 @@ const data = [
   { name: 'Rolf', lines: 12, episodes: 4 },
   { name: 'Vikram', lines: 10, episodes: 2 },
 ];
+
+// const xAccessor = d => (d.lines / d.episodes);
+const xAccessor = d => d.lines;
+const yAccessor = d => d.name;
+
+const dimensions = {
+  width: 800,
+  height: 1000,
+  margin: {
+    top: 25,
+    right: 10,
+    bottom: 10,
+    left: 60,
+  },
+};
+
+dimensions.boundedWidth =
+  dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+dimensions.boundedHeight =
+  dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+const wrapper = d3
+  .select('body')
+  .append('svg')
+  .attr('width', dimensions.width)
+  .attr('height', dimensions.height);
+
+const bounds = wrapper
+  .append('g')
+  .attr(
+    'transform',
+    `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+  );
+
+const groupAxis = bounds.append('g');
+const groupBars = bounds.append('g');
+
+const xScale = d3
+  .scaleLinear()
+  .domain([0, d3.max(data, xAccessor)])
+  .range([0, dimensions.boundedWidth]);
+
+const xAxisGenerator = d3.axisTop().scale(xScale);
+
+groupAxis.append('g').call(xAxisGenerator);
+
+const yScale = d3
+  .scaleBand()
+  .domain(data.map(yAccessor))
+  .range([0, dimensions.boundedHeight])
+  .padding(0.2);
+
+const yAxisGenerator = d3.axisLeft().scale(yScale);
+
+groupAxis.append('g').call(yAxisGenerator);
+
+const bars = groupBars
+  .append('g')
+  .selectAll('rect')
+  .data(data)
+  .join('rect')
+  .attr('x', 0)
+  .attr('y', d => yScale(yAccessor(d)))
+  .attr('width', d => xScale(xAccessor(d)))
+  .attr('height', yScale.bandwidth())
+  .attr('fill', '#e7962a');
