@@ -54,6 +54,16 @@ const data = [
   { name: 'Vikram', lines: 10, episodes: 2 },
 ];
 
+d3
+  .select('#wrapper')
+  .append('h1')
+  .text('That\'s how much they said');
+
+d3
+  .select('#wrapper')
+  .append('p')
+  .html('Lines spoken <button>per episode</button><button id="active">the entire series</button> by characters who appeared in at least six episodes.');
+
 // const xAccessor = d => (d.lines / d.episodes);
 const xAccessor = d => d.lines;
 const yAccessor = d => d.name;
@@ -63,7 +73,7 @@ const dimensions = {
   height: 1000,
   margin: {
     top: 25,
-    right: 10,
+    right: 50,
     bottom: 10,
     left: 60,
   },
@@ -75,10 +85,18 @@ dimensions.boundedHeight =
   dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
 const wrapper = d3
-  .select('body')
+  .select('#wrapper')
   .append('svg')
   .attr('width', dimensions.width)
-  .attr('height', dimensions.height);
+  .attr('height', dimensions.height)
+
+wrapper
+  .attr('tabindex', '0')
+  .attr('role', 'figure');
+
+wrapper
+  .append('title')
+  .text('Bar chart hihglighting the number of lines')
 
 const bounds = wrapper
   .append('g')
@@ -86,6 +104,11 @@ const bounds = wrapper
     'transform',
     `translate(${dimensions.margin.left} ${dimensions.margin.top})`
   );
+
+bounds
+  .attr('tabindex', '0')
+  .attr('role', 'list')
+  .attr('aria-label', 'Bars ');
 
 const groupAxis = bounds.append('g');
 const groupBars = bounds.append('g');
@@ -95,9 +118,21 @@ const xScale = d3
   .domain([0, d3.max(data, xAccessor)])
   .range([0, dimensions.boundedWidth]);
 
-const xAxisGenerator = d3.axisTop().scale(xScale);
+const xAxisGenerator = d3.axisTop().scale(xScale).tickSize(0).tickPadding(5);
 
-groupAxis.append('g').call(xAxisGenerator);
+groupAxis
+  .append('g')
+  .call(xAxisGenerator)
+  .selectAll('g.tick')
+  .append('line')
+  .attr('x1', 0)
+  .attr('x2', 0)
+  .attr('y1', 0)
+  .attr('y2', dimensions.boundedHeight)
+  .attr('stroke', 'currentColor')
+  .attr('stroke-width', 0.5)
+  .attr('stroke-dasharray', '4 6')
+  .attr('opacity', 0.5)
 
 const yScale = d3
   .scaleBand()
@@ -105,15 +140,32 @@ const yScale = d3
   .range([0, dimensions.boundedHeight])
   .padding(0.2);
 
-const yAxisGenerator = d3.axisLeft().scale(yScale);
+const yAxisGenerator = d3.axisLeft().scale(yScale).tickSize(0).tickPadding(5);
 
 groupAxis.append('g').call(yAxisGenerator);
 
-const bars = groupBars
+groupAxis
+    .selectAll('text')
+    .attr('font-size', 12);
+
+groupAxis
+  .selectAll('path')
+  .remove()
+
+const groupsBar = groupBars
   .append('g')
-  .selectAll('rect')
+  .selectAll('g')
   .data(data)
-  .join('rect')
+  .enter()
+  .append('g')
+
+  groupsBar
+  .attr('tabindex', '0')
+  .attr('role', 'listitem')
+  .attr('aria-label', d => `${yAccessor(d)} spoke ${xAccessor(d)} lines`);
+
+groupsBar
+  .append('rect')
   .attr('x', 0)
   .attr('y', d => yScale(yAccessor(d)))
   .attr('width', d => xScale(xAccessor(d)))
