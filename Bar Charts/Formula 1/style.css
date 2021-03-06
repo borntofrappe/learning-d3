@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&family=Playfair+Display:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Faster+One&family=Lato:wght@400;700&display=swap');
 
 * {
   box-sizing: border-box;
@@ -7,11 +7,82 @@
 }
 
 body {
-  color: hsl(204, 64%, 23%);
-  background: hsl(33, 82%, 94%);
-  font-family: 'Noto Sans', sans-serif;
+  color: #010101;
+  background: #fefefe;
+  font-family: 'Lato', sans-serif;
+  min-height: 100vh;
+  background-image: linear-gradient(-80deg, #bfd5e3 30%, #d0e1e9 30%);
 }
 
-h1 {
-  font-family: 'Playfair Display', serif;
+#wrapper {
+  max-width: 800px;
+  padding: 1rem 0.75rem;
+  margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fefefe;
+}
+
+#wrapper > * + * {
+  margin-top: 1rem;
+}
+
+#wrapper h1 {
+  font-family: 'Faster One', cursive;
+  font-weight: 900;
+  font-size: 2rem;
+  position: relative;
+}
+
+#wrapper p {
+  font-weight: 500;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 550px;
+  text-align: center;
+}
+
+#wrapper p:last-of-type {
+  font-size: 0.9rem;
+  font-family: 'Lato', sans-serif;
+  align-self: flex-start;
+}
+
+#wrapper p:last-of-type a {
+  color: inherit;
+}
+
+#wrapper p button {
+  padding: 0.2rem 0.5rem;
+  background-color: hsl(33, 82%, 98%);
+  border: 0.5px solid #010101;
+  color: inherit;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#wrapper p button.active {
+  background-color: #010101;
+  color: hsl(33, 82%, 98%);
+}
+
+#wrapper svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+#wrapper svg text {
+  font-family: 'Lato', sans-serif;
+  fill: currentColor;
+  font-size: 12px;
+}
+
+#wrapper svg text#x-axis-label {
+  text-transform: uppercase;
+  font-weight: bold;
+  opacity: 0.5;
+  font-size: 14px;
 }

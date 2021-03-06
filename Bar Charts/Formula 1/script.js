@@ -1,3 +1,4 @@
+const winsThreshold = 5;
 const data = [
   { name: 'Lewis Hamilton', races: 266, wins: 95 },
   { name: 'Michael Schumacher', races: 306, wins: 91 },
@@ -109,71 +110,222 @@ const data = [
   { name: 'Lorenzo Bandini', races: 42, wins: 1 },
   { name: 'Giancarlo Baghetti', races: 21, wins: 1 },
   { name: 'Jean Alesi', races: 201, wins: 1 },
-];
 
-const xAccessor = d => (d.wins / d.races);
-// const xAccessor = d => d.wins;
-const yAccessor = d => d.name;
+].filter(({wins}) => wins >= winsThreshold);
 
-const dimensions = {
-  width: 800,
-  height: 1800,
-  margin: {
-    top: 25,
-    right: 10,
-    bottom: 10,
-    left: 120,
-  },
-};
+function drawBarChart() {
+  const metrics = [
+    {
+      id: 'wins-absolute',
+      button: 'absolute',
+      label: 'total wins',
+      accessor: d => d.wins,
+    },
+    {
+      id: 'wins-relative',
+      button: 'relative',
+      label: 'wins over races',
+      accessor: d => d.wins / d.races,
+    },
+  ];
 
-dimensions.boundedWidth =
-  dimensions.width - (dimensions.margin.left + dimensions.margin.right);
-dimensions.boundedHeight =
-  dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+  /* INTRODUCTORY MARKUP */
+  d3.select('#wrapper')
+    .append('h1')
+    .text("How much they won");
 
-const wrapper = d3
-  .select('body')
-  .append('svg')
-  .attr('width', dimensions.width)
-  .attr('height', dimensions.height);
+  d3.select('#wrapper')
+    .append('p')
+    .html(
+      `Number of ${metrics
+        .map(({ id, button }) => `<button id="${id}">${button}</button>`)
+        .join(
+          ''
+        )} victories by F1 drivers who won at least ${winsThreshold} races.`
+    );
 
-const bounds = wrapper
-  .append('g')
-  .attr(
-    'transform',
-    `translate(${dimensions.margin.left} ${dimensions.margin.top})`
-  );
+    /* STATIC SVG
+    included regardless of the selected option
+    */
+    const dimensions = {
+      width: 800,
+      height: 1600,
+      margin: {
+        top: 35,
+        right: 40,
+        bottom: 10,
+        left: 120,
+      },
+    };
+  
+    dimensions.boundedWidth =
+      dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+    dimensions.boundedHeight =
+      dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-const groupAxis = bounds.append('g');
-const groupBars = bounds.append('g');
+  const wrapper = d3
+    .select('#wrapper')
+    .append('svg')
+    .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height);
 
-const xScale = d3
-  .scaleLinear()
-  .domain([0, d3.max(data, xAccessor)])
-  .range([0, dimensions.boundedWidth]);
+  wrapper.attr('tabindex', '0').attr('role', 'figure');
 
-const xAxisGenerator = d3.axisTop().scale(xScale);
+  wrapper.append('title');
 
-groupAxis.append('g').call(xAxisGenerator);
+  const bounds = wrapper
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
 
-const yScale = d3
-  .scaleBand()
-  .domain(data.map(yAccessor))
-  .range([0, dimensions.boundedHeight])
-  .padding(0.2);
+  const axisGroup = bounds.append('g');
+  const barsGroup = bounds.append('g').attr('id', 'bars');
 
-const yAxisGenerator = d3.axisLeft().scale(yScale);
+  barsGroup
+    .attr('tabindex', '0')
+    .attr('role', 'list')
+    .attr('aria-label', 'Bars');
 
-groupAxis.append('g').call(yAxisGenerator);
+  axisGroup
+    .append('g')
+    .attr('id', 'x-axis')
+    .append('text')
+    .attr('id', 'x-axis-label')
+    .attr('x', dimensions.boundedWidth / 2)
+    .attr('y', -dimensions.margin.top + 10);
 
-const bars = groupBars
-  .append('g')
-  .selectAll('rect')
-  .data(data)
-  .join('rect')
-  .attr('x', 0)
-  .attr('y', d => yScale(yAccessor(d)))
-  .attr('width', d => xScale(xAccessor(d)))
-  .attr('height', yScale.bandwidth())
-  .attr('fill', '#e7962a');
+  d3
+    .select('#wrapper')
+    .append('p')
+    .html('Inspired by <a href="https://pudding.cool/2017/08/the-office/">this essay</a> to practice with D3, data binding and transitions.');
 
+  function drawBars(metric) {
+    /* UPDATE VISUALIZATION
+    according to the chosen metric update
+    - <title> element
+    - label on the x-axis
+    - y position of the bars
+    - width of the rectangle
+    */
+    d3.select('#wrapper svg title').text(
+      `Bar chart hihglighting the number of ${metric.label}`
+    );
+
+    d3.select('#wrapper svg #x-axis-label').text(metric.label);
+
+    const xAccessor = metric.accessor;
+    const yAccessor = d => d.name;
+
+    const sortedData = data.sort((a, b) =>
+      xAccessor(a) < xAccessor(b) ? 1 : -1
+    );
+
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, xAccessor)])
+      .range([0, dimensions.boundedWidth]);
+
+    const xAxisGenerator = d3
+      .axisTop()
+      .scale(xScale)
+      .tickSize(0)
+      .tickPadding(5);
+
+    const xAxis = axisGroup.select('#x-axis').call(xAxisGenerator);
+
+    xAxis.selectAll('path').remove();
+
+    xAxis
+      .selectAll('g.tick')
+      .append('path')
+      .attr('d', `M 0 0 V ${dimensions.boundedHeight}`)
+      .attr('stroke', 'currentColor')
+      .attr('stroke-width', 0.5)
+      .attr('stroke-dasharray', '4 6')
+      .attr('opacity', 0.5);
+
+    const yScale = d3
+      .scaleBand()
+      .domain(sortedData.map(yAccessor))
+      .range([0, dimensions.boundedHeight])
+      .padding(0.2);
+
+    // firstTransition for change in width (initial and update)
+    // second transition for the change in y coordinate 
+    const firstTransition = d3.transition().duration(500);
+    const secondTransition = d3
+      .transition()
+      .delay(200)
+      .duration(1000);
+
+    /* DATA JOIN
+    for new elements include the group, rectangle and text elements
+    for existing element, update the group's position, the rectangle's width
+    */
+    const barGroups = barsGroup.selectAll('g').data(sortedData, yAccessor);
+
+    const newBarGroups = barGroups
+      .enter()
+      .append('g')
+      .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
+
+    barGroups
+      .transition(firstTransition)
+      .transition(secondTransition)
+      .delay((d, i) => {
+        const index = sortedData.findIndex(({ name }) => name === yAccessor(d));
+        return Math.floor(index / 2) * 50;
+      })
+      .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
+
+    /* ISSUE: the order of the elements dictates the order in which the bars are tabbed
+    is the only solution updating the DOM?
+    */
+    newBarGroups
+      .attr('tabindex', '0')
+      .attr('role', 'listitem')
+      .merge(barGroups)
+      .attr('aria-label', d => `${yAccessor(d)} spoke ${xAccessor(d)} lines`);
+
+    newBarGroups
+      .append('rect')
+      .attr('height', yScale.bandwidth())
+      .attr('fill', '#010101')
+      .transition(firstTransition)
+      .attr('width', d => xScale(xAccessor(d)));
+
+    barGroups
+      .select('rect')
+      .transition(firstTransition)
+      .attr('width', d => xScale(xAccessor(d)));
+
+    newBarGroups
+      .append('text')
+      .text(yAccessor)
+      .attr('x', -5)
+      .attr('text-anchor', 'end')
+      .attr('dominant-baseline', 'middle')
+      .attr('y', yScale.bandwidth() / 2);
+
+    d3.selectAll('#wrapper button')
+      .attr('class', function() {
+        return d3.select(this).attr('id') === metric.id ? 'active' : '';
+      })
+      .on('click', function() {
+        const selection = metrics.find(
+          ({ id }) => d3.select(this).attr('id') === id
+        );
+        if (selection.id !== metric.id) {
+          drawBars(selection);
+        }
+      });
+  }
+
+  // include the bars for the first metric
+  drawBars(metrics[0]);
+}
+
+drawBarChart();
