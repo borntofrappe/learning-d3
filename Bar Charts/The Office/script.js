@@ -52,122 +52,221 @@ const data = [
   { name: 'Zeke', lines: 13, episodes: 3 },
   { name: 'Rolf', lines: 12, episodes: 4 },
   { name: 'Vikram', lines: 10, episodes: 2 },
-];
+].filter(({ episodes }) => episodes >= 6);
 
-d3
-  .select('#wrapper')
-  .append('h1')
-  .text('That\'s how much they said');
+function drawBarChart() {
+  const metrics = [
+    {
+      id: 'lines-series',
+      button: 'the entire series',
+      label: 'total lines',
+      accessor: d => d.lines,
+    },
+    {
+      id: 'lines-episode',
+      button: 'per episode',
+      label: 'lines per episode',
+      accessor: d => d.lines / d.episodes,
+    },
+  ];
 
-d3
-  .select('#wrapper')
-  .append('p')
-  .html('Lines spoken <button>per episode</button><button id="active">the entire series</button> by characters who appeared in at least six episodes.');
+  /* INTRODUCTORY MARKUP */
+  d3.select('#wrapper')
+    .append('h1')
+    .text("That's how much they said");
 
-// const xAccessor = d => (d.lines / d.episodes);
-const xAccessor = d => d.lines;
-const yAccessor = d => d.name;
+  d3.select('#wrapper')
+    .append('p')
+    .html(
+      `Lines spoken ${metrics
+        .map(({ id, button }) => `<button id="${id}">${button}</button>`)
+        .join(
+          ''
+        )} by characters of the series "The Office" who appeared in at least six episodes.`
+    );
 
-const dimensions = {
-  width: 800,
-  height: 1000,
-  margin: {
-    top: 25,
-    right: 50,
-    bottom: 10,
-    left: 60,
-  },
-};
+    /* STATIC SVG
+    included regardless of the selected option
+    */
+    const dimensions = {
+      width: 800,
+      height: 800,
+      margin: {
+        top: 35,
+        right: 40,
+        bottom: 10,
+        left: 60,
+      },
+    };
+  
+    dimensions.boundedWidth =
+      dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+    dimensions.boundedHeight =
+      dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-dimensions.boundedWidth =
-  dimensions.width - (dimensions.margin.left + dimensions.margin.right);
-dimensions.boundedHeight =
-  dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+  const wrapper = d3
+    .select('#wrapper')
+    .append('svg')
+    .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height);
 
-const wrapper = d3
-  .select('#wrapper')
-  .append('svg')
-  .attr('width', dimensions.width)
-  .attr('height', dimensions.height)
+  wrapper.attr('tabindex', '0').attr('role', 'figure');
 
-wrapper
-  .attr('tabindex', '0')
-  .attr('role', 'figure');
+  wrapper.append('title');
 
-wrapper
-  .append('title')
-  .text('Bar chart hihglighting the number of lines')
+  const bounds = wrapper
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
 
-const bounds = wrapper
-  .append('g')
-  .attr(
-    'transform',
-    `translate(${dimensions.margin.left} ${dimensions.margin.top})`
-  );
+  const axisGroup = bounds.append('g');
+  const barsGroup = bounds.append('g').attr('id', 'bars');
 
-bounds
-  .attr('tabindex', '0')
-  .attr('role', 'list')
-  .attr('aria-label', 'Bars ');
+  barsGroup
+    .attr('tabindex', '0')
+    .attr('role', 'list')
+    .attr('aria-label', 'Bars');
 
-const groupAxis = bounds.append('g');
-const groupBars = bounds.append('g');
+  axisGroup
+    .append('g')
+    .attr('id', 'x-axis')
+    .append('text')
+    .attr('id', 'x-axis-label')
+    .attr('x', dimensions.boundedWidth / 2)
+    .attr('y', -dimensions.margin.top + 10);
 
-const xScale = d3
-  .scaleLinear()
-  .domain([0, d3.max(data, xAccessor)])
-  .range([0, dimensions.boundedWidth]);
+  d3
+    .select('#wrapper')
+    .append('p')
+    .html('Inspired by <a href="https://pudding.cool/2017/08/the-office/">this essay</a> to practice with D3, data binding and transitions.');
 
-const xAxisGenerator = d3.axisTop().scale(xScale).tickSize(0).tickPadding(5);
+  function drawBars(metric) {
+    /* UPDATE VISUALIZATION
+    according to the chosen metric update
+    - <title> element
+    - label on the x-axis
+    - y position of the bars
+    - width of the rectangle
+    */
+    d3.select('#wrapper svg title').text(
+      `Bar chart hihglighting the number of ${metric.label}`
+    );
 
-groupAxis
-  .append('g')
-  .call(xAxisGenerator)
-  .selectAll('g.tick')
-  .append('line')
-  .attr('x1', 0)
-  .attr('x2', 0)
-  .attr('y1', 0)
-  .attr('y2', dimensions.boundedHeight)
-  .attr('stroke', 'currentColor')
-  .attr('stroke-width', 0.5)
-  .attr('stroke-dasharray', '4 6')
-  .attr('opacity', 0.5)
+    d3.select('#wrapper svg #x-axis-label').text(metric.label);
 
-const yScale = d3
-  .scaleBand()
-  .domain(data.map(yAccessor))
-  .range([0, dimensions.boundedHeight])
-  .padding(0.2);
+    const xAccessor = metric.accessor;
+    const yAccessor = d => d.name;
 
-const yAxisGenerator = d3.axisLeft().scale(yScale).tickSize(0).tickPadding(5);
+    const sortedData = data.sort((a, b) =>
+      xAccessor(a) < xAccessor(b) ? 1 : -1
+    );
 
-groupAxis.append('g').call(yAxisGenerator);
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, xAccessor)])
+      .range([0, dimensions.boundedWidth]);
 
-groupAxis
-    .selectAll('text')
-    .attr('font-size', 12);
+    const xAxisGenerator = d3
+      .axisTop()
+      .scale(xScale)
+      .tickSize(0)
+      .tickPadding(5);
 
-groupAxis
-  .selectAll('path')
-  .remove()
+    const xAxis = axisGroup.select('#x-axis').call(xAxisGenerator);
 
-const groupsBar = groupBars
-  .append('g')
-  .selectAll('g')
-  .data(data)
-  .enter()
-  .append('g')
+    xAxis.selectAll('path').remove();
 
-  groupsBar
-  .attr('tabindex', '0')
-  .attr('role', 'listitem')
-  .attr('aria-label', d => `${yAccessor(d)} spoke ${xAccessor(d)} lines`);
+    xAxis
+      .selectAll('g.tick')
+      .append('path')
+      .attr('d', `M 0 0 V ${dimensions.boundedHeight}`)
+      .attr('stroke', 'currentColor')
+      .attr('stroke-width', 0.5)
+      .attr('stroke-dasharray', '4 6')
+      .attr('opacity', 0.5);
 
-groupsBar
-  .append('rect')
-  .attr('x', 0)
-  .attr('y', d => yScale(yAccessor(d)))
-  .attr('width', d => xScale(xAccessor(d)))
-  .attr('height', yScale.bandwidth())
-  .attr('fill', '#e7962a');
+    const yScale = d3
+      .scaleBand()
+      .domain(sortedData.map(yAccessor))
+      .range([0, dimensions.boundedHeight])
+      .padding(0.2);
+
+    // firstTransition for change in width (initial and update)
+    // second transition for the change in y coordinate 
+    const firstTransition = d3.transition().duration(500);
+    const secondTransition = d3
+      .transition()
+      .delay(200)
+      .duration(1000);
+
+    /* DATA JOIN
+    for new elements include the group, rectangle and text elements
+    for existing element, update the group's position, the rectangle's width
+    */
+    const barGroups = barsGroup.selectAll('g').data(sortedData, yAccessor);
+
+    const newBarGroups = barGroups
+      .enter()
+      .append('g')
+      .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
+
+    barGroups
+      .transition(firstTransition)
+      .transition(secondTransition)
+      .delay((d, i) => {
+        const index = sortedData.findIndex(({ name }) => name === yAccessor(d));
+        return Math.floor(index / 2) * 50;
+      })
+      .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
+
+    /* ISSUE: the order of the elements dictates the order in which the bars are tabbed
+    is the only solution updating the DOM?
+    */
+    newBarGroups
+      .attr('tabindex', '0')
+      .attr('role', 'listitem')
+      .merge(barGroups)
+      .attr('aria-label', d => `${yAccessor(d)} spoke ${xAccessor(d)} lines`);
+
+    newBarGroups
+      .append('rect')
+      .attr('height', yScale.bandwidth())
+      .attr('fill', '#e7962a')
+      .transition(firstTransition)
+      .attr('width', d => xScale(xAccessor(d)));
+
+    barGroups
+      .select('rect')
+      .transition(firstTransition)
+      .attr('width', d => xScale(xAccessor(d)));
+
+    newBarGroups
+      .append('text')
+      .text(yAccessor)
+      .attr('x', -5)
+      .attr('text-anchor', 'end')
+      .attr('dominant-baseline', 'middle')
+      .attr('y', yScale.bandwidth() / 2);
+
+    d3.selectAll('#wrapper button')
+      .attr('class', function() {
+        return d3.select(this).attr('id') === metric.id ? 'active' : '';
+      })
+      .on('click', function() {
+        const selection = metrics.find(
+          ({ id }) => d3.select(this).attr('id') === id
+        );
+        if (selection.id !== metric.id) {
+          drawBars(selection);
+        }
+      });
+  }
+
+  // include the bars for the first metric
+  drawBars(metrics[0]);
+}
+
+drawBarChart();

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato&family=Playfair+Display:wght@500;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Playfair+Display:wght@500;900&display=swap');
 
 * {
   box-sizing: border-box;
@@ -41,6 +41,16 @@ body {
   text-align: center;
 }
 
+#wrapper p:last-of-type {
+  font-size: 0.9rem;
+  font-family: 'Lato', sans-serif;
+  align-self: flex-start;
+}
+
+#wrapper p:last-of-type a {
+  color: inherit;
+}
+
 #wrapper p button {
   padding: 0.2rem 0.5rem;
   background-color: hsl(33, 82%, 98%);
@@ -51,7 +61,7 @@ body {
   letter-spacing: 1px;
 }
 
-#wrapper p button#active {
+#wrapper p button.active {
   background-color: hsl(204, 64%, 23%);
   color: hsl(33, 82%, 98%);
 }
@@ -64,4 +74,13 @@ body {
 
 #wrapper svg text {
   font-family: 'Lato', sans-serif;
+  fill: currentColor;
+  font-size: 12px;
+}
+
+#wrapper svg text#x-axis-label {
+  text-transform: uppercase;
+  font-weight: bold;
+  opacity: 0.5;
+  font-size: 14px;
 }
