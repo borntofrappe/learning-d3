@@ -1,4 +1,5 @@
 const winsThreshold = 5;
+
 const data = [
   { name: 'Lewis Hamilton', races: 266, wins: 95 },
   { name: 'Michael Schumacher', races: 306, wins: 91 },
@@ -132,16 +133,16 @@ function drawBarChart() {
   /* INTRODUCTORY MARKUP */
   d3.select('#wrapper')
     .append('h1')
-    .text("How much they won");
+    .text("Most celebrated F1 drivers");
 
   d3.select('#wrapper')
     .append('p')
     .html(
-      `Number of ${metrics
+      `Highlighting the ${metrics
         .map(({ id, button }) => `<button id="${id}">${button}</button>`)
         .join(
           ''
-        )} victories by F1 drivers who won at least ${winsThreshold} races.`
+        )} number of races awarded to F1 drivers with at least ${winsThreshold > 1 ? `${winsThreshold} wins` : `${winsThreshold} win`}.`
     );
 
     /* STATIC SVG
@@ -149,7 +150,7 @@ function drawBarChart() {
     */
     const dimensions = {
       width: 800,
-      height: 1600,
+      height: 1800,
       margin: {
         top: 35,
         right: 40,
@@ -277,7 +278,7 @@ function drawBarChart() {
       .transition(secondTransition)
       .delay((d, i) => {
         const index = sortedData.findIndex(({ name }) => name === yAccessor(d));
-        return Math.floor(index / 2) * 50;
+        return Math.floor(index / 5) * 50;
       })
       .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
 
@@ -293,7 +294,7 @@ function drawBarChart() {
     newBarGroups
       .append('rect')
       .attr('height', yScale.bandwidth())
-      .attr('fill', '#010101')
+      .attr('fill', 'hsl(352, 95%, 45%)')
       .transition(firstTransition)
       .attr('width', d => xScale(xAccessor(d)));
 
