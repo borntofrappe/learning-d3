@@ -1,5 +1,6 @@
 const winsThreshold = 5;
 
+/* races describes the number of races _started_ */
 const data = [
   { name: 'Lewis Hamilton', races: 266, wins: 95 },
   { name: 'Michael Schumacher', races: 306, wins: 91 },
@@ -278,7 +279,7 @@ function drawBarChart() {
       .transition(secondTransition)
       .delay((d, i) => {
         const index = sortedData.findIndex(({ name }) => name === yAccessor(d));
-        return Math.floor(index / 5) * 50;
+        return Math.floor(index / 4) * 50;
       })
       .attr('transform', d => `translate(0 ${yScale(yAccessor(d))})`);
 
