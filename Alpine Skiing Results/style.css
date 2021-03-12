@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@800&family=Recursive:wght@400;600&display=swap');
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: #b9e0fa;
+  color: #1253a1;
+  font-family: 'Recursive', sans-serif;
+  font-weight: 400;
+}
+
+main {
+  background: #fff;
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 0.75rem 0.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1rem 1rem -0.8rem #001630;
+}
+
+main > * + * {
+  margin-top: 0.5rem;
+}
+
+svg {
+  display: block;
+  width: 90%;
+  height: auto;
+  background: red;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+svg text {
+  font-family: 'Recursive', sans-serif;
+}
+
+h1 {
+  font-family: 'Raleway', sans-serif;
+  font-weight: 800;
+}
+
+a {
+  color: #f33812;
+  text-decoration: none;
+  font-weight: 600;
+}
