@@ -19,7 +19,7 @@ const data = [
 
 `intervals` is the most important property for the visualization, as it highlights the number of seconds in which the athlete completed the session, and is therefore essential to consider the order.
 
-Refer to the [official results](https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104402#details) for the detailed information.
+Refer to the [official results](https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104410#details) for the detailed information.
 
 ## Colors
 
