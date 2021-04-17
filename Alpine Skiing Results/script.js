@@ -89,51 +89,121 @@ const dataset = {
   ]
 }
 
-const main = d3.select('main')
+const root = d3.select('#root')
 
-main.append('h1').text('Swoosh');
-main.append('p').html('Alpine skiing competitions are often divided in two stages. The <a href="https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104410#details">recent slalom in Are, Sweden</a> provides one example of this structure.')
+root.append('h1').text('Alpine Skiing Rules');
+root.append('p').html('Let\'s consider the <a href="https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104410">slalom competition in Are, Sweden</a>, which took place on <time datetime="2021-02-13">March 13, 2021</time>.')
 
-main.append('p').html('Athletes are assigned a bib number.')
+function plotBibNumbers() {
+  const section = root
+    .append('section');
 
-const dimensions = {
-  width: 600,
-  height: 100,
-  margin: {
-    top: 5,
-    right: 5,
-    bottom: 5,
-    left: 5
+  section.append('h2').html('Athletes are assigned a bib number')
+  section.append('p').html('The process is prone to change, but for the <time datetime="2020-10-18">2020</time> to <time datetime="2021-03-21">2021</time> season, the assignment is based on ranking and a touch of randomness:')
+
+  const rules = [
+    'athletes in the top ten receive a random odd number between <strong>1</strong> and <strong>19</strong>',
+    'athletes from number ten to twenty receive a random even number between <strong>2</strong> and <strong>20</strong>',
+    'athletes from number twenty to thirty receive a random number between <strong>21</strong> and <strong>30</strong>',
+    'athletes beyond the thirtyest position receive a number based on ranking'
+  ];
+
+
+  section
+    .append('ul')
+    .selectAll('li')
+    .data(rules)
+    .enter()
+    .append('li')
+    .html(d => d);
+
+
+  section.append('h3').html('In Sweden:')
+
+  const dimensions = {
+    width: 600,
+    height: 100,
+    margin: {
+      top: 50,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
+    legend: {
+      top: 10
+    }
   }
+  
+  dimensions.boundedWidth = dimensions.width - (dimensions.margin.left + dimensions.margin.right)
+  dimensions.boundedHeight = dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
+  dimensions.legend.gap = dimensions.height - dimensions.legend.top - dimensions.boundedHeight;
+  
+  const xScale = d3
+    .scaleBand()
+    .domain(dataset.run1.map(({bib}) => bib))
+    .range([0, dimensions.boundedWidth]);
+
+  const wrapper = section.append('svg').attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+
+  const randomAthleteIndex = Math.floor(Math.random() * dataset.run1.length)
+
+  const highlightGroup = wrapper
+    .append('g')
+    .attr('transform', `translate(${xScale.bandwidth() / 2} ${dimensions.legend.top})`)
+    .attr('fill', 'currentColor')
+
+    highlightGroup
+    .append('circle')
+    .attr('r', 4)
+    
+    highlightGroup
+    .append('path')
+    .attr('d', `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(randomAthleteIndex + 1)} 0 ${xScale(randomAthleteIndex + 1)} ${dimensions.legend.gap}`)
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 2)
+
+  highlightGroup
+    .append('text')
+    .html(`<tspan font-weight="bold">${randomAthleteIndex + 1}</tspan>: ${dataset.run1[randomAthleteIndex].name}`)
+    .attr('font-size', 14)
+    .attr('fill', 'currentColor')
+    .attr('x', 10)
+    .attr('dominant-baseline', 'middle')
+
+  const athletesGroup = wrapper
+    .append('g')
+    .attr('transform', `translate(${dimensions.margin.left} ${dimensions.margin.top})`)
+
+
+  
+  const athleteGroups = athletesGroup.append('g').attr('transform', `translate(0 ${dimensions.boundedHeight / 2})`).selectAll('g').data(dataset.run1).enter().append('g').attr('transform', ({bib}) => `translate(${xScale(bib)+xScale.bandwidth() / 2} 0)`);
+  athleteGroups.append('circle').attr('r', 3).attr('fill', 'currentColor')
+  athleteGroups.append('text').text(({bib}) => d3.format("02")(bib)).attr('fill', 'currentColor').attr('font-size', 10).attr('text-anchor', 'middle').attr('y', (d, i) => i % 2 === 0 ? -7.5 : 15)
+  
+  const delaunay = d3.Delaunay.from(dataset.run1, d => xScale(d.bib) + xScale.bandwidth() / 2, d => 0)
+  const voronoi = delaunay.voronoi([0, 0, dimensions.boundedWidth, dimensions.boundedHeight]);
+  
+  athletesGroup
+    .append('g')
+    .selectAll('path')
+    .data(dataset.run1)
+    .enter()
+    .append('path')
+    .attr('d', (d, i) => voronoi.renderCell(i))
+    .attr('fill', 'transparent')
+    // .attr('stroke', 'currentColor')
+    // .attr('stroke-width', 1)
+    .on('mouseenter', (event, d) => {
+      highlightGroup.select('text').html(`<tspan font-weight="bold">${d.bib}</tspan>: ${d.name}`)
+      
+      highlightGroup.select('path')
+    .attr('d', `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(d.bib)} 0 ${xScale(d.bib)} ${dimensions.legend.gap}`)
+    })
+
+  section.append('p').html('Hover on the dots to highlight a specific athlete.')
+
 }
 
-dimensions.boundedWidth = dimensions.width - (dimensions.margin.left + dimensions.margin.right)
-dimensions.boundedHeight = dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
+plotBibNumbers();
 
-const wrapper = main.append('svg').attr('viewBox', [0, 0, dimensions.width, dimensions.height])
-const bounds = wrapper
-  .append('g')
-  .attr('transform', `translate(${dimensions.margin.left} ${dimensions.margin.top})`)
-
-const xScale = d3
-  .scaleBand()
-  .domain(dataset.run1.map(({bib}) => bib))
-  .range([0, dimensions.boundedWidth]);
-
-const athletesGroup = bounds.append('g').attr('transform', `translate(0 ${dimensions.boundedHeight / 2})`).selectAll('g').data(dataset.run1).enter().append('g').attr('transform', ({bib}) => `translate(${xScale(bib)+xScale.bandwidth() / 2} 0)`);
-athletesGroup.append('circle').attr('r', 3)
-athletesGroup.append('text').text(({bib}) => d3.format("02")(bib)).attr('font-size', 10).attr('text-anchor', 'middle').attr('y', (d, i) => i % 2 === 0 ? -7.5 : 15)
-
-const delaunay = d3.Delaunay.from(dataset.run1, d => xScale(d.bib) + xScale.bandwidth() / 2, d => 0)
-const voronoi = delaunay.voronoi([0, 0, dimensions.boundedWidth, dimensions.boundedHeight]);
-
-bounds
-  .append('g')
-  .selectAll('path')
-  .data(dataset.run1)
-  .enter()
-  .append('path')
-  .attr('d', (d, i) => voronoi.renderCell(i))
-  .attr('fill', 'transparent')
-  // .attr('stroke', 'currentColor')
-  // .attr('stroke-width', 1)
