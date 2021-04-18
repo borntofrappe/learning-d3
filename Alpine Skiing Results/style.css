@@ -14,6 +14,7 @@ body {
 }
 
 #root {
+  width: 80vw;
   max-width: 800px;
   margin: 1rem auto;
   padding: 0.75rem 0.75rem;
@@ -31,15 +32,32 @@ h3 {
 }
 
 h1 {
-  font-size: 2.48rem;
+  font-size: 2rem;
 }
 
 h2 {
-  font-size: 1.84rem;
+  font-size: 1.5rem;
+}
+
+#root {
+  counter-reset: custom-counter;
+}
+
+h2 {
+  position: relative;
+  counter-increment: custom-counter;
+}
+
+h2::before {
+  position: absolute;
+  right: 100%;
+  margin: 0 0.5rem;
+  content: '#' counter(custom-counter);
+  opacity: 0.4;
 }
 
 h3 {
-  font-size: 1.76rem;
+  font-size: 1.3rem;
 }
 
 section > * + * {
@@ -56,4 +74,8 @@ ul li + li {
 
 svg text {
   font-family: inherit;
+}
+
+svg {
+  margin-top: 1.2em;
 }

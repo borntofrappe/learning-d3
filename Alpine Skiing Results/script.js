@@ -89,27 +89,35 @@ const dataset = {
   ]
 }
 
-const root = d3.select('#root')
+const root = d3.select('#root');
 
 root.append('h1').text('Alpine Skiing Rules');
-root.append('p').html('Let\'s consider the <a href="https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104410">slalom competition in Are, Sweden</a>, which took place on <time datetime="2021-02-13">March 13, 2021</time>.')
+root
+  .append('p')
+  .html(
+    'To consider how alpine skiing competition often take place, let\'s consider the <a href="https://www.fis-ski.com/DB/general/results.html?sectorcode=AL&raceid=104410">slalom competition in Are, Sweden</a>, which took place on <time datetime="2021-02-13">March 13, 2021</time>.'
+  );
 
-function plotBibNumbers() {
-  const section = root
-    .append('section');
+function highlightBibNumber() {
+  const section = root.append('section');
 
-  section.append('h2').html('Athletes are assigned a bib number')
-  section.append('p').html('The process is prone to change, but for the <time datetime="2020-10-18">2020</time> to <time datetime="2021-03-21">2021</time> season, the assignment is based on ranking and a touch of randomness:')
+  section.append('h2').text('Athletes are assigned a bib number');
+
+  const details = section.append('details');
+  details
+    .append('summary')
+    .html(
+      'The process changes frequently, but for the <time datetime="2020-10-18">2020</time> to <time datetime="2021-03-21">2021</time> season, the assignment is based on ranking and a touch of randomness.'
+    );
 
   const rules = [
     'athletes in the top ten receive a random odd number between <strong>1</strong> and <strong>19</strong>',
     'athletes from number ten to twenty receive a random even number between <strong>2</strong> and <strong>20</strong>',
     'athletes from number twenty to thirty receive a random number between <strong>21</strong> and <strong>30</strong>',
-    'athletes beyond the thirtyest position receive a number based on ranking'
+    'athletes beyond the thirtyest position receive a number based on ranking',
   ];
 
-
-  section
+  details
     .append('ul')
     .selectAll('li')
     .data(rules)
@@ -117,73 +125,114 @@ function plotBibNumbers() {
     .append('li')
     .html(d => d);
 
-
-  section.append('h3').html('In Sweden:')
-
   const dimensions = {
     width: 600,
     height: 100,
     margin: {
-      top: 50,
+      top: 0,
       right: 0,
       bottom: 0,
-      left: 0
+      left: 0,
+    },
+    visualization: {
+      top: 75,
     },
     legend: {
-      top: 10
-    }
-  }
-  
-  dimensions.boundedWidth = dimensions.width - (dimensions.margin.left + dimensions.margin.right)
-  dimensions.boundedHeight = dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
-  dimensions.legend.gap = dimensions.height - dimensions.legend.top - dimensions.boundedHeight;
-  
+      top: 10,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+  dimensions.legend.gap = dimensions.visualization.top - dimensions.legend.top;
+
   const xScale = d3
     .scaleBand()
-    .domain(dataset.run1.map(({bib}) => bib))
+    .domain(dataset.run1.map(({ bib }) => bib))
     .range([0, dimensions.boundedWidth]);
 
-  const wrapper = section.append('svg').attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+  const wrapper = section
+    .append('svg')
+    .attr('viewBox', [0, 0, dimensions.width, dimensions.height]);
 
-  const randomAthleteIndex = Math.floor(Math.random() * dataset.run1.length)
+  const randomAthleteIndex = Math.floor(Math.random() * dataset.run1.length);
 
   const highlightGroup = wrapper
     .append('g')
-    .attr('transform', `translate(${xScale.bandwidth() / 2} ${dimensions.legend.top})`)
-    .attr('fill', 'currentColor')
+    .attr(
+      'transform',
+      `translate(${xScale.bandwidth() / 2} ${dimensions.legend.top})`
+    )
+    .attr('fill', 'currentColor');
 
-    highlightGroup
-    .append('circle')
-    .attr('r', 4)
-    
-    highlightGroup
+  highlightGroup.append('circle').attr('r', 4);
+  const highlightHtml = (name, bib) => `<tspan font-weight="bold" font-size="16">${name}</tspan> <tspan font-size="14">received bib number ${bib}</tspan>`
+
+  highlightGroup
     .append('path')
-    .attr('d', `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(randomAthleteIndex + 1)} 0 ${xScale(randomAthleteIndex + 1)} ${dimensions.legend.gap}`)
+    .attr(
+      'd',
+      `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(
+        randomAthleteIndex + 1
+      )} 0 ${xScale(randomAthleteIndex + 1)} ${dimensions.legend.gap}`
+    )
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 2)
+    .attr('stroke-width', 2);
 
   highlightGroup
     .append('text')
-    .html(`<tspan font-weight="bold">${randomAthleteIndex + 1}</tspan>: ${dataset.run1[randomAthleteIndex].name}`)
-    .attr('font-size', 14)
+    .html(highlightHtml(dataset.run1[randomAthleteIndex].name, randomAthleteIndex + 1))
+    .attr('font-size', 16)
     .attr('fill', 'currentColor')
-    .attr('x', 10)
-    .attr('dominant-baseline', 'middle')
+    .attr('x', 20)
+    .attr('dominant-baseline', 'middle');
 
   const athletesGroup = wrapper
     .append('g')
-    .attr('transform', `translate(${dimensions.margin.left} ${dimensions.margin.top})`)
+    .attr(
+      'transform',
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
 
+  const athleteGroups = athletesGroup
+    .append('g')
+    .selectAll('g')
+    .data(dataset.run1)
+    .enter()
+    .append('g')
+    .attr(
+      'transform',
+      ({ bib }) => `translate(${xScale(bib) + xScale.bandwidth() / 2} ${dimensions.visualization.top})`
+    );
 
-  
-  const athleteGroups = athletesGroup.append('g').attr('transform', `translate(0 ${dimensions.boundedHeight / 2})`).selectAll('g').data(dataset.run1).enter().append('g').attr('transform', ({bib}) => `translate(${xScale(bib)+xScale.bandwidth() / 2} 0)`);
-  athleteGroups.append('circle').attr('r', 3).attr('fill', 'currentColor')
-  athleteGroups.append('text').text(({bib}) => d3.format("02")(bib)).attr('fill', 'currentColor').attr('font-size', 10).attr('text-anchor', 'middle').attr('y', (d, i) => i % 2 === 0 ? -7.5 : 15)
-  
-  const delaunay = d3.Delaunay.from(dataset.run1, d => xScale(d.bib) + xScale.bandwidth() / 2, d => 0)
-  const voronoi = delaunay.voronoi([0, 0, dimensions.boundedWidth, dimensions.boundedHeight]);
-  
+  athleteGroups
+    .append('circle')
+    .attr('r', 3)
+    .attr('fill', 'currentColor');
+  athleteGroups
+    .append('text')
+    .text(({ bib }) => d3.format('02')(bib))
+    .attr('fill', 'currentColor')
+    .attr('font-size', 11)
+    .attr('text-anchor', 'middle')
+    .attr('y', 15)
+    .style('opacity', ({bib}) => bib === randomAthleteIndex + 1 ? 1 : 0);
+
+  const delaunay = d3.Delaunay.from(
+    dataset.run1,
+    d => xScale(d.bib) + xScale.bandwidth() / 2,
+    d => 0
+  );
+  const voronoi = delaunay.voronoi([
+    0,
+    0,
+    dimensions.boundedWidth,
+    dimensions.boundedHeight,
+  ]);
+
   athletesGroup
     .append('g')
     .selectAll('path')
@@ -195,15 +244,41 @@ function plotBibNumbers() {
     // .attr('stroke', 'currentColor')
     // .attr('stroke-width', 1)
     .on('mouseenter', (event, d) => {
-      highlightGroup.select('text').html(`<tspan font-weight="bold">${d.bib}</tspan>: ${d.name}`)
-      
-      highlightGroup.select('path')
-    .attr('d', `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(d.bib)} 0 ${xScale(d.bib)} ${dimensions.legend.gap}`)
-    })
+      highlightGroup
+        .select('text')
+        .html(highlightHtml(d.name, d.bib));
 
-  section.append('p').html('Hover on the dots to highlight a specific athlete.')
+      highlightGroup
+        .select('path')
+        .attr(
+          'd',
+          `M 0 0 c 0 ${dimensions.legend.gap} ${xScale(d.bib)} 0 ${xScale(
+            d.bib
+          )} ${dimensions.legend.gap}`
+        );
+
+        athleteGroups
+        .select('text')
+        .style('opacity', 0)
+
+        athletesGroup
+        .select(`g:nth-of-type(${d.bib})`)
+        .select('text')
+        .style('opacity', 1)
+    });
+
+    section.append('p').text('Hover on the visualization to highlight a specific athlete').style('font-size', '0.9em');
 
 }
 
-plotBibNumbers();
+function highlightFirstRun() {
+  const section = root.append('section');
 
+  section.append('h2').text('The first run proceeds in order');
+  section.append('p').text('Interval after interval, the athletes compete to the smallest margin.');
+
+  const data = dataset.run1;
+}
+
+highlightBibNumber();
+highlightFirstRun();
