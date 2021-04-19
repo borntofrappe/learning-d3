@@ -48,4 +48,4 @@ I need to sort the visualizations better, but here it goes:
 | [Football Stats](https://codepen.io/borntofrappe/pen/eYBeJjL)                 | squares, hexagons          |
 | [Number of Births](https://codepen.io/borntofrappe/full/YzpLpjm)              | line, lineRadial, delaunay |
 | [Most Celebrated F1 Drivers](https://codepen.io/borntofrappe/pen/MWbqLYM)     | accessibility, transition  |
-| Alpine Skiing Results                                                         | line, dashboard            |
+| School Closures Caused by Coronavirus                                         | geo, topojson, animation   |
