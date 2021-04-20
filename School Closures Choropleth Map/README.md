@@ -1,4 +1,4 @@
-# [School Closures Caused by Coronavirus](https://replit.com/@borntofrappe/School-Closures-Caused-by-Coronavirus)
+# [School Closures Choropleth Map](https://replit.com/@borntofrappe/School-Closures-Choropleth-Map)
 
 [UNESCO](https://en.unesco.org) studies the impact of Covid-19 on education at a global scale with [a couple of informative maps](https://en.unesco.org/covid19/educationresponse). The goal of this project is to immediately replicate the second of these geographical representation, the one studying the duration of school closures, in order to practice with `d3-geo` and `topojson`.
 
