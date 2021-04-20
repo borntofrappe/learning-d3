@@ -12,27 +12,26 @@ node script
 
 ## Projects
 
-I need to sort the visualizations better, but here it goes:
+A table worth of projects exploring the D3 library, its features and modules.
 
-- projects exploring the D3 library, its features and modules
+| Title                                                                                                           | Keys                    |
+| --------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)                                                        | enter-update-exit, join |
+| [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)                                              | random, normal          |
+| [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)                                                     | scale-chromatic, symbol |
+| [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)                                                 | simulation              |
+| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)                                                    | data, table, shape      |
+| [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)                                                     | spider, lineRadial      |
+| [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg)                                   | random, area            |
+| [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                                                      | area, marker            |
+| [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                                                    | chord, ribbon, arc      |
+| [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                                                      | arc, path               |
+| [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                                                      | d3, react               |
+| Bins                                                                                                            | bin, random             |
+| [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)                                               | mouse, line,delaunay    |
+| [School Closures Caused by Coronavirus](https://replit.com/@borntofrappe/School-Closures-Caused-by-Coronavirus) | geo, topojson, csv      |
 
-| Title                                                                         | Keys                    |
-| ----------------------------------------------------------------------------- | ----------------------- |
-| [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)                      | enter-update-exit, join |
-| [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)            | random, normal          |
-| [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)                   | scale-chromatic, symbol |
-| [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)               | simulation              |
-| [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)                  | data, table, shape      |
-| [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)                   | spider, lineRadial      |
-| [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg) | random, area            |
-| [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)                    | area, marker            |
-| [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
-| [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
-| [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                    | d3, react               |
-| Bins                                                                          | bin, random             |
-| [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)             | mouse, line,delaunay    |
-
-- projects using D3 to create interesting visualizations.
+A table worth of projects leaning on D3 to create interesting visualizations.
 
 | Title                                                                         | Keys                       |
 | ----------------------------------------------------------------------------- | -------------------------- |
@@ -48,4 +47,3 @@ I need to sort the visualizations better, but here it goes:
 | [Football Stats](https://codepen.io/borntofrappe/pen/eYBeJjL)                 | squares, hexagons          |
 | [Number of Births](https://codepen.io/borntofrappe/full/YzpLpjm)              | line, lineRadial, delaunay |
 | [Most Celebrated F1 Drivers](https://codepen.io/borntofrappe/pen/MWbqLYM)     | accessibility, transition  |
-| School Closures Caused by Coronavirus                                         | geo, topojson, animation   |
