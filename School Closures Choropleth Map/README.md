@@ -1,13 +1,6 @@
-# [School Closures Choropleth Map](https://replit.com/@borntofrappe/School-Closures-Choropleth-Map)
+# [School Closures Choropleth Map](https://codepen.io/borntofrappe/full/oNBaKdw)
 
-[UNESCO](https://en.unesco.org) studies the impact of Covid-19 on education at a global scale with [a couple of informative maps](https://en.unesco.org/covid19/educationresponse). The goal of this project is to immediately replicate the second of these geographical representation, the one studying the duration of school closures, in order to practice with `d3-geo` and `topojson`.
-
-_Please note_: to read the data from `duration_school_closures.csv` it is necessary to run the project on a server.
-
-```bash
-npm install live-server
-live-server
-```
+[UNESCO](https://en.unesco.org) studies the impact of Covid-19 on education at a global scale with [a couple of informative maps](https://en.unesco.org/covid19/educationresponse). The goal of this project is to replicate the second of these geographical representation, the one studying the duration of school closures, in order to practice with `d3-geo` and `topojson`.
 
 ## World
 
@@ -75,6 +68,19 @@ Ultimately I opted to just draw the countries (all, but Antarctica), but the ins
 ## Data
 
 The data describing the number of weeks of full and partial school closure is retrieved from the [cited UNESCO source](https://en.unesco.org/covid19/educationresponse). It is important to note that the source is however modified to differentiate the countries with an `id` column. The change is necessary since the `ISO` value from the original dataset describes the country with a short string, and the value doesn't match the identifier provided by the topojson object. `id` replaces the label with with the [ISO 3166-1 numeric country code](https://en.wikipedia.org/wiki/ISO_3166-1_numeric).
+
+`dataMap` is then created to have a map describing the values on the basis of their identifier.
+
+```js
+const dataMap = d3.group(data, (d) => d.id);
+```
+
+This construct allows to retrieve a specific value, and even test for the existence of a specific value with map-specific functions.
+
+```js
+dataMap.has(id);
+dataMap.get(id);
+```
 
 ## Useful Links
 
