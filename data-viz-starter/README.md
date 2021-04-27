@@ -1,5 +1,5 @@
-# data-viz-starter
+# [data-viz-starter]()
 
-<!-- ## [Live Demo]() -->
+- explain the purpose of the demo
 
-## Notes
+- annotate important features of the demo and the D3 library
