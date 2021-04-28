@@ -1149,11 +1149,24 @@ async function drawMap() {
     return acc;
   },{})
   
-  header.append('p').html(`The agency lists <strong>${data.length}</strong> sites, divided in <strong>${Object.keys(regions).length}</strong> regions and <strong>${Object.keys(states).length}</strong> states.<br/>The goal of this visualization is to highlight the geographical distribution at a global scale, most notably through the libraries <code>d3-geo</code> and <code>topojson</code>.`)
+  header.append('p').html(`The agency lists <strong>${data.length}</strong> sites, divided in <strong>${Object.keys(regions).length}</strong> regions and <strong>${Object.keys(states).length}</strong> states.`)
+  header.append('p').html('The goal of this visualization is to highlight the geographical distribution at a global scale, most notably through the libraries <code>d3-geo</code> and <code>topojson</code>.')
+  header.append('p').html('<small>There\'s also a tooltip if you manage to click on one of the locations. Good luck exploring!</small>')
+  
   const main = root.append('main');
   const margin = 10; + margin * 2
 
-  const wrapper = main
+  const visualization = main.append('div');
+  const tooltip = visualization.append('div').attr('id', 'tooltip').style('opacity', 0).style('visibility', 'none')
+  tooltip.append('h2');
+  tooltip.append('a').text('Go to listing');
+  tooltip.append('button').text('Dismiss').on('click', () => {
+    tooltip
+      .transition()
+      .style('opacity', 0).style('visibility', 'none')
+  });
+
+  const wrapper = visualization
     .append('svg')
     .attr('width', width)
     .attr('height', height)
@@ -1265,9 +1278,24 @@ async function drawMap() {
     .on('mouseleave', () => {
       highlightGroup.style('opacity', 0);
     })
-    .on('click', (e, { coords, id, state, description, category, isInDanger, isTransboundary}) => {
+    .on('click', (e, { coords, id, name }) => {
       if(pathGenerator({type: 'Point', coordinates: coords})) {
-        console.log(id)
+        const [x, y] = projection(coords);
+        const isLeft = x < width / 2;
+        const isTop = y < height / 2;
+
+
+        tooltip
+        .style('top', isTop ? '50%' : 'initial')
+        .style('right', isLeft ? 'initial' : '50%')
+        .style('bottom', isTop ? 'initial' : '50%')
+        .style('left', isLeft ? '50%' : 'initial')
+          .transition()
+          .style('opacity', 1)
+          .style('visibility', 'visible');
+
+        tooltip.select('h2').html(name);
+        tooltip.select('a').attr('href', `https://whc.unesco.org/en/list/${id}`);
       }
     })
 
@@ -1278,6 +1306,9 @@ async function drawMap() {
     .attr('max', 360)
     .attr('value', 0)
     .on('input', function() {
+      tooltip
+      .transition()
+      .style('opacity', 0).style('visibility', 'none')
       projection.rotate([parseInt(this.value), 0])
       pathGenerator.projection(projection)
       
