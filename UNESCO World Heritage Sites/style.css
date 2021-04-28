@@ -13,36 +13,57 @@ body {
   min-height: 100vh;
 }
 
-#root {
-  max-width: 800px;
-  width: 90vw;
-  margin: 0.5rem auto;
+::selection {
+  background: hsl(0, 0%, 98%, 0.4);
+}
+
+p {
   line-height: 1.75;
-}
-
-#root > * + * {
-  margin-top: 1em;
-}
-
-h1 {
-  font-weight: 700;
-  font-size: 2.32rem;
-}
-
-abbr {
-  text-decoration: none;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 code {
   font-family: 'Nova Mono', monospace;
   padding: 0 0.25rem;
   background: hsl(0, 0%, 98%, 0.25);
+}
+
+#root {
+  max-width: 800px;
+  width: 90vw;
+  margin: 0.5rem auto;
+}
+
+#root > * + * {
+  margin-top: 1em;
+}
+
+header > * + * {
+  margin-top: 0.5em;
+}
+
+h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 2.32rem;
+  text-align: center;
+  line-height: 1.25;
+}
+
+h1 svg {
+  font-size: 5rem;
+}
+
+abbr {
+  text-decoration: none;
+  display: contents;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 main > * + * {

@@ -9,7 +9,93 @@
     <title>UNESCO World Heritage Sites</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <header>
+        <h1>
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-50 -50 100 100"
+            width="1em"
+            height="1em"
+          >
+            <defs>
+              <clipPath id="clip">
+                <rect x="-40" y="-50" width="80" height="22.5" />
+              </clipPath>
+            </defs>
+            <g fill="none" stroke="currentColor" stroke-width="4">
+              <g stroke-linecap="square" clip-path="url(#clip)">
+                <path d="M -40 -29.5 l 40 -18 40 18" />
+                <path d="M -40 -22.5 l 40 -18 40 18" />
+              </g>
+              <path d="M -40 -22.5 h 80" />
+              <path d="M -40 24 h 80" />
+              <path d="M -45 32 h 90" />
+              <path d="M -50 40 h 100" />
+            </g>
+            <g font-size="45" fill="currentColor">
+              <text
+                x="-35"
+                y="16.5"
+                textLength="70"
+                lengthAdjust="spacingAndGlyphs"
+              >
+                UNESCO
+              </text>
+            </g>
+          </svg>
+
+          <abbr
+            title="United Nations Educational, Scientific and Cultural Organization"
+            >UNESCO</abbr
+          >
+          World Heritage
+
+          <svg
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-50 -50 100 100"
+            width="1em"
+            height="1em"
+          >
+            <defs>
+              <path
+                transform="rotate(35)"
+                d="M -40 0 a 40 40 0 0 1 80 0"
+                id="a"
+              />
+              <path transform="" d="M 0 46 a 46 46 0 0 0 0 -92" id="b" />
+            </defs>
+            <g fill="none" stroke="currentColor" stroke-width="4">
+              <path
+                d="M -3 30 a 30.1 30.1 0 0 1 3 -60 30.1 30.1 0 0 1 3 60 v -15 l 15 -15 -18 -18 -18 18 15 15 z"
+              />
+            </g>
+
+            <g
+              fill="currentColor"
+              font-size="7"
+              style="text-transform: uppercase"
+            >
+              <text>
+                <textPath href="#a" textLength="80">
+                  Patrimonio mundial
+                </textPath>
+              </text>
+              <text>
+                <textPath href="#b" textLength="90">
+                  Patrimonio mundial
+                </textPath>
+              </text>
+              <text transform="rotate(105)">
+                <textPath href="#b" textLength="75">World heritage</textPath>
+              </text>
+            </g>
+          </svg>
+        </h1>
+      </header>
+    </div>
 
     <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.js"></script>
     <!-- d3 version dated 27/04/2021 -->

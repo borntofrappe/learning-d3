@@ -1135,8 +1135,7 @@ async function drawMap() {
 
   const root = d3.select('#root');
 
-  const header = root.append('header')
-  header.append('h1').html('<abbr title="United Nations Educational, Scientific and Cultural Organization">UNESCO</abbr> World Heritage');
+  const header = root.select('header')
   const regions = data.reduce((acc, curr) => {
     curr.regions.forEach(region => {
       acc[region] = acc[region] ? acc[region] + 1 : 1;
@@ -1150,7 +1149,7 @@ async function drawMap() {
     return acc;
   },{})
   
-  header.append('p').html(`The agency lists <strong>${data.length}</strong> sites in <strong>${Object.keys(regions).length}</strong> regions and <strong>${Object.keys(states).length}</strong> states. The goal of this visualization is to highlight the geographical distribution at a global scale, leaning on the <code>d3-geo</code> and <code>topojson</code> libraries.`)
+  header.append('p').html(`The agency lists <strong>${data.length}</strong> sites, divided in <strong>${Object.keys(regions).length}</strong> regions and <strong>${Object.keys(states).length}</strong> states.<br/>The goal of this visualization is to highlight the geographical distribution at a global scale, most notably through the libraries <code>d3-geo</code> and <code>topojson</code>.`)
   const main = root.append('main');
   const margin = 10; + margin * 2
 
