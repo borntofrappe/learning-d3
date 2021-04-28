@@ -47,3 +47,4 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [Football Stats](https://codepen.io/borntofrappe/pen/eYBeJjL)                 | squares, hexagons          |
 | [Number of Births](https://codepen.io/borntofrappe/full/YzpLpjm)              | line, lineRadial, delaunay |
 | [Most Celebrated F1 Drivers](https://codepen.io/borntofrappe/pen/MWbqLYM)     | accessibility, transition  |
+| [UNESCO World Heritage](https://codepen.io/borntofrappe/pen/jOyRJKO)          | geo, topojson              |

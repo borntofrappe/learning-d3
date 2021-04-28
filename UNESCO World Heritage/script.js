@@ -1,4 +1,6 @@
 async function drawMap() {
+  // ideally you'd fetch data from an external source
+  const url = 'https://whc.unesco.org/en/list';
   const data = [
     { id: 208, name: "Cultural Landscape and Archaeological Remains of the Bamiyan Valley", coords: [67.82525, 34.84694], states: ["Afghanistan"], regions: ["Asia and the Pacific"] },
     { id: 211, name: "Minaret and Archaeological Remains of Jam", coords: [64.5158888889, 34.3964166667], states: ["Afghanistan"], regions: ["Asia and the Pacific"] },
@@ -1135,49 +1137,85 @@ async function drawMap() {
 
   const root = d3.select('#root');
 
-  const header = root.select('header')
+  const header = root.select('header');
+
   const regions = data.reduce((acc, curr) => {
     curr.regions.forEach(region => {
       acc[region] = acc[region] ? acc[region] + 1 : 1;
-    })
+    });
     return acc;
-  },{})
+  }, {});
+
   const states = data.reduce((acc, curr) => {
     curr.states.forEach(region => {
       acc[region] = acc[region] ? acc[region] + 1 : 1;
-    })
+    });
     return acc;
-  },{})
-  
-  header.append('p').html(`The agency lists <strong>${data.length}</strong> sites, divided in <strong>${Object.keys(regions).length}</strong> regions and <strong>${Object.keys(states).length}</strong> states.`)
-  header.append('p').html('The goal of this visualization is to highlight the geographical distribution at a global scale, most notably through the libraries <code>d3-geo</code> and <code>topojson</code>.')
-  header.append('p').html('<small>There\'s also a tooltip if you manage to click on one of the locations. Good luck exploring!</small>')
-  
+  }, {});
+
+  header
+    .append('p')
+    .html(
+      `The agency lists <strong>${
+        data.length
+      }</strong> sites, divided in <strong>${
+        Object.keys(regions).length
+      }</strong> regions and <strong>${
+        Object.keys(states).length
+      }</strong> states.`
+    );
+  header
+    .append('p')
+    .html(
+      'The goal of this visualization is to highlight the geographical distribution at a global scale, most notably through the libraries <code>d3-geo</code> and <code>topojson</code>.'
+    );
+  header
+    .append('p')
+    .html(
+      "<small>There's also a tooltip if you manage to click on one of the locations. Good luck exploring!</small>"
+    );
+
   const main = root.append('main');
-  const margin = 10; + margin * 2
+  const margin = 10;
 
   const visualization = main.append('div');
-  const tooltip = visualization.append('div').attr('id', 'tooltip').style('opacity', 0).style('visibility', 'none')
+  const tooltip = visualization
+    .append('div')
+    .attr('id', 'tooltip')
+    .style('opacity', 0)
+    .style('visibility', 'none');
+
   tooltip.append('h2');
   tooltip.append('a').text('Go to listing');
-  tooltip.append('button').text('Dismiss').on('click', () => {
-    tooltip
-      .transition()
-      .style('opacity', 0).style('visibility', 'none')
-  });
+  tooltip
+    .append('button')
+    .text('Dismiss')
+    .on('click', () => {
+      tooltipGroup
+        .style('opacity', 0);
+
+      tooltip
+        .transition()
+        .style('opacity', 0)
+        .style('visibility', 'none');
+    });
 
   const wrapper = visualization
     .append('svg')
     .attr('width', width)
     .attr('height', height)
-    .attr('viewBox', [-margin, -margin, width + margin * 2, height + margin * 2]);
+    .attr('viewBox', [
+      -margin,
+      -margin,
+      width + margin * 2,
+      height + margin * 2,
+    ]);
 
-  const defs = wrapper
-    .append('defs')
-    
-  const gradientSphereId = 'gradient-sphere'
-  const gradientShadowId = 'gradient-shadow'
-  const maskShadowId = 'mask-shadow'
+  const defs = wrapper.append('defs');
+
+  const gradientSphereId = 'gradient-sphere';
+  const gradientShadowId = 'gradient-shadow';
+  const maskShadowId = 'mask-shadow';
 
   defs
     .append('linearGradient')
@@ -1187,13 +1225,13 @@ async function drawMap() {
     .attr('y1', 0)
     .attr('y2', 1)
     .selectAll('stop')
-    .data(['#515cff', '#353893', '#100f24'])
+    .data(['hsl(236, 100%, 66%)', 'hsl(238, 47%, 39%)', 'hsl(243, 41%, 10%)'])
     .enter()
     .append('stop')
     .attr('stop-color', d => d)
-    .attr('offset', (d, i, {length}) => `${i * 100 / (length - 1)}%`);
+    .attr('offset', (d, i, { length }) => `${(i * 100) / (length - 1)}%`);
 
-    defs
+  defs
     .append('linearGradient')
     .attr('id', gradientShadowId)
     .attr('x1', 0.5)
@@ -1201,39 +1239,47 @@ async function drawMap() {
     .attr('y1', 0.5)
     .attr('y2', 1)
     .selectAll('stop')
-    .data(['#000', '#fff'])
+    .data(['black', 'white'])
     .enter()
     .append('stop')
     .attr('stop-color', d => d)
-    .attr('offset', (d, i, {length}) => `${i * 100 / (length - 1)}%`);
+    .attr('offset', (d, i, { length }) => `${(i * 100) / (length - 1)}%`);
 
-
-    defs
+  defs
     .append('mask')
     .attr('id', maskShadowId)
     .append('rect')
     .attr('width', width)
     .attr('height', height)
-    .attr('fill', `url(#${gradientShadowId})`)
-
+    .attr('fill', `url(#${gradientShadowId})`);
 
   const bounds = wrapper.append('g');
   const worldGroup = bounds.append('g');
   const highlightGroup = bounds.append('g');
+  const tooltipGroup = bounds.append('g');
 
   highlightGroup
     .style('opacity', 0)
     .style('pointer-events', 'none')
     .append('circle')
     .attr('r', 8)
-    .attr('fill', 'white')
+    .attr('fill', 'hsl(0, 0%, 100%)');
+
+  tooltipGroup
+    .style('opacity', 0)
+    .style('pointer-events', 'none')
+    .append('circle')
+    .attr('r', 9)
+    .attr('fill', 'hsl(0, 0%, 100%)')
+    .attr('stroke', 'hsl(221, 78%, 7%)')
+    .attr('stroke-width', 2);
 
   worldGroup
     .append('path')
     .attr('d', pathGenerator(sphere))
     .attr('fill', `url(#${gradientSphereId})`)
     .attr('stroke', 'none');
-  
+
   const countries = topojson.feature(world, world.objects.countries);
 
   const countriesPaths = worldGroup
@@ -1243,16 +1289,16 @@ async function drawMap() {
     .enter()
     .append('path')
     .attr('d', pathGenerator)
-    .attr('fill', '#8889f8')
-    .attr('stroke', '#8889f8');
+    .attr('fill', 'hsl(239, 89%, 75%)')
+    .attr('stroke', 'hsl(239, 89%, 75%)');
 
-    worldGroup
+  worldGroup
     .append('path')
     .attr('d', pathGenerator(sphere))
-    .attr('fill', `#000`)
+    .attr('fill', `hsl(0, 0%, 0%)`)
     .attr('mask', `url(#${maskShadowId})`)
     .attr('stroke', 'none');
-    
+
   const dataCircles = worldGroup
     .append('g')
     .selectAll('circle')
@@ -1260,44 +1306,50 @@ async function drawMap() {
     .enter()
     .append('circle')
     .attr('r', 5)
-    .attr('fill', '#ffa3ff')
-    .attr('transform', ({coords}) => {
+    .attr('fill', 'hsl(300, 100%, 78%)')
+    .attr('transform', ({ coords }) => {
       const [x, y] = projection(coords);
-      return `translate(${x} ${y})`
+      return `translate(${x} ${y})`;
     })
-    .attr('opacity', ({coords}) => pathGenerator({type: 'Point', coordinates: coords}) ? 1 : 0)
-    .on('mouseenter', (e, {coords}) => {
-      if(pathGenerator({type: 'Point', coordinates: coords})) {
+    .attr('opacity', ({ coords }) =>
+      pathGenerator({ type: 'Point', coordinates: coords }) ? 1 : 0
+    )
+    .on('mouseenter', (e, { coords }) => {
+      if (pathGenerator({ type: 'Point', coordinates: coords })) {
         const [x, y] = projection(coords);
         highlightGroup
-          .attr('transform', `translate(${x} ${y})`)  
-          .style('opacity', 1)
+          .attr('transform', `translate(${x} ${y})`)
+          .style('opacity', 1);
       }
-
     })
     .on('mouseleave', () => {
       highlightGroup.style('opacity', 0);
     })
     .on('click', (e, { coords, id, name }) => {
-      if(pathGenerator({type: 'Point', coordinates: coords})) {
+      if (pathGenerator({ type: 'Point', coordinates: coords })) {
         const [x, y] = projection(coords);
         const isLeft = x < width / 2;
         const isTop = y < height / 2;
 
+        tooltipGroup
+          .attr('transform', `translate(${x} ${y})`)
+          .style('opacity', 1);
 
         tooltip
-        .style('top', isTop ? '50%' : 'initial')
-        .style('right', isLeft ? 'initial' : '50%')
-        .style('bottom', isTop ? 'initial' : '50%')
-        .style('left', isLeft ? '50%' : 'initial')
+          .style('top', isTop ? '50%' : 'initial')
+          .style('right', isLeft ? 'initial' : '50%')
+          .style('bottom', isTop ? 'initial' : '50%')
+          .style('left', isLeft ? '50%' : 'initial')
           .transition()
           .style('opacity', 1)
           .style('visibility', 'visible');
 
         tooltip.select('h2').html(name);
-        tooltip.select('a').attr('href', `https://whc.unesco.org/en/list/${id}`);
+        tooltip
+          .select('a')
+          .attr('href', `${url}/${id}`);
       }
-    })
+    });
 
   main
     .append('input')
@@ -1306,24 +1358,34 @@ async function drawMap() {
     .attr('max', 360)
     .attr('value', 0)
     .on('input', function() {
+      tooltipGroup
+        .style('opacity', 0);
+
       tooltip
-      .transition()
-      .style('opacity', 0).style('visibility', 'none')
-      projection.rotate([parseInt(this.value), 0])
-      pathGenerator.projection(projection)
-      
-      countriesPaths
-        .attr('d', pathGenerator)
+        .transition()
+        .style('opacity', 0)
+        .style('visibility', 'none');
+      projection.rotate([parseInt(this.value), 0]);
+      pathGenerator.projection(projection);
+
+      countriesPaths.attr('d', pathGenerator);
 
       dataCircles
-      .attr('transform', ({coords}) => {
-        const [x, y] = projection(coords);
-        return `translate(${x} ${y})`
-      })
-      .attr('opacity', ({coords}) => pathGenerator({type: 'Point', coordinates: coords}) ? 1 : 0)
-    })
+        .attr('transform', ({ coords }) => {
+          const [x, y] = projection(coords);
+          return `translate(${x} ${y})`;
+        })
+        .attr('opacity', ({ coords }) =>
+          pathGenerator({ type: 'Point', coordinates: coords }) ? 1 : 0
+        );
+    });
 
-  root.append('footer').append('a').attr('href', 'https://whc.unesco.org/en/list/').text('Source');
+  root
+    .append('footer')
+    .append('a')
+    .attr('href', url)
+    .text('Source');
 }
 
 drawMap();
+  

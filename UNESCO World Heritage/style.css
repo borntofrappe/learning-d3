@@ -7,9 +7,9 @@
 }
 
 body {
-  background: linear-gradient(hsl(217, 94%, 21%), hsl(221, 78%, 7%));
-  color: hsl(0, 0%, 100%);
   font-family: 'Source Sans Pro', sans-serif;
+  color: hsl(0, 0%, 100%);
+  background: linear-gradient(hsl(217, 94%, 21%), hsl(221, 78%, 7%));
   min-height: 100vh;
 }
 
@@ -36,7 +36,7 @@ code {
 #root {
   max-width: 800px;
   width: 90vw;
-  margin: 0.5rem auto;
+  margin: 1rem auto;
 }
 
 #root > * + * {
@@ -90,7 +90,7 @@ main > div {
   max-width: 350px;
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 1.5rem 0.75rem;
+  gap: 1rem 0.75rem;
 }
 
 #tooltip h2 {
