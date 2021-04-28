@@ -1,6 +1,8 @@
 # Positivity Tree
 
-## [Live Demo](https://codepen.io/borntofrappe/full/eYpNRRX)
+## [Live Demo](https://codepen.io/borntofrappe/pen/eYpNRRX)
+
+## Notes
 
 This project is inspired by one of the visuals shown [in this article](https://www.lemonde.fr/les-decodeurs/article/2020/04/07/les-enjeux-du-deconfinement-expliques-en-schemas_6035827_4355770.html) on [lemonde.fr](https://www.lemonde.fr/), and more specifically the graphic showing how a virus is able to spread to more and more people with each passing generation.
 
@@ -31,7 +33,12 @@ To draw the faces I decided to experiment with the `<defs>` ,`<symbol>` and `<us
          <circle r="47" stroke="currentColor" stroke-width="6" fill="none" />
          <circle r="5" cx="-15" cy="-6" />
          <circle r="5" cx="15" cy="-6" />
-         <path d="M -10 15 h 20" stroke="currentColor" stroke-width="4" fill="none" />
+         <path
+           d="M -10 15 h 20"
+           stroke="currentColor"
+           stroke-width="4"
+           fill="none"
+         />
        </symbol>
      </defs>
    </svg>
@@ -83,13 +90,13 @@ A tree diagram is based on a hierarchical structure. Namely, you start with a ro
 
 ```js
 const data = {
-  name: "",
+  name: '',
   children: [
     {
-      name: "",
+      name: '',
     },
     {
-      name: "",
+      name: '',
       children: [],
     },
   ],
@@ -123,7 +130,9 @@ In the for loop:
 1. consider the objects in the `data` array that have the boolean set to `true` and no `id` attribute
 
    ```js
-   const latestGenerations = data.filter((point) => point.isSmiling && !point.id);
+   const latestGenerations = data.filter(
+     (point) => point.isSmiling && !point.id
+   );
    ```
 
 `isSmiling` because only the nodes with the affirmative boolean are meant to have children. `id` to make sure you don't get the same data point twice. More on this in a second.
@@ -199,39 +208,39 @@ const dataRoot = root(data);
 
 The inspiring visualization has an additional intriguing feature: for devices with a viewport smaller than an arbitrary threshold, the tree diagram displays the data top to bottom, instead of left to right.
 
-As the direction changes, there are different parts of the codebase which need adjusting: the size of the tree diagram, the link function (vertical or horizontal), the position of the individual data points. To accommodate for these changes, I move the code in the body of a function, which then uses the data join introduced in the **data join** project to append/update the necessary elements.
+As the direction changes, there are different parts of the codebase which need adjusting: the size of the tree diagram, the link function (vertical or horizontal), the position of the individual data points. To accommodate for these changes, I move the code in the body of a function, which then uses the data join introduced in the `Data Join` project to append/update the necessary elements.
 
 Instead of just appending the path elements with a class of `.connection` for instance.
 
 ```js
 svg
-  .selectAll("path.highlight")
+  .selectAll('path.highlight')
   .data(links.filter((link) => link.target.data.isSmiling))
   .enter()
-  .append("path")
-  .attr("class", "highlight")
-  .attr("d", (d) => link(d))
-  .attr("fill", "none")
-  .attr("stroke", "hsl(45, 90%, 80%)")
-  .attr("stroke-width", "25");
+  .append('path')
+  .attr('class', 'highlight')
+  .attr('d', (d) => link(d))
+  .attr('fill', 'none')
+  .attr('stroke', 'hsl(45, 90%, 80%)')
+  .attr('stroke-width', '25');
 ```
 
 Use the join concept to update and later update if the nodes are already available.
 
 ```js
 svg
-  .selectAll("path.highlight")
+  .selectAll('path.highlight')
   .data(links.filter((link) => link.target.data.isSmiling))
   .join(
     (enter) =>
       enter
-        .append("path")
-        .attr("class", "highlight")
-        .attr("d", (d) => link(d))
-        .attr("fill", "none")
-        .attr("stroke", "hsl(45, 90%, 80%)")
-        .attr("stroke-width", "25"),
-    (update) => update.attr("d", (d) => link(d))
+        .append('path')
+        .attr('class', 'highlight')
+        .attr('d', (d) => link(d))
+        .attr('fill', 'none')
+        .attr('stroke', 'hsl(45, 90%, 80%)')
+        .attr('stroke-width', '25'),
+    (update) => update.attr('d', (d) => link(d))
   );
 ```
 
@@ -253,7 +262,7 @@ plotData(data, topToBottom);
 And following the resize event, it is again called, but only if the boolean changes its value.
 
 ```js
-window.addEventListener("resize", function () {
+window.addEventListener('resize', function () {
   const { innerWidth } = this;
   if (topToBottom !== innerWidth < threshold) {
     topToBottom = innerWidth < threshold;

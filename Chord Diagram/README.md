@@ -2,10 +2,6 @@
 
 ## [Live Demo](https://codepen.io/borntofrappe/full/gOPObrL)
 
-Based on the network structure highlighted in [this project](https://codepen.io/borntofrappe/pen/qQZyor) create a diagram connecting the nodes in a circular pattern and through a series of ribbons.
+## Notes
 
-## Links
-
-- [d3-chord](https://github.com/d3/d3-chord#ribbon)
-
-- [network diagram](https://codepen.io/borntofrappe/pen/qQZyor)
+Create a diagram connecting nodes in a circular pattern and through a series of ribbons, starting from the network structure highlighted in [this project](https://codepen.io/borntofrappe/pen/qQZyor).

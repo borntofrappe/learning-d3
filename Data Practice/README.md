@@ -1,10 +1,10 @@
 # Data Practice
 
-Practice with D3 and JavaScript to map data to HTML and SVG elements.
-
-## [Live Demo](https://codepen.io/borntofrappe/full/pojPJGa)
+## [Live Demo](https://codepen.io/borntofrappe/pen/pojPJGa)
 
 ## Notes
+
+Practice with D3 and JavaScript to map data to HTML and SVG elements.
 
 - the icons are picked from [Google Material Design](https://material.io/resources/icons/).
 
@@ -23,7 +23,8 @@ Practice with D3 and JavaScript to map data to HTML and SVG elements.
 - the value for each key is computed with a handy function, which takes as input a string and returns the sum of the index corresponding to each letter
 
   ```js
-  const getValue = (key) => key.split("").reduce((acc, curr) => acc + curr.charCodeAt(), 0);
+  const getValue = (key) =>
+    key.split('').reduce((acc, curr) => acc + curr.charCodeAt(), 0);
   ```
 
 - once the data is processed through a function generating the pie slices, it provides the following information
@@ -32,8 +33,8 @@ Practice with D3 and JavaScript to map data to HTML and SVG elements.
   [
     {
       data: {
-        key: "volleyball",
-        icon: "",
+        key: 'volleyball',
+        icon: '',
         value: 1078,
       },
       index: 0,

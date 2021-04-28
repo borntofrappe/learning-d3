@@ -2,7 +2,7 @@
 
 ## Development
 
-Run `script.js` using node to copy the **data-viz-folder** as a starting point.
+Run `script.js` to create a folder based on **data-viz-folder**.
 
 ```bash
 node script
@@ -27,7 +27,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)                  | chord, ribbon, arc      |
 | [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)                    | arc, path               |
 | [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)                    | d3, react               |
-| Bins                                                                          | bin, random             |
+| [Bins](https://codepen.io/borntofrappe/pen/NWdVGre)                           | array, bin, random      |
 | [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)             | mouse, line,delaunay    |
 | [School Closures Choropleth Map](https://codepen.io/borntofrappe/pen/oNBaKdw) | geo, topojson           |
 

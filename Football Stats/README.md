@@ -1,6 +1,6 @@
 # Football Stats
 
-## [Live Demo](https://codepen.io/borntofrappe/full/eYBeJjL)
+## [Live Demo](https://codepen.io/borntofrappe/pen/eYBeJjL)
 
 ## Notes
 
@@ -12,7 +12,7 @@ A first visualization replicates the graph proposed in the article, where a seri
 
 A second visualization, however, presents the same information with a different visual. Here the goal is to focus on individual years, showing the different stages of the competition with a more artsy `<svg>` element.
 
-## D3 V6
+### D3 V6
 
 One considerable (and breaking) change introduced with the most recent version of D3 relates to how the library manages events. Version 6 deprecates `d3.event`, in favour of an `event` received as the first argument of the callback function. The datum for the selected element is now described by the second argument.
 

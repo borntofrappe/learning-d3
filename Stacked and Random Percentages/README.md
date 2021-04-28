@@ -1,6 +1,8 @@
 # Stacked and Random Percentages
 
-## [Live Demo](https://codepen.io/borntofrappe/full/QWjeEEg)
+## [Live Demo](https://codepen.io/borntofrappe/pen/QWjeEEg)
+
+## Notes
 
 This project is inspired by a pretend data visualization, shown [in this keynote](https://youtu.be/w9yrrQBBKos) to the JamStack 2020 conference.
 

@@ -2,9 +2,9 @@
 
 ## Live Demos
 
-- [Renderer - D3](https://codepen.io/borntofrappe/full/OJMVmNg)
+- [Renderer - D3](https://codepen.io/borntofrappe/pen/OJMVmNg)
 
-- [Renderer - React](https://codepen.io/borntofrappe/full/zYrGwZV)
+- [Renderer - React](https://codepen.io/borntofrappe/pen/zYrGwZV)
 
 ## Notes
 

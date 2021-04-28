@@ -1,8 +1,12 @@
-# [School Closures Choropleth Map](https://codepen.io/borntofrappe/full/oNBaKdw)
+# School Closures Choropleth Map
+
+## [Live Demo](https://codepen.io/borntofrappe/pen/oNBaKdw)
+
+## Notes
 
 [UNESCO](https://en.unesco.org) studies the impact of Covid-19 on education at a global scale with [a couple of informative maps](https://en.unesco.org/covid19/educationresponse). The goal of this project is to replicate the second of these geographical representation, the one studying the duration of school closures, in order to practice with `d3-geo` and `topojson`.
 
-## World
+### World
 
 `topojson/world-data` provides the data necessary to draw the world and its countries.
 
@@ -65,7 +69,7 @@ With this information, it is finally possible to draw the map.
 
 Ultimately I opted to just draw the countries (all, but Antarctica), but the instructions are worth remembering.
 
-## Data
+### Data
 
 The data describing the number of weeks of full and partial school closure is retrieved from the [cited UNESCO source](https://en.unesco.org/covid19/educationresponse). It is important to note that the source is however modified to differentiate the countries with an `id` column. The change is necessary since the `ISO` value from the original dataset describes the country with a short string, and the value doesn't match the identifier provided by the topojson object. `id` replaces the label with with the [ISO 3166-1 numeric country code](https://en.wikipedia.org/wiki/ISO_3166-1_numeric).
 
@@ -82,7 +86,7 @@ dataMap.has(id);
 dataMap.get(id);
 ```
 
-## Useful Links
+### Useful Links
 
 - [d3-geo](https://github.com/d3/d3-geo)
 

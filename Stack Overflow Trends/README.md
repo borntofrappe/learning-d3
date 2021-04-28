@@ -1,12 +1,12 @@
 # Stack Overflow Trends
 
-## [Live Demo](https://codepen.io/borntofrappe/full/oNjjdeZ)
-
-Describe the popularity of the Python language with a line chart. Customize the path elements with marker elements.
+## [Live Demo](https://codepen.io/borntofrappe/pen/oNjjdeZ)
 
 ## Notes
 
-This project builds on top of [this SVG demo](https://codepen.io/borntofrappe/pen/wvKKzzE) exploring the `<marker>` elements. I've created an `.svg` file in the **res** folder for further reference.
+Describe the popularity of the Python language with a line chart. Customize the path elements with marker elements.
+
+This project builds on top of [this SVG demo](https://codepen.io/borntofrappe/pen/wvKKzzE) exploring the `<marker>` elements. I've created an `.svg` file in the `res` folder for further reference.
 
 ### Data
 
@@ -16,4 +16,4 @@ The visualization considers data from [Stack Overflow](https://stackoverflow.com
 https://insights.stackoverflow.com/trends?tags=python
 ```
 
-Stack Overflow maps data from `2008`, but I'm only interested in a subset describing the most recent observations. This allows to keep the attention on the line and the different marker elements. See `data.js` in the **res** folder for the more comprehensive set.
+Stack Overflow maps data from `2008`, but I'm only interested in a subset describing the most recent observations. This allows to keep the attention on the line and the different marker elements. See `data.js` in the `res` folder for the more comprehensive set.

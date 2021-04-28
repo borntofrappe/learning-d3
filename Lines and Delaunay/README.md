@@ -1,14 +1,14 @@
 # Lines and Delaunay
 
-## [Live Demo](https://codepen.io/borntofrappe/full/ExNQbax)
+## [Live Demo](https://codepen.io/borntofrappe/pen/ExNQbax)
 
 ## Notes
 
 Here I want to create a chart with multiple lines, and lean on the [`d3-delaunay` module](https://github.com/d3/d3-delaunay) to ease user interaction in the form of `mouse` events.
 
-## Data
-
 The visualization is inspired by an article describing the [change in influenza activity as a result of the COVID-19 pandemic](https://www.cdc.gov/mmwr/volumes/69/wr/mm6937a6.htm?s_cid=mm6937a6_w). The article highlights how the selected countries (United States, Australia, Chile and South Africa) reported a considerable decrease in the number of positive cases of influenza, and links the phenomenon with the measures and precautions put into place to cope with the recent pandemic.
+
+### Data
 
 Data is collected from the [WHO Influenza Surveillance Outputs](https://www.who.int/influenza/resources/charts/en/) considering:
 
@@ -19,8 +19,6 @@ Data is collected from the [WHO Influenza Surveillance Outputs](https://www.who.
 - years 2017 to 2020
 
 - number of positive and negative tests, all subtypes combined
-
-## Data
 
 Before creating the line chart, it is necessary to update the data with the percentage of positive cases, shown on the `y` axis. To this end, I decided to store the tests in a `dataset` variable, and create `data` with the new value.
 
@@ -36,7 +34,7 @@ _Please note:_ creating a different variable is ultimately a preference, and it 
 dataset.forEach(...)
 ```
 
-## Line Chart
+### Line Chart
 
 The visualization is created in an `<svg>` element with an arbitray width and height.
 
@@ -136,7 +134,7 @@ Incrementing the `x` coordinate by half the band width of the scale is but a cho
 
 The function receives the object for the different lines, and produces the syntax necessary to the `d` attribute of the path elements `<path>`.
 
-## Highlight
+### Highlight
 
 Before introducing Delaunay's triangulation, creating an overlay for mouse interaction, it is worth describing what is actually shown following mouse interaction, and how.
 
@@ -150,7 +148,7 @@ In this group I store three elements: a `<circle>`, initialized without a radius
 
 I prefer this approach instead of adding a `<div>` container to work as a tooltip. The most immediate gain is that it is no longer necessary to consider the position of the tooltip, or whether the tooltip hides sections of the line charts.
 
-## Delaunay
+### Delaunay
 
 It is first necessary to convert the `data` collection to a one dimensional array. This is because `d3.Delaunay.from` works by sectioning the area of the line chart according to an array of points.
 
@@ -261,7 +259,7 @@ delaunayGroup
   .on('mouseenter', () => ())
 ```
 
-## Final Touches
+### Final Touches
 
 Instead of using the `d3` object in the script, I ultimately decided to extract the necessary functions at the beginning of the program. This is also useful to highlight which parts of the library are actually being used.
 

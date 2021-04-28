@@ -1,16 +1,10 @@
 # Force Simulation
 
-Introduction to the `d3-force` module.
-
-## [Live Demo](https://codepen.io/borntofrappe/full/GRpNqpd)
-
-## Notice
-
-Consider using the Canvas API instead of SVG syntax. It should be more viable when the number of data points grows exponentially.
+## [Live Demo](https://codepen.io/borntofrappe/pen/GRpNqpd)
 
 ## Notes
 
-Inspired by [this particular slide](https://www.lemonde.fr/les-decodeurs/visuel/2020/04/02/coronavirus-a-quoi-sert-le-confinement_6035266_4355770.html#slide=31) from a data visualization [@lemondefr](https://www.lemonde.fr/), the goal is to show a network structure made entirely of circle elements. The idea is to then style more and more circle elements in the same way. Start with the circle at the center of the graph, spread the style to connecting circles, repeat going outwards. This combines two concepts actually: a network diagram and a hierarchical structure. If you think about the tree structure developed for the **positivity tree** project, the only difference is that the elements are laid in a circular pattern.
+Inspired by [this particular slide](https://www.lemonde.fr/les-decodeurs/visuel/2020/04/02/coronavirus-a-quoi-sert-le-confinement_6035266_4355770.html#slide=31) from a data visualization [@lemondefr](https://www.lemonde.fr/), the goal is to show a network structure made entirely of circle elements. The idea is to then style more and more circle elements in the same way. Start with the circle at the center of the graph, spread the style to connecting circles, repeat going outwards. This combines two concepts actually: a network diagram and a hierarchical structure. If you think about the tree structure developed for the `Positivity Tree` project, the only difference is that the elements are laid in a circular pattern.
 
 ### Getting Started
 
@@ -57,7 +51,9 @@ As mentioned, the data is inherently hierarchial. To this end, I use a for loop 
   const generations = 4;
   const connections = 5;
   for (let generation = 0; generation < generations; generation += 1) {
-    const currentGenerations = data.filter((point) => point.generation === generation);
+    const currentGenerations = data.filter(
+      (point) => point.generation === generation
+    );
   }
   ```
 
@@ -118,16 +114,16 @@ I modified the `viewBox` to draw elements from the center of the `<svg>` element
 
 ```js
 svg
-  .selectAll("circle")
+  .selectAll('circle')
   .data(data)
   .enter()
-  .append("circle")
-  .attr("cx", (d) => d.x)
-  .attr("cy", (d) => d.y)
-  .attr("r", 4)
-  .attr("fill", "none")
-  .attr("stroke-width", 1)
-  .attr("stroke", "currentColor");
+  .append('circle')
+  .attr('cx', (d) => d.x)
+  .attr('cy', (d) => d.y)
+  .attr('r', 4)
+  .attr('fill', 'none')
+  .attr('stroke-width', 1)
+  .attr('stroke', 'currentColor');
 ```
 
 In terms of style, I decided to actually use the `currentColor` value, and update the color depending on the value of the boolean.
@@ -135,11 +131,11 @@ In terms of style, I decided to actually use the `currentColor` value, and updat
 ```js
 svg
   // ...
-  .append("circle")
-  .style("color", (d) => (d.hasStyle ? "tomato" : "inherit"))
-  .attr("fill", (d) => (d.hasStyle ? "currentColor" : "none"))
-  .attr("stroke-width", 2)
-  .attr("stroke", "currentColor");
+  .append('circle')
+  .style('color', (d) => (d.hasStyle ? 'tomato' : 'inherit'))
+  .attr('fill', (d) => (d.hasStyle ? 'currentColor' : 'none'))
+  .attr('stroke-width', 2)
+  .attr('stroke', 'currentColor');
 ```
 
 The stroke and fill, if specified, pick up from the color specified through the CSS property.
@@ -176,9 +172,9 @@ The attributes updated in the latter selection boil down to the `color` property
 ```js
 update
   // currentColor
-  .style("color", (d) => (d.hasStyle ? "tomato" : "inherit"))
+  .style('color', (d) => (d.hasStyle ? 'tomato' : 'inherit'))
   // fill
-  .attr("fill", (d) => (d.hasStyle ? "currentColor" : "none"));
+  .attr('fill', (d) => (d.hasStyle ? 'currentColor' : 'none'));
 ```
 
 ### Data Update

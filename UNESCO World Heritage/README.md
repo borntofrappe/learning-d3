@@ -1,4 +1,8 @@
-# [UNESCO World Heritage](https://codepen.io/borntofrappe/pen/jOyRJKO)
+# UNESCO World Heritage
+
+## [Live Demo](https://codepen.io/borntofrappe/pen/jOyRJKO)
+
+## Notes
 
 With this demo I intend to lean on D3, specifically the `d3-geo` module, and the `topojson` library to map the sites registered by the UNESCO agency as part of the world's heritage.
 

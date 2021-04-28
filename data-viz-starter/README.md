@@ -1,5 +1,7 @@
-# [data-viz-starter]()
+# data-viz-starter
 
-- explain the purpose of the demo
+<!-- ## [Live Demo](LINK_TO_LIVE_DEMO_HERE) -->
 
-- annotate important features of the demo and the D3 library
+## Notes
+
+Explain the goal of this viz. Jot down a couple of notes on the most relevant findings/challenges.
