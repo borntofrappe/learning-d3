@@ -1,3 +1,5 @@
+const { select, selectAll, scaleLinear, scaleBand, range, line, axisTop } = d3;
+
 const data = {
   laps: 53,
   drivers: [
@@ -13,18 +15,18 @@ const data = {
     { name: "Sergio Pérez", short: "PER", color: "hsl(320, 79%, 80%)", position: [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,12,14,14,14,14,13,11,11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,9,9,9,10,10,10,10,10] },
     { name: "Nicholas Latifi", short: "LAT", color: "hsl(209, 100%, 65%)", position: [20,19,19,19,19,19,18,18,18,18,18,18,18,18,18,18,18,19,18,18,18,18,16,7,9,9,9,9,12,12,12,11,11,11,11,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,11,11] },
     { name: "Romain Grosjean", short: "GRO", color: "hsl(0, 0%, 69%)", position: [16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,15,14,12,12,17,17,17,17,17,17,15,13,13,12,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,12] },
-    { name: "Kimi Räikkönen", short: "RAI", color: "hsl(0, 67%, 43%)", position: [14,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13,16,16,16,12,5,4,4,4,4,2,2,2,2,2,2,3,4,5,6,7,7,7,7,7,8,9,9,11,11,11,11,11,11,12,13] },
+    { name: "Kimi Räikkönen", short: "RAI", color: "hsl(0, 67%, 47%)", position: [14,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,13,16,16,16,12,5,4,4,4,4,2,2,2,2,2,2,3,4,5,6,7,7,7,7,7,8,9,9,11,11,11,11,11,11,12,13] },
     { name: "George Russell", short: "RUS", color: "hsl(209, 100%, 65%)", position: [19,17,18,18,18,18,17,17,17,17,17,17,17,17,17,17,17,17,16,15,14,13,18,16,15,15,15,15,16,15,14,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14,14,14,14,14,14,14,14] },
-    { name: "Alexander Albon", short: "ALB", color: "hsl(228, 100%, 59%)", position: [9,15,15,15,14,14,14,14,14,14,14,14,14,14,14,14,14,13,12,12,11,11,15,18,16,16,16,16,17,16,15,14,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,15,15] },
-    { name: "Antonio Giovinazzi", short: "GIO", color: "hsl(0, 67%, 43%)", position: [18,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,15,14,14,13,13,15,10,4,5,5,5,5,3,3,9,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16] },
-    { name: "Max Verstappen", short: "VER", color: "hsl(228, 100%, 59%)", position: [5,7,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,8,13,11,11,11,11,14,14,16] },
+    { name: "Alexander Albon", short: "ALB", color: "hsl(228, 98%, 63%)", position: [9,15,15,15,14,14,14,14,14,14,14,14,14,14,14,14,14,13,12,12,11,11,15,18,16,16,16,16,17,16,15,14,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,15,15] },
+    { name: "Antonio Giovinazzi", short: "GIO", color: "hsl(0, 67%, 47%)", position: [18,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,15,14,14,13,13,15,10,4,5,5,5,5,3,3,9,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16] },
+    { name: "Max Verstappen", short: "VER", color: "hsl(228, 98%, 63%)", position: [5,7,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,8,13,11,11,11,11,14,14,16] },
     { name: "Charles Leclerc", short: "LEC", color: "hsl(0, 100%, 46%)", position: [13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,16,17,17,17,17,14,6] },
     { name: "Kevin Magnussen", short: "MAG", color: "hsl(0, 0%, 69%)", position: [15,20,20,20,20,20,19,19,19,19,19,19,19,19,19,19,19,18] },
     { name: "Sebastian Vettel", short: "VET", color: "hsl(0, 100%, 46%)", position: [17,18,17,17,17,17,20] },
   ]
 }
 
-const main = d3.select('main');
+const main = select('main');
 main.append('h1').text('F1 race lap chart — Italy 2020');
 
 const dimensions = {
@@ -45,32 +47,37 @@ dimensions.boundedHeight =
 
 function drawLapChart(container, data) {
   const { laps, drivers, firstLap = 0 } = data;
+
+  const id = Math.random()
+    .toString()
+    .split('.')
+    .pop();
+    
   const viz = container
     .append('svg')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height)
     .append('g')
     .attr(
       'transform',
       `translate(${dimensions.margin.left} ${dimensions.margin.top})`
     );
 
-  const xScale = d3
-    .scaleLinear()
+  const xScale = scaleLinear()
     .domain([0, laps])
     .range([0, dimensions.boundedWidth]);
-  const yScale = d3
-    .scaleBand()
-    .domain(d3.range(drivers.length))
+
+  const yScale = scaleBand()
+    .domain(range(drivers.length))
     .range([0, dimensions.boundedHeight]);
 
-  const lineGenerator = d3
-    .line()
+  const lineGenerator = line()
     .x((d, i) => xScale(i))
     .y(d => yScale(d - 1) + yScale.bandwidth() / 2);
 
   const groupAxis = viz.append('g');
-  const xAxis = d3
-    .axisTop(xScale)
+  const xAxis = axisTop(xScale)
     .ticks(5)
     .tickSize(0)
     .tickFormat(d => d + firstLap);
@@ -97,7 +104,8 @@ function drawLapChart(container, data) {
     .selectAll('g')
     .data(drivers)
     .enter()
-    .append('g');
+    .append('g')
+    .attr('class', d => `driver-${id} ${d.short}-${id}`);
 
   groupsDrivers
     .append('path')
@@ -129,7 +137,7 @@ function drawLapChart(container, data) {
     .text(d => `${d.position[d.position.length - 1]} ${d.short}`)
     .attr('dominant-baseline', 'middle')
     .attr('fill', d => d.color)
-    .attr('font-size', 13)
+    .attr('font-size', 14)
     .attr(
       'transform',
       d =>
@@ -138,6 +146,22 @@ function drawLapChart(container, data) {
         ) +
           yScale.bandwidth() / 2})`
     );
+
+  groupsDrivers
+    .filter(d => d.position.length === laps + 1)
+    .append('rect')
+    .attr('y', d => yScale(d.position[d.position.length - 1] - 1))
+    .attr('width', dimensions.boundedWidth + dimensions.margin.right)
+    .attr('height', yScale.bandwidth())
+    .attr('opacity', 0)
+    .on('mouseenter', (e, { short }) => {
+      selectAll(`.driver-${id}`).style('opacity', 0.2);
+      selectAll(`.${short}-${id}`).style('opacity', 1);
+    });
+
+  viz.on('mouseleave', () => {
+    selectAll(`.driver-${id}`).style('opacity', 1);
+  });
 }
 
 const dataPositions = Array(data.laps)
@@ -148,6 +172,7 @@ const dataPositions = Array(data.laps)
       []
     )
   );
+
 const changes = dataPositions.reduce(
   (acc, curr, i, array) =>
     i === 0
@@ -170,7 +195,7 @@ const articles = [
     interval: [20, 24],
   },
   {
-    title: 'Ref flag',
+    title: 'Red flag',
     brief:
       'On top of the commotion, the race is interrupted on lap 25. Charles Leclerc loses the back of the car, hits the tyre barrier, and the marshals are called to clear the debris. The 10 second penalty at the restart of the race causes Hamilton to drop behind and opens the door for Pierre Gasly to take a surprising, emotional victory.',
     interval: [26, 31],
@@ -196,7 +221,7 @@ articles.forEach(({ title, brief, interval }) => {
           name,
           short,
           color,
-          position: [...position.slice(firstLap, lastLap + 1)],
+          position: position.slice(firstLap, lastLap + 1),
         })),
     };
     drawLapChart(article, dataArticle);
