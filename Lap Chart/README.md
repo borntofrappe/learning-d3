@@ -4,9 +4,9 @@
 
 ## Notes
 
-The goal of this project is to recreate one of the visualizations proposed on the F1 website, and specifically the one highlighting the progression of drivers lap by lap. You can find an example in the _lap chart_ tab on the page devoted to [live timing](https://www.formula1.com/en/f1-live.html).
+The section of the F1 website devoted to [live timing](https://www.formula1.com/en/f1-live.html) shows a rather intriguing visualization in the tab labeled lap chart. The goal of this project is to recreate the chart for the italian grand prix run in 2020. I chose the specific circuit due to the considerable shuffle in positions, not to mention the surprising victory of Pierre Gasly.
 
-Data is collected for the italian grand prix in 2020, for the tumultuous nature of the race.
+At first I created a single lap chart, but plotting 20 drivers and 53 laps creates a rather noisy visual. To this end I decided to include multiple visualizations, focused on specific intervals.
 
 ```js
 drivers: data.drivers.filter(({position}) => position[firstLap])
