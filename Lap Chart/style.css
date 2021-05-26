@@ -5,7 +5,25 @@
 }
 
 body {
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 5%);
-  font-family: monospace;
+  background: #222;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+}
+
+main {
+  max-width: 850px;
+  width: 95vw;
+  margin: 1rem auto;
+}
+
+h1 {
+  font-weight: 300;
+  font-size: 1.1rem;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
