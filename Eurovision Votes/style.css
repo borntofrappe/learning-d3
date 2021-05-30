@@ -12,13 +12,33 @@ body {
   color: hsl(0, 0%, 100%);
 }
 
-h1 {
+h1,
+h2 {
   font-family: 'Noto Serif', serif;
+}
+
+h1 {
   font-weight: 400;
+  font-size: 1.82rem;
 }
 
 h2,
 h3 {
-  font-family: 'Rubik', sans-serif;
-  font-weight: 500;
+  font-weight: 400;
+  font-size: 1.28rem;
+}
+
+main {
+  max-width: 800px;
+  margin: 1rem auto;
+}
+
+article > * + * {
+  margin-top: 0.75em;
+}
+
+article > svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
