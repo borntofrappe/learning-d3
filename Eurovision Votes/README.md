@@ -1,9 +1,9 @@
 # Eurovision Votes
 
-<!-- ## [Live Demo](LINK_TO_LIVE_DEMO_HERE) -->
+## [Live Demo](https://codepen.io/borntofrappe/pen/dyvJpOJ)
 
 ## Notes
 
-The goal of this project is to recreate a couple of visualizations from [this interesting analysis](https://googletrends.github.io/eurosearch-19/) of the Google trends for the Eurovision song contest, and specifically the Sankey diagram and the scatterplot highlighting the connection between two metrics.
+[Google Trends](https://googletrends.github.io/eurosearch-19/) analyses the 2019 edition of the Eurovision song contest in terms of results and search activity. Here I want to replicate a couple of visualizations from the article, like the Sankey diagram highlighting the rankings and the scatter plot to consider the correlation between votes and searh results. Instead of the 2019 edition, I want to focus on the 2021 contest. In place of Google searches, I want to highlight the difference between the types of voting in the competition.
 
-I'd like to focus on the split between the two types of votes, from professional juries and the public, and on the 2021 edition. Data is collected from the [wikipedia page of the contest](https://en.wikipedia.org/wiki/Eurovision_Song_Contest_2021#Final_2). The [official Eurovision website](https://eurovision.tv/about/voting) explains how voting takes place.
+Data is collected from the [wikipedia page of the contest](https://en.wikipedia.org/wiki/Eurovision_Song_Contest_2021#Final_2).

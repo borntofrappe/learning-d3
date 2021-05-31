@@ -26,12 +26,6 @@ h2 {
   font-size: 1.42rem;
 }
 
-#root {
-  padding: 1rem;
-  max-width: 800px;
-  margin: 1rem auto;
-}
-
 p {
   line-height: 1.42;
 }
@@ -40,6 +34,12 @@ mark {
   background: hsla(0, 0%, 100%, 0.1);
   color: inherit;
   padding: 0.15rem 0.25rem;
+}
+
+#root {
+  padding: 0 1rem;
+  max-width: 800px;
+  margin: 1rem auto;
 }
 
 #root > * + * {

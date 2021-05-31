@@ -1,4 +1,5 @@
-
+// inspiration https://googletrends.github.io/eurosearch-19/
+// data https://en.wikipedia.org/wiki/Eurovision_Song_Contest_2021#Final_2
 const data = [
   { country: "Cyprus", jury: 50, televoting: 44 },
   { country: "Albania", jury: 22, televoting: 35 },
@@ -30,12 +31,24 @@ const data = [
 
 const winner = 'Italy';
 
-const root = d3.select('#root');
+const {
+  select,
+  scaleLinear,
+  scaleBand,
+  max,
+  sankey,
+  sankeyLinkHorizontal,
+  axisBottom,
+  axisLeft,
+  axisTop,
+} = d3;
+
+const root = select('#root');
 root.append('h1').text('Eurovision Votes');
 root
   .append('p')
   .text(
-    "On the night of the grand final national juries and the public voted for their favorite songs. Here's how the two types impacted the competition."
+    'On the night of the grand final, national juries and the public voted for their favorite songs.'
   );
 
 const ranking = root.append('article');
@@ -98,14 +111,12 @@ function highlightRanking(container) {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-  const sankeyGenerator = d3
-    .sankey()
-    .nodePadding(10)
+  const sankeyGenerator = sankey()
     .nodeSort(d => d)
     .size([dimensions.boundedWidth, dimensions.boundedHeight]);
 
   const sankeyData = sankeyGenerator({ nodes, links });
-  const sankeyLinkGenerator = d3.sankeyLinkHorizontal();
+  const sankeyLinkGenerator = sankeyLinkHorizontal();
 
   const viz = container
     .append('svg')
@@ -135,8 +146,7 @@ function highlightRanking(container) {
     .append('path')
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 1)
-    .attr('opacity', 0.5)
+    .attr('stroke-width', 2)
     .attr('d', sankeyLinkGenerator);
 
   const nodesGroups = nodesGroup
@@ -149,6 +159,12 @@ function highlightRanking(container) {
       ({ x0, y0, x1, y1 }) =>
         `translate(${x0 + (x1 - x0) / 2} ${y0 + (y1 - y0) / 2})`
     );
+
+  nodesGroups
+    .append('circle')
+    .attr('r', 11)
+    .attr('filter', 'url(#dropShadow)')
+    .attr('fill', 'currentColor');
 
   nodesGroups
     .append('circle')
@@ -232,13 +248,12 @@ function highlightComparison(container) {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data, d => d.televoting)])
+  const xScale = scaleLinear()
+    .domain([0, max(data, d => d.televoting)])
     .range([0, dimensions.boundedWidth]);
-  const yScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data, d => d.jury)])
+
+  const yScale = scaleLinear()
+    .domain([0, max(data, d => d.jury)])
     .range([dimensions.boundedHeight, 0]);
 
   const viz = container
@@ -265,6 +280,12 @@ function highlightComparison(container) {
       'transform',
       d => `translate(${xScale(d.televoting)} ${yScale(d.jury)})`
     );
+
+  dataGroups
+    .append('circle')
+    .attr('r', 13)
+    .attr('filter', 'url(#dropShadow)')
+    .attr('fill', 'currentColor');
 
   dataGroups
     .append('circle')
@@ -297,7 +318,7 @@ function highlightComparison(container) {
     .attr('r', 18)
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '2 2')
+    .attr('stroke-dasharray', 3)
     .attr('transform', `translate(${xScale(televoting)} ${yScale(jury)})`);
 
   highlightGroup
@@ -344,14 +365,13 @@ function highlightComparison(container) {
     .attr('y', dimensions.boundedHeight + dimensions.margin.bottom)
     .text('Televoting points');
 
-  const xAxis = d3
-    .axisBottom(xScale)
+  const xAxis = axisBottom(xScale)
     .ticks(3)
     .tickPadding(12)
     .tickSize(0)
     .tickFormat(d => d || '');
-  const yAxis = d3
-    .axisLeft(yScale)
+
+  const yAxis = axisLeft(yScale)
     .ticks(3)
     .tickPadding(12)
     .tickSize(0)
@@ -375,7 +395,7 @@ function highlightComparison(container) {
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 0.5)
-    .attr('opacity', 0.25)
+    .attr('opacity', 0.2)
     .attr('d', `M 0 0 v ${-dimensions.boundedHeight}`);
 
   yAxisGroup
@@ -385,7 +405,7 @@ function highlightComparison(container) {
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 0.5)
-    .attr('opacity', 0.25)
+    .attr('opacity', 0.2)
     .attr('d', `M 0 0 h ${dimensions.boundedWidth}`);
 
   axisGroup
@@ -393,8 +413,8 @@ function highlightComparison(container) {
     .attr('id', 'equal-line')
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
-    .attr('stroke-width', 0.4)
-    .attr('stroke-dasharray', '3 3')
+    .attr('stroke-width', 0.5)
+    .attr('stroke-dasharray', 4)
     .attr(
       'd',
       `M ${xScale.range()[0]} ${yScale.range()[0]} L ${xScale.range()[1]} ${
@@ -418,26 +438,28 @@ function highlightGap(container) {
   const dataGaps = data
     .map(({ country, jury, televoting }) => ({
       country,
-      gap: jury - televoting,
+      gap: televoting - jury,
     }))
     .sort((a, b) => (a.gap < b.gap ? 1 : -1));
-  const favoriteJury = dataGaps[0];
-  const favoritePublic = dataGaps[dataGaps.length - 1];
+
+  const favoritePublic = dataGaps[0];
+  const favoriteJury = dataGaps[dataGaps.length - 1];
+
   container
     .append('p')
     .html(
-      `On one extreme ${favoriteJury.country} received <mark>${
-        favoriteJury.gap
-      }</mark> more votes from the jury. On the opposite end, ${
+      `On one extreme, ${favoriteJury.country} received <mark>${
+        Math.abs(favoriteJury.gap)
+      }</mark> more votes from the jury than the public. On the opposite end, televoting favored ${
         favoritePublic.country
-      } collected <mark>${Math.abs(
+      } with a difference of <mark>${Math.abs(
         favoritePublic.gap
-      )}</mark> more votes from the public.`
+      )}</mark> votes.`
     );
 
   const dimensions = {
     width: 500,
-    height: 800,
+    height: 1000,
     margin: {
       top: 60,
       right: 55,
@@ -453,7 +475,7 @@ function highlightGap(container) {
 
   const viz = container
     .append('svg')
-    .style('max-width', '620px')
+    .style('max-width', '650px')
     .style('margin-left', 'auto')
     .style('margin-right', 'auto')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
@@ -465,16 +487,16 @@ function highlightGap(container) {
       `translate(${dimensions.margin.left} ${dimensions.margin.top})`
     );
 
-  const maxGap = d3.max([
+  const maxGap = max([
     Math.abs(favoriteJury.gap),
     Math.abs(favoritePublic.gap),
   ]);
-  const xScale = d3
-    .scaleLinear()
+
+  const xScale = scaleLinear()
     .domain([-maxGap, maxGap])
     .range([0, dimensions.boundedWidth]);
-  const yScale = d3
-    .scaleBand()
+
+  const yScale = scaleBand()
     .domain(dataGaps.map(d => d.country))
     .range([0, dimensions.boundedHeight]);
 
@@ -496,7 +518,7 @@ function highlightGap(container) {
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 1)
-    .attr('stroke-dasharray', '2')
+    .attr('stroke-dasharray', 3)
     .attr('d', d => `M ${xScale(0)} 0 H ${xScale(d.gap)}`);
 
   dataGroups
@@ -508,6 +530,12 @@ function highlightGap(container) {
   const dataGroupsEnd = dataGroups
     .append('g')
     .attr('transform', d => `translate(${xScale(d.gap)} 0)`);
+
+  dataGroupsEnd
+    .append('circle')
+    .attr('r', 11)
+    .attr('filter', 'url(#dropShadow)')
+    .attr('fill', 'currentColor');
 
   dataGroupsEnd
     .append('circle')
@@ -534,12 +562,12 @@ function highlightGap(container) {
     .attr('text-anchor', d => (d.gap >= 0 ? 'start' : 'end'))
     .text(d => d.country);
 
-  const xAxis = d3
-    .axisTop(xScale)
+  const xAxis = axisTop(xScale)
     .ticks(6)
     .tickPadding(12)
     .tickSize(0)
     .tickFormat(d => Math.abs(d));
+
   const xAxisGroup = axisGroup.append('g').call(xAxis);
 
   xAxisGroup.select('path').remove();
@@ -550,7 +578,7 @@ function highlightGap(container) {
     .attr('fill', 'none')
     .attr('stroke', 'currentColor')
     .attr('stroke-width', 0.5)
-    .attr('opacity', 0.15)
+    .attr('opacity', 0.2)
     .attr('d', `M 0 0 v ${dimensions.boundedHeight}`);
 
   xAxisGroup.selectAll('text').attr('font-size', 8);
@@ -566,7 +594,7 @@ function highlightGap(container) {
     .append('text')
     .attr('x', dimensions.boundedWidth)
     .attr('text-anchor', 'end')
-    .text('More jury points');
+    .text('More televoting points');
 
-  labelsGroup.append('text').text('More televoting points');
+  labelsGroup.append('text').text('More jury points');
 }
