@@ -28,14 +28,63 @@ const data = [
   { country: "San Marino", jury: 37, televoting: 13}
 ]
 
+const winner = 'Italy';
 
-const main = d3.select('main');
-main.append('h1').text('Eurovision Votes');
+const root = d3.select('#root');
+root.append('h1').text('Eurovision Votes');
+root
+  .append('p')
+  .text(
+    "On the night of the grand final national juries and the public voted for their favorite songs. Here's how the two types impacted the competition."
+  );
 
-function drawScatterplot() {
-  const article = main.append('article');
-  article.append('h2').text('Professional juries vs televoting');
+// const ranking = root.append('article');
+// ranking.append('h2').text('The ranking');
+// ranking.append('p').text('Juries and the public have the same weight in terms of votes. This causes a considerable shuffle when the results are announced one type after the other.')
 
+// highlightRanking(ranking);
+
+const comparison = root.append('article');
+comparison.append('h2').text('Professional juries vs televoting');
+comparison
+  .append('p')
+  .text(
+    'The difference between the two types of voting is often considerable.'
+  );
+
+highlightComparison(comparison);
+highlightGap(comparison);
+
+function highlightRanking(container) {
+  const dimensions = {
+    width: 500,
+    height: 1600,
+    margin: {
+      top: 20,
+      right: 100,
+      bottom: 20,
+      left: 100,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+  const viz = container
+    .append('svg')
+    .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height)
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
+}
+
+function highlightComparison(container) {
   const dimensions = {
     width: 800,
     height: 500,
@@ -61,7 +110,7 @@ function drawScatterplot() {
     .domain([0, d3.max(data, d => d.jury)])
     .range([dimensions.boundedHeight, 0]);
 
-  const viz = article
+  const viz = container
     .append('svg')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
     .attr('width', dimensions.width)
@@ -73,6 +122,7 @@ function drawScatterplot() {
     );
 
   const axisGroup = viz.append('g');
+  const highlightGroup = viz.append('g');
   const dataGroup = viz.append('g');
 
   const dataGroups = dataGroup
@@ -107,6 +157,42 @@ function drawScatterplot() {
     .attr('y', -20)
     .attr('text-anchor', 'middle')
     .attr('fill', 'currentColor');
+
+  const { televoting, jury } = data.find(({ country }) => country === winner);
+
+  highlightGroup
+    .append('circle')
+    .attr('fill', 'none')
+    .attr('r', 18)
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', '2 2')
+    .attr('transform', `translate(${xScale(televoting)} ${yScale(jury)})`);
+
+  highlightGroup
+    .append('circle')
+    .attr('fill', 'currentColor')
+    .attr('r', 18)
+    .attr('opacity', 0.25)
+    .attr('transform', `translate(${xScale(televoting)} ${yScale(jury)})`);
+
+  highlightGroup
+    .append('path')
+    .attr('id', 'winner-circle')
+    .attr('fill', 'none')
+    .attr('d', 'M 0 -29 a 29 29 0 0 0 0 58 29 29 0 0 0 0 -58')
+    .attr('transform', `translate(${xScale(televoting)} ${yScale(jury)})`);
+
+  highlightGroup
+    .append('text')
+    .append('textPath')
+    .attr('href', '#winner-circle')
+    .attr('fill', 'currentColor')
+    .attr('startOffset', '50%')
+    .attr('text-anchor', 'middle')
+    .attr('letter-spacing', 1.5)
+    .attr('font-size', 10)
+    .text('Winner');
 
   const labelsGroup = axisGroup
     .append('g')
@@ -197,4 +283,156 @@ function drawScatterplot() {
     .text('Line of equal jury and televoting points');
 }
 
-drawScatterplot();
+function highlightGap(container) {
+  const dataGaps = data
+    .map(({ country, jury, televoting }) => ({
+      country,
+      gap: jury - televoting,
+    }))
+    .sort((a, b) => (a.gap < b.gap ? 1 : -1));
+  const favoriteJury = dataGaps[0];
+  const favoritePublic = dataGaps[dataGaps.length - 1];
+  container
+    .append('p')
+    .html(
+      `On one extreme ${favoriteJury.country} received <mark>${
+        favoriteJury.gap
+      }</mark> more votes from the jury. On the opposite end, ${
+        favoritePublic.country
+      } collected <mark>${Math.abs(
+        favoritePublic.gap
+      )}</mark> more votes from the public.`
+    );
+
+  const dimensions = {
+    width: 500,
+    height: 800,
+    margin: {
+      top: 60,
+      right: 55,
+      bottom: 20,
+      left: 55,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+  const viz = container
+    .append('svg')
+    .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height)
+    .append('g')
+    .attr(
+      'transform',
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
+
+  const maxGap = d3.max([
+    Math.abs(favoriteJury.gap),
+    Math.abs(favoritePublic.gap),
+  ]);
+  const xScale = d3
+    .scaleLinear()
+    .domain([-maxGap, maxGap])
+    .range([0, dimensions.boundedWidth]);
+  const yScale = d3
+    .scaleBand()
+    .domain(dataGaps.map(d => d.country))
+    .range([0, dimensions.boundedHeight]);
+
+  const axisGroup = viz.append('g');
+  const dataGroup = viz.append('g');
+
+  const dataGroups = dataGroup
+    .selectAll('g')
+    .data(dataGaps)
+    .enter()
+    .append('g')
+    .attr(
+      'transform',
+      d => `translate(0 ${yScale(d.country) + yScale.bandwidth() / 2})`
+    );
+
+  dataGroups
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1)
+    .attr('stroke-dasharray', '2')
+    .attr('d', d => `M ${xScale(0)} 0 H ${xScale(d.gap)}`);
+
+  dataGroups
+    .append('circle')
+    .attr('r', 2)
+    .attr('cx', xScale(0))
+    .attr('fill', 'currentColor');
+
+  const dataGroupsEnd = dataGroups
+    .append('g')
+    .attr('transform', d => `translate(${xScale(d.gap)} 0)`);
+
+  dataGroupsEnd
+    .append('circle')
+    .attr('r', 11)
+    .attr('fill', 'currentColor');
+
+  dataGroupsEnd
+    .append('svg')
+    .attr('viewBox', [0, 0, 100, 100])
+    .attr('x', -8)
+    .attr('y', -8)
+    .attr('width', 16)
+    .attr('height', 16)
+    .append('use')
+    .attr('href', d => `#${d.country.split(' ').join('-')}`);
+
+  dataGroupsEnd
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('font-size', 9)
+    .attr('dominant-baseline', 'middle')
+    .attr('y', 1)
+    .attr('x', d => (d.gap >= 0 ? 18 : -18))
+    .attr('text-anchor', d => (d.gap >= 0 ? 'start' : 'end'))
+    .text(d => d.country);
+
+  const xAxis = d3
+    .axisTop(xScale)
+    .ticks(6)
+    .tickPadding(12)
+    .tickSize(0)
+    .tickFormat(d => Math.abs(d));
+  const xAxisGroup = axisGroup.append('g').call(xAxis);
+
+  xAxisGroup.select('path').remove();
+
+  xAxisGroup
+    .selectAll('g.tick')
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 0.5)
+    .attr('opacity', 0.15)
+    .attr('d', `M 0 0 v ${dimensions.boundedHeight}`);
+
+  xAxisGroup.selectAll('text').attr('font-size', 8);
+
+  labelsGroup = axisGroup
+    .append('g')
+    .attr('transform', `translate(0 ${-dimensions.margin.top + 20})`)
+    .attr('fill', 'currentColor')
+    .attr('font-size', 9)
+    .style('text-transform', 'uppercase');
+
+  labelsGroup
+    .append('text')
+    .attr('x', dimensions.boundedWidth)
+    .attr('text-anchor', 'end')
+    .text('More jury points');
+
+  labelsGroup.append('text').text('More televoting points');
+}
