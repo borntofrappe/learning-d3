@@ -38,11 +38,15 @@ root
     "On the night of the grand final national juries and the public voted for their favorite songs. Here's how the two types impacted the competition."
   );
 
-// const ranking = root.append('article');
-// ranking.append('h2').text('The ranking');
-// ranking.append('p').text('Juries and the public have the same weight in terms of votes. This causes a considerable shuffle when the results are announced one type after the other.')
+const ranking = root.append('article');
+ranking.append('h2').text('The ranking');
+ranking
+  .append('p')
+  .text(
+    'Juries and the public have the same weight in terms of votes. This causes a considerable shuffle when the results are announced one type after the other.'
+  );
 
-// highlightRanking(ranking);
+highlightRanking(ranking);
 
 const comparison = root.append('article');
 comparison.append('h2').text('Professional juries vs televoting');
@@ -56,14 +60,36 @@ highlightComparison(comparison);
 highlightGap(comparison);
 
 function highlightRanking(container) {
+  const rankings = [
+    data.map(({ country, jury }) => ({ country, votes: jury })),
+    data.map(({ country, televoting }) => ({ country, votes: televoting })),
+    data.map(({ country, jury, televoting }) => ({
+      country,
+      votes: jury + televoting,
+    })),
+  ];
+
+  rankings.forEach(r => r.sort((a, b) => (a.votes < b.votes ? 1 : -1)));
+  const nodes = rankings.reduce((acc, curr) => [...acc, ...curr], []);
+
+  const links = rankings[0]
+    .map(({ country }, _, { length }) => {
+      const ranks = rankings.map(
+        (r, i) => r.findIndex(d => d.country === country) + i * length
+      );
+      return [ranks.slice(0, 2), ranks.slice(1)];
+    })
+    .reduce((acc, curr) => [...acc, ...curr], [])
+    .map(([source, target]) => ({ source, target, value: 1 }));
+
   const dimensions = {
     width: 500,
-    height: 1600,
+    height: 1000,
     margin: {
-      top: 20,
-      right: 100,
+      top: 40,
+      right: 120,
       bottom: 20,
-      left: 100,
+      left: 120,
     },
   };
 
@@ -72,8 +98,20 @@ function highlightRanking(container) {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
+  const sankeyGenerator = d3
+    .sankey()
+    .nodePadding(10)
+    .nodeSort(d => d)
+    .size([dimensions.boundedWidth, dimensions.boundedHeight]);
+
+  const sankeyData = sankeyGenerator({ nodes, links });
+  const sankeyLinkGenerator = d3.sankeyLinkHorizontal();
+
   const viz = container
     .append('svg')
+    .style('max-width', '550px')
+    .style('margin-left', 'auto')
+    .style('margin-right', 'auto')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
     .attr('width', dimensions.width)
     .attr('height', dimensions.height)
@@ -82,6 +120,99 @@ function highlightRanking(container) {
       'transform',
       `translate(${dimensions.margin.left} ${dimensions.margin.top})`
     );
+
+  const axisGroup = viz.append('g');
+  const dataGroup = viz.append('g');
+  const linksGroup = dataGroup.append('g');
+  const nodesGroup = dataGroup.append('g');
+  const juryGroup = dataGroup.append('g');
+  const overallGroup = dataGroup.append('g');
+
+  linksGroup
+    .selectAll('path')
+    .data(sankeyData.links)
+    .enter()
+    .append('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1)
+    .attr('opacity', 0.5)
+    .attr('d', sankeyLinkGenerator);
+
+  const nodesGroups = nodesGroup
+    .selectAll('g')
+    .data(sankeyData.nodes)
+    .enter()
+    .append('g')
+    .attr(
+      'transform',
+      ({ x0, y0, x1, y1 }) =>
+        `translate(${x0 + (x1 - x0) / 2} ${y0 + (y1 - y0) / 2})`
+    );
+
+  nodesGroups
+    .append('circle')
+    .attr('r', 11)
+    .attr('fill', 'currentColor');
+
+  nodesGroups
+    .append('svg')
+    .attr('viewBox', [0, 0, 100, 100])
+    .attr('x', -8)
+    .attr('y', -8)
+    .attr('width', 16)
+    .attr('height', 16)
+    .append('use')
+    .attr('href', d => `#${d.country.split(' ').join('-')}`);
+
+  const labelsGroup = axisGroup
+    .append('g')
+    .attr('transform', `translate(0 ${-dimensions.margin.top + 20})`)
+    .attr('fill', 'currentColor')
+    .attr('font-size', 11)
+    .attr('text-anchor', 'middle');
+
+  labelsGroup
+    .selectAll('text')
+    .data(['Jury', 'Televoting', 'Overall'])
+    .enter()
+    .append('text')
+    .attr('transform', (d, i) => {
+      const { x0, x1 } = rankings[i][0];
+      return `translate(${x0 + (x1 - x0) / 2} 0)`;
+    })
+    .text(d => d);
+
+  juryGroup
+    .selectAll('text')
+    .data(rankings[0])
+    .enter()
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('font-size', 11)
+    .attr('dominant-baseline', 'middle')
+    .attr('transform', d => {
+      const { y0, y1 } = d;
+      return `translate(${-dimensions.margin.left + 2} ${y0 + (y1 - y0) / 2})`;
+    })
+    .text((d, i) => `${i + 1}. ${d.country}`);
+
+  overallGroup
+    .selectAll('text')
+    .data(rankings[rankings.length - 1])
+    .enter()
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('font-size', 11)
+    .attr('text-anchor', 'end')
+    .attr('dominant-baseline', 'middle')
+    .attr('transform', d => {
+      const { y0, y1 } = d;
+      return `translate(${dimensions.boundedWidth +
+        dimensions.margin.right -
+        2} ${y0 + (y1 - y0) / 2})`;
+    })
+    .text((d, i) => `${i + 1}. ${d.country}`);
 }
 
 function highlightComparison(container) {
@@ -322,6 +453,9 @@ function highlightGap(container) {
 
   const viz = container
     .append('svg')
+    .style('max-width', '620px')
+    .style('margin-left', 'auto')
+    .style('margin-right', 'auto')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
     .attr('width', dimensions.width)
     .attr('height', dimensions.height)
