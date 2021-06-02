@@ -4,15 +4,6 @@
   margin: 0;
 }
 
-:root {
-  --accent: hsl(201, 18%, 35%);
-  --accent: hsl(202, 14%, 49%);
-  --accent: hsl(199, 12%, 57%);
-  --accent: hsl(41, 100%, 65%);
-  --accent: hsl(46, 100%, 66%);
-  --accent: hsl(45, 98%, 75%);
-}
-
 body {
   background: hsl(207, 19%, 22%);
   color: hsl(215, 25%, 97%);
@@ -22,5 +13,12 @@ body {
 
 #root {
   max-width: 700px;
-  margin: 1rem auto;
+  margin: 0rem auto;
+  padding: 1rem;
+}
+
+#root svg {
+  display: block;
+  width: 100%;
+  height: auto;
 }
