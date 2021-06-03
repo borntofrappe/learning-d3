@@ -50,4 +50,4 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [UNESCO World Heritage](https://codepen.io/borntofrappe/pen/jOyRJKO)          | geo, topojson              |
 | [F1 Race Lap Chart](https://codepen.io/borntofrappe/pen/yLMoYbY)              | line                       |
 | [Eurovision Votes](https://codepen.io/borntofrappe/pen/dyvJpOJ)               | sankey, scatterplot        |
-| [Seine River]()                                                               | sankey, hierarchy          |
+| [Seine River]()                                                               | sankey, radial             |
