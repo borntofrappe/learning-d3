@@ -5,8 +5,8 @@
 }
 
 body {
-  background: hsl(207, 19%, 22%);
-  color: hsl(215, 25%, 97%);
+  background: #dff0d9;
+  color: #684349;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
 }
