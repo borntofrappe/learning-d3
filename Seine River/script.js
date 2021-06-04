@@ -13,27 +13,52 @@ const data = {
     { name: 'Oise', size: 17000, length: 341, side: 'r' },
     { name: 'Marne', size: 12800, length: 514, side: 'r' },
     { name: 'Aube', size: 3600, length: 249, side: 'r' },
-    { name: 'Ource', size: 736, length: 100, side: 'r' }
+    { name: 'Ource', size: 736, length: 100, side: 'r' },
   ],
 };
 
-const { select, sankey, sankeyLinkHorizontal, format } = d3;
+const {
+  select,
+  sankey,
+  sankeyLinkHorizontal,
+  linkVertical,
+  format,
+  min,
+  max,
+  scaleBand,
+  scaleLinear,
+} = d3;
+
+const formatThousand = format(',');
 
 const root = select('main');
-root.append('h1').text('Seine river');
-root.append('p').html(`<a href="https://en.wikipedia.org/wiki/Seine">Wikipedia</a> lists ${data.tributaries.length} tributaries, dividing them according to the side in which they enter the river.`);
+root.append('h1').text('The Seine');
+root
+  .append('p')
+  .html(
+    `<a href="https://en.wikipedia.org/wiki/Seine">Wikipedia</a> lists ${
+      data.tributaries.length
+    } tributaries, dividing the streams according to the side in which they merge in the river toward the ${
+      data.mouth
+    }.`
+  );
 
-const formatThousand = d3.format(',')
+drawSankeyDiagram();
 
-highlightBasin();
-highlightLength();
+root
+  .append('p')
+  .text('The rivers vary considerably in terms of basin size and length.');
 
-function highlightBasin() {
-  const article = root.append('article');
+drawRadialCharts();
 
-  const nodes = [...data.tributaries, { name: data.river, size: data.size }];
+function drawSankeyDiagram() {
+  const dataTributaries = data.tributaries.map(
+    ({ name, size: value, side }) => ({ name, value, side })
+  );
 
-  const links = data.tributaries.map(({ name, size: value, side }) => {
+  const nodes = [...dataTributaries, { name: data.river, value: data.size }];
+
+  const links = dataTributaries.map(({ name, value, side }) => {
     const source = side === 'l' ? name : data.river;
     const target = source === name ? data.river : name;
     return {
@@ -61,20 +86,20 @@ function highlightBasin() {
 
   const sankeyGenerator = sankey()
     .nodeId(d => d.name)
-    .nodeAlign(d3.sankeyCenter)
     .nodePadding(35)
     .size([dimensions.boundedWidth, dimensions.boundedHeight]);
 
   const sankeyData = sankeyGenerator({ nodes, links });
   const sankeyLinkGenerator = sankeyLinkHorizontal();
 
-  const svg = article
+  const svg = root
     .append('svg')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
     .attr('width', dimensions.width)
-    .attr('height', dimensions.height)
+    .attr('height', dimensions.height);
 
   const mouthGroup = svg.append('g');
+
   const riverGroup = svg
     .append('g')
     .attr(
@@ -137,8 +162,8 @@ function highlightBasin() {
   textGroup
     .append('text')
     .html(
-      ({ size }) =>
-        `${formatThousand(size)} km<tspan dy="-3" font-size="8">2</tspan>`
+      ({ value }) =>
+        `${formatThousand(value)} km<tspan dy="-3" font-size="8">2</tspan>`
     )
     .attr('y', -4)
     .attr('font-size', 11);
@@ -148,44 +173,51 @@ function highlightBasin() {
     .attr('text-anchor', 'middle')
     .attr('transform', ({ x1, x0 }) => `translate(${(x1 - x0) / 2} 0)`)
     .select('text')
-    .attr('font-size', 18)
+    .attr('font-size', 18);
 
+  const linkGenerator = linkVertical();
+  const { x0, x1, y0 } = sankeyData.nodes.find(d => d.name === data.river);
 
-      const linkGenerator = d3.linkVertical();
-      const { x0, x1, y0} = sankeyData.nodes.find(d => d.name === data.river);
+  mouthGroup
+    .append('path')
+    .attr(
+      'd',
+      `${linkGenerator({
+        source: [0, 0],
+        target: [x0, y0 + dimensions.margin.top],
+      })} h ${x1 - x0} ${linkGenerator({
+        source: [x1, y0 + dimensions.margin.top],
+        target: [dimensions.boundedWidth, 0],
+      })} L 0 0`
+    )
+    .attr('fill', '#c6e4da');
 
-      mouthGroup
-        .append('path')
-        .attr('d', `${linkGenerator({ source: [0, 0], target: [x0, y0 + dimensions.margin.top]})} h ${x1 - x0} ${linkGenerator({ source: [x1, y0 + dimensions.margin.top], target: [dimensions.boundedWidth, 0]})} L 0 0`)
-        .attr('fill', '#c6e4da')
-
-        mouthGroup
-        .append('text')
-        .attr('fill', 'currentColor')
-        .attr('text-anchor', 'middle')
-        .attr('x', dimensions.boundedWidth / 2)
-        .attr('y', 15)
-        .text(data.mouth)
-        .attr('font-weight', 'bold')
-        .attr('font-size', 12);
+  mouthGroup
+    .append('text')
+    .attr('fill', 'currentColor')
+    .attr('text-anchor', 'middle')
+    .attr('x', dimensions.boundedWidth / 2)
+    .attr('y', 15)
+    .text(data.mouth)
+    .attr('font-weight', 'bold')
+    .attr('font-size', 12);
 }
 
+function drawRadialChart(container, metric, unit) {
+  const unitOfMeasure = unit.replace(
+    /(\d+)/,
+    d => `<tspan font-size="0.9em" dy="-3">${d}<tspan>`
+  );
 
-function highlightLength() {
-  const article = root.append('article');
-
-
-  const lengthData = data.tributaries.map(({name, length}) => ({name, length})).sort((a, b) => a.length - b.length);
-  const shortestStream = lengthData[0]
-  const longestStream = lengthData[lengthData.length - 1]
-  article.append('p').html(`In terms of length, ${shortestStream.name} reaches ${formatThousand(shortestStream.length)} km, while ${longestStream.name} reaches ${formatThousand(longestStream.length)} km.`);
-
+  const dataTributaries = data.tributaries
+    .map(d => ({ name: d.name, value: d[metric] }))
+    .sort((a, b) => b.value - a.value);
 
   const dimensions = {
     width: 500,
     height: 500,
     margin: {
-      top: 70,
+      top: 75,
       right: 10,
       bottom: 10,
       left: 10,
@@ -197,12 +229,8 @@ function highlightLength() {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-
-  const viz = article
+  const viz = container
     .append('svg')
-    .style('max-width', '500px')
-    .style('margin-right', 'auto')
-    .style('margin-left', 'auto')
     .attr('viewBox', [0, 0, dimensions.width, dimensions.height])
     .attr('width', dimensions.width)
     .attr('height', dimensions.height)
@@ -212,87 +240,105 @@ function highlightLength() {
       `translate(${dimensions.margin.left} ${dimensions.margin.top})`
     );
 
-
-  const markerId = 'marker-path'
-  viz.append('defs').append('marker').attr('id', markerId).attr('orient', 'auto').attr('refX', 5).attr('refY', 2.5).attr('markerWidth', 1).attr('viewBox', '0 0 5 5').append('rect').attr('width', 5).attr('height', 5).attr('fill', '#74a6b0')
-
   const dataGroup = viz
     .append('g')
     .attr(
       'transform',
-      `translate(${dimensions.boundedWidth / 2} ${dimensions.boundedHeight / 2})`
+      `translate(${dimensions.boundedWidth / 2} ${dimensions.boundedHeight /
+        2})`
     );
 
-    const tributariesGroup = dataGroup.append('g')
-    const riverGroup = dataGroup.append('g')
+  const tributariesGroup = dataGroup.append('g');
+  const riverGroup = dataGroup.append('g');
 
-    const innerRadius = 50;
-    const outerRadius = d3.min([dimensions.boundedWidth, dimensions.boundedHeight]) / 2;
-    const angleScale = d3.scaleBand().domain([...lengthData].reverse().map(d => d.name)).range([0, 360])
-    const radiusScale = d3.scaleLinear().domain([0, d3.max(data.tributaries, d => d.length)]).range([innerRadius, outerRadius])
+  const innerRadius = 50;
+  const outerRadius =
+    min([dimensions.boundedWidth, dimensions.boundedHeight]) / 2;
 
-    riverGroup
-      .append('text')
-        .attr('font-size', 18)
-        .attr('fill', 'currentColor')
-      .attr('text-anchor', 'middle')
-      .attr('y', -4)
-      .attr('font-weight', 'bold')
-      .text(data.river)
+  const angleScale = scaleBand()
+    .domain(dataTributaries.map(d => d.name))
+    .range([0, 360]);
 
-      riverGroup
-      .append('text')
-        .attr('font-size', 13)
-        .attr('fill', 'currentColor')
-      .attr('text-anchor', 'middle')
-      .attr('y', 14)
-      .text(`${data.length} km`)
+  const radiusScale = scaleLinear()
+    .domain([0, max(dataTributaries, d => d.value)])
+    .range([innerRadius, outerRadius]);
 
-      riverGroup
-      .append('circle')
-      .attr('r', innerRadius)
-      .attr('fill', 'none')
-      .attr('stroke', '#74a6b0')
-      .attr('stroke-width', 10)
+  riverGroup
+    .append('text')
+    .attr('font-size', 18)
+    .attr('fill', 'currentColor')
+    .attr('text-anchor', 'middle')
+    .attr('y', -4)
+    .attr('font-weight', 'bold')
+    .text(data.river);
 
-    const tributariesGroups = tributariesGroup
-      .selectAll('g')
-      .data(data.tributaries)
-      .enter()
-      .append('g')
+  riverGroup
+    .append('text')
+    .attr('font-size', 13)
+    .attr('fill', 'currentColor')
+    .attr('text-anchor', 'middle')
+    .attr('y', 14)
+    .html(
+      `${formatThousand(
+        data[metric]
+      )} <tspan font-size="11">${unitOfMeasure}</tspan>`
+    );
 
-    tributariesGroups
-      .append('path')
-      .attr('transform', d => `rotate(${angleScale(d.name)})`)
-      .attr('d', d => `M 0 -${innerRadius} V -${radiusScale(d.length)}`)
-      .attr('fill', 'none')
-      .attr('stroke', '#c6e4da')
-      .attr('stroke-width', 10)
-      .attr('marker-end', `url(#${markerId})`)
+  riverGroup
+    .append('circle')
+    .attr('r', innerRadius)
+    .attr('fill', 'none')
+    .attr('stroke', '#74a6b0')
+    .attr('stroke-width', 10);
 
+  const tributariesGroups = tributariesGroup
+    .selectAll('g')
+    .data(dataTributaries)
+    .enter()
+    .append('g');
 
-    const textGroup = tributariesGroups
-      .append('g')
-      .attr('transform', d => {
-        const angle = angleScale(d.name);
-        const radius = radiusScale(d.length) + 5
-        return `rotate(${angleScale(d.name)}) translate(0 -${radius}) ${angle > 180 ? 'rotate(90)' : 'rotate(270)'}`;
-      })
-      .attr('dominant-baseline', 'middle')
-      .attr('text-anchor', d => angleScale(d.name) > 180 ? 'end' : 'start')
-      .attr('fill', 'currentColor')
-      textGroup
-        .append('text')
-        .attr('font-size', 15)
-        .attr('y', -8)
-        .text(d => d.name)
-        .attr('font-weight', 'bold')
+  tributariesGroups
+    .append('path')
+    .attr('transform', d => `rotate(${angleScale(d.name)})`)
+    .attr('d', d => `M 0 -${innerRadius} V -${radiusScale(d.value)}`)
+    .attr('fill', 'none')
+    .attr('stroke', '#c6e4da')
+    .attr('stroke-width', 10)
+    .attr('marker-end', `url(#line-cap)`);
 
-        textGroup
-        .append('text')
-        .attr('font-size', 13)
-        .attr('y', 8)
-        .html(d => `${d.length} <tspan>km</tspan>`)
+  const textGroup = tributariesGroups
+    .append('g')
+    .attr('transform', d => {
+      const angle = angleScale(d.name);
+      const radius = radiusScale(d.value) + 5;
+      return `rotate(${angleScale(d.name)}) translate(0 -${radius}) ${
+        angle > 180 ? 'rotate(90)' : 'rotate(270)'
+      }`;
+    })
+    .attr('dominant-baseline', 'middle')
+    .attr('text-anchor', d => (angleScale(d.name) > 180 ? 'end' : 'start'))
+    .attr('fill', 'currentColor');
+  textGroup
+    .append('text')
+    .attr('font-size', 16)
+    .attr('y', -8)
+    .text(d => d.name)
+    .attr('font-weight', 'bold');
 
+  textGroup
+    .append('text')
+    .attr('font-size', 14)
+    .attr('y', 8)
+    .html(
+      d =>
+        `${formatThousand(
+          d.value
+        )} <tspan font-size="12">${unitOfMeasure}</tspan>`
+    );
+}
 
+function drawRadialCharts() {
+  const container = root.append('div');
+  drawRadialChart(container, 'size', 'km2');
+  drawRadialChart(container, 'length', 'km');
 }

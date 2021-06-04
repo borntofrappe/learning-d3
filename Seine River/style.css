@@ -15,10 +15,25 @@ body {
   background: hsla(175, 36%, 74%, 0.5);
 }
 
+h1,
+strong,
+a {
+  color: hsl(190, 31%, 26%);
+  font-weight: bold;
+}
+
+p {
+  line-height: 1.5;
+}
+
 main {
-  max-width: 700px;
+  max-width: 800px;
   margin: 0rem auto;
   padding: 1rem;
+}
+
+main > * + * {
+  margin-top: 0.5em;
 }
 
 main svg {
@@ -27,13 +42,36 @@ main svg {
   height: auto;
 }
 
-main > * + * {
-  margin-top: 0.5em;
+div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-h1,
-strong,
-a {
-  color: #2e5057;
-  font-weight: bold;
+div > svg {
+  max-width: 380px;
+}
+
+@supports (display: grid) {
+  div {
+    justify-content: initial;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  div > svg {
+    width: 100%;
+    max-width: initial;
+  }
+
+  div > svg:nth-of-type(1) {
+    grid-column: 1/3;
+    grid-row: 1/3;
+  }
+
+  div > svg:nth-of-type(2) {
+    grid-column: 2/4;
+    grid-row: 2/4;
+  }
 }
