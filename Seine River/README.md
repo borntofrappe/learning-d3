@@ -1,6 +1,6 @@
 # Seine River
 
-## [Live Demo](LINK_TO_LIVE_DEMO_HERE)
+## [Live Demo](https://codepen.io/borntofrappe/pen/qBroKjx)
 
 ## Notes
 
@@ -55,3 +55,7 @@ The visual is finally referenced in the lines through the `marker-end` attribute
 ```html
 <path marker-end="url(#line-cap)" />
 ```
+
+### Grid
+
+The radial charts describing the basin size and length are included in a `<div>` container with the goal of having the two side by side. If CSS grid is supported, however, the layout changes to a grid of three columns and rows, with the goal of overlapping the visual in the top left and bottom right corners. The overlap shouldn't compromise the visualization as the charts inherently include considerable whitespace.
