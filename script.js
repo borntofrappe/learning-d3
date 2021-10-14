@@ -1,7 +1,6 @@
-const fs = require("fs");
-const readline = require("readline");
-const { copyFilesSync } = require("./utils");
-const { updateFilesSync } = require("./utils");
+import fs from "fs";
+import readline from "readline";
+import { copyFilesSync, updateFilesSync } from "./utils.js";
 
 const rl = readline.createInterface({
   input: process.stdin,

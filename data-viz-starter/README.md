@@ -1,6 +1,6 @@
 # data-viz-starter
 
-<!-- ## [Live Demo](DEMO_URL) -->
+<!-- ## [Live Demo](LIVE_DEMO_URL) -->
 
 ## Notes
 

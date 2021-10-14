@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/borntofrappe/learning-d3/issues"
   },
-  "homepage": "https://github.com/borntofrappe/learning-d3#readme"
+  "homepage": "https://github.com/borntofrappe/learning-d3#readme",
+  "type": "module"
 }
