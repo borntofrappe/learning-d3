@@ -1,7 +1,7 @@
 # data-viz-starter
 
-<!-- ## [Live Demo](LINK_TO_LIVE_DEMO_HERE) -->
+<!-- ## [Live Demo](DEMO_URL) -->
 
 ## Notes
 
-Explain the goal of this viz. Jot down a couple of notes on the most relevant findings/challenges.
+What is the goal of this visualization? What parts of the D3 library does the project explore?

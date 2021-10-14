@@ -1,2 +1,2 @@
-const main = d3.select('main');
-main.append('h1').text('Bonne chance');
+const main = d3.select("body").append("main");
+main.append("h1").text("data-viz-starter");
