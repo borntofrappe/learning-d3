@@ -63,3 +63,7 @@ From this starting point the idea is to use an `#each` block to iterate through 
   </g>
 {/each}
 ```
+
+## Scatterplot
+
+The scatterplot maps the waiting time between eruptions and the duration of the same natural phenomenon for [Old Faithful](https://en.wikipedia.org/wiki/Old_Faithful), a popular geyser in Yellowstone Park.
