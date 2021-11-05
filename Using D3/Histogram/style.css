@@ -1,0 +1,29 @@
+body {
+  background: hsl(0, 0%, 100%);
+  color: hsl(0, 0%, 20%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+main {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+select {
+  font-weight: bold;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+p {
+  line-height: 1.5;	
+}
+
+strong {
+  text-transform: capitalize;
+}
