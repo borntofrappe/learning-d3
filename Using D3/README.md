@@ -67,3 +67,39 @@ From this starting point the idea is to use an `#each` block to iterate through 
 ## Scatterplot
 
 The scatterplot maps the waiting time between eruptions and the duration of the same natural phenomenon for [Old Faithful](https://en.wikipedia.org/wiki/Old_Faithful), a popular geyser in Yellowstone Park.
+
+### [React](https://codesandbox.io/s/old-faithful-eruptions-8cuke)
+
+Similarly to the line chart and the Svelte counterpart, React allows to use the same D3 functions for the scales and axis. What changes is how the markup is produced, with JSX syntax.
+
+To include a collection of elements create an array of elements.
+
+```jsx
+const circles = data.map((d, i) => (
+  <circle
+    cx={xScale(xAccessor(d))}
+    cy={yScale(yAccessor(d))}
+    r="5"
+    fill="currentColor"
+    opacity="0.5"
+  />
+));
+```
+
+In the JSX returned by the component it is then possible to include the array directly.
+
+```jsx
+return (<g>
+  {circles}
+</g>)
+```
+
+Ultimately React raises a warning to include a `key` and differentiate the elements. For the simple project, I find it sufficient to include a short label with the  index of the observation.
+
+```jsx
+const circles = data.map((d, i) => (
+  <circle
+    key={`circle-${i}}`}
+    />
+))
+```
