@@ -1,6 +1,6 @@
 body {
-  background: hsl(0, 0%, 100%);
-  color: hsl(0, 0%, 20%);
+  color: hsl(0, 0%, 28%);
+  background: hsl(160, 20%, 97%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
@@ -11,7 +11,14 @@ main {
 }
 
 select {
+  color: inherit;
+	font-family: inherit;
+	font-size: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid currentCOlor;
   font-weight: bold;
+	padding: 0.2rem;
 }
 
 svg {
@@ -21,7 +28,7 @@ svg {
 }
 
 p {
-  line-height: 1.5;	
+  line-height: 1.5;
 }
 
 strong {

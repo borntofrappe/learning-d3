@@ -154,23 +154,14 @@ const data = [
 
 const { bin, scaleLinear, extent, max, axisBottom, axisLeft } = d3;
 
-const selectedStat = "attack";
-
-const selectedData = data
-  .map(({ name, stats }) => ({
-    name,
-    stat: stats.find((d) => d.name === selectedStat).value,
-  }))
-  .sort((a, b) => b.stat - a.stat);
-
 const dimensions = {
   width: 600,
   height: 300,
   margin: {
-    top: 30,
+    top: 40,
     right: 20,
     bottom: 20,
-    left: 40,
+    left: 20,
   },
 };
 
@@ -179,42 +170,24 @@ dimensions.boundedWidth =
 dimensions.boundedHeight =
   dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-const valueAccessor = (d) => d.stat;
-
-const xScale = scaleLinear()
-  .domain(extent(selectedData, valueAccessor))
-  .range([0, dimensions.boundedWidth])
-  .nice();
-
-const binGenerator = bin()
-  .domain(xScale.domain())
-  .value(valueAccessor)
-  .thresholds(10);
-
-const bins = binGenerator(selectedData);
-const binPadding = 4;
-
-const yScale = scaleLinear()
-  .domain([0, max(bins, (d) => d.length)])
-  .range([dimensions.boundedHeight, 0])
-  .nice();
-
-const xAxis = axisBottom(xScale).ticks(5);
-const yAxis = axisLeft(yScale).ticks(5);
-
 const main = d3.select("body").append("main");
 main.append("h1").text("First Gen Stats");
-main
-  .append("p")
-  .html(
-    `The following histogram highlights the distribution of the <strong>${selectedStat}</strong> stat for pokemon of the first generation.`
-  );
+
+const intro = main.append("p");
 
 const wrapper = main
   .append("svg")
   .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
   .attr("width", dimensions.width)
   .attr("height", dimensions.height);
+
+const defs = wrapper
+  .append("defs")
+  .append("clipPath")
+  .attr("id", "clip-bounds")
+  .append("rect")
+  .attr("width", dimensions.boundedWidth)
+  .attr("height", dimensions.boundedHeight);
 
 const bounds = wrapper
   .append("g")
@@ -223,53 +196,166 @@ const bounds = wrapper
     `translate(${dimensions.margin.left} ${dimensions.margin.top})`
   );
 
-const binsGroup = bounds.append("g").attr("fill", "currentColor");
-
-const binGroups = binsGroup
-  .selectAll("g")
-  .data(bins)
-  .enter()
+const axisGroup = bounds.append("g");
+const axisGroupX = axisGroup
   .append("g")
-  .attr(
+  .attr("transform", `translate(0 ${dimensions.boundedHeight})`);
+const axisGroupY = axisGroup.append("g");
+
+const binsGroup = bounds
+  .append("g")
+  .attr("fill", "currentColor")
+  .attr("clip-path", `url(#clip-bounds)`);
+
+const message = main.append("p");
+
+function plotMetric(selectedMetric) {
+  const selectedData = data
+    .map(({ name, stats }) => ({
+      name,
+      stat: stats.find((d) => d.name === selectedMetric).value,
+    }))
+    .sort((a, b) => b.stat - a.stat);
+
+  const valueAccessor = (d) => d.stat;
+
+  const xScale = scaleLinear()
+    .domain(extent(selectedData, valueAccessor))
+    .range([0, dimensions.boundedWidth])
+    .nice();
+
+  const binGenerator = bin()
+    .domain(xScale.domain())
+    .value(valueAccessor)
+    .thresholds(10);
+
+  const bins = binGenerator(selectedData);
+  const binPadding = 4;
+
+  const yScale = scaleLinear()
+    .domain([0, max(bins, (d) => d.length) + 5])
+    .range([dimensions.boundedHeight, 0])
+    .nice();
+
+  const xAxis = axisBottom(xScale).ticks(5);
+  const yAxis = axisLeft(yScale)
+    .ticks(5)
+    .tickFormat((d) => (d !== 0 ? d : ""));
+
+  const best = selectedData[0];
+  const worst = selectedData[selectedData.length - 1];
+
+  const updateGroups = binsGroup
+    .selectAll("g")
+    .data(bins);
+
+  const enterGroups = updateGroups.enter();
+  const exitGroups = updateGroups.exit();
+  exitGroups.remove();
+
+  const enterBinGroups = enterGroups
+    .append("g")
+    .attr(
+      "transform",
+      ({ x0, length }) => `translate(${xScale(x0)} ${yScale(length)})`
+    );
+
+  enterBinGroups
+    .append("rect")
+    .attr("fill", "hsl(5, 86%, 60%)")
+    .attr("rx", 5)
+    .attr("x", binPadding)
+    .attr("width", ({ x1, x0 }) => xScale(x1) - xScale(x0) - binPadding * 2)
+    .attr(
+      "height",
+      ({ length }) => dimensions.boundedHeight - yScale(length) + 5
+    );
+
+  enterBinGroups
+    .filter(({ length }) => length)
+    .append("text")
+    .attr("x", ({ x1, x0 }) => (xScale(x1) - xScale(x0)) / 2)
+    .attr("y", "-5")
+    .attr("text-anchor", "middle")
+    .attr("font-size", "14")
+    .attr("font-weight", "bold")
+    .text(({ length }) => length);
+
+  updateGroups.attr(
     "transform",
     ({ x0, length }) => `translate(${xScale(x0)} ${yScale(length)})`
   );
 
-binGroups
-  .append("rect")
-  .attr("x", binPadding)
-  .attr("width", ({ x1, x0 }) => xScale(x1) - xScale(x0) - binPadding * 2)
-  .attr("height", ({ length }) => dimensions.boundedHeight - yScale(length));
+  updateGroups
+    .select("rect")
+    .attr("width", ({ x1, x0 }) => xScale(x1) - xScale(x0) - binPadding * 2)
+    .attr(
+      "height",
+      ({ length }) => dimensions.boundedHeight - yScale(length) + 5
+    );
 
-binGroups
-  .filter(({ length }) => length)
-  .append("text")
-  .attr("x", ({ x1, x0 }) => (xScale(x1) - xScale(x0)) / 2)
-  .attr("y", "-5")
-  .attr("text-anchor", "middle")
-  .attr("font-size", "14")
-  .attr("font-weight", "bold")
-  .text(({ length }) => length);
+  updateGroups
+    .filter(({ length }) => length)
+    .select("text")
+    .attr("x", ({ x1, x0 }) => (xScale(x1) - xScale(x0)) / 2)
+    .text(({ length }) => length);
 
-const axisGroup = bounds.append("g");
+  updateGroups
+    .filter(({ length }) => length === 0)
+    .select("text")
+    .remove();
 
-axisGroup
-  .append("g")
-  .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
-  .call(xAxis);
+  axisGroupX.call(xAxis);
 
-axisGroup.append("g").call(yAxis);
+  axisGroupY.call(yAxis);
 
-main
-  .append("p")
-  .html(
-    `<strong>${
-      selectedData[0].name
-    }</strong> tops the chart with a base stat of <strong>${
-      selectedData[0].stat
-    }</strong>. On the opposite end of the spectrum, <strong>${
-      selectedData[selectedData.length - 1].name
-    }</strong> manages only <strong>${
-      selectedData[selectedData.length - 1].stat
-    }</strong> base points.`
+  axisGroup.selectAll("line").remove();
+  axisGroup.selectAll("path").remove();
+
+  axisGroupY
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("opacity", "0.1")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`);
+
+  message.html(
+    `<strong>${best.name}</strong> tops the chart with a base stat of <strong>${best.stat}</strong>. On the opposite end of the spectrum, <strong>${worst.name}</strong> manages only <strong>${worst.stat}</strong> base points.`
   );
+}
+
+const metrics = [
+  "hp",
+  "attack",
+  "defense",
+  "special-attack",
+  "special-defense",
+  "speed",
+];
+const metric = metrics[Math.floor(Math.random() * metrics.length)];
+
+intro
+  .append("span")
+  .text("The following histogram highlights the distribution of the ");
+
+const selection = intro.append("select");
+
+selection
+  .selectAll("option")
+  .data(metrics)
+  .enter()
+  .append("option")
+  .attr("value", (d) => d)
+  .text((d) => d)
+  .filter((d) => d === metric)
+  .attr("selected", "true");
+
+intro.append("span").text(" stat for pokemon of the first generation.");
+
+plotMetric(metric);
+
+selection.on("input", (e) => {
+  const { value } = e.target;
+  plotMetric(value);
+});

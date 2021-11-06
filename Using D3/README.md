@@ -103,3 +103,31 @@ const circles = data.map((d, i) => (
     />
 ))
 ```
+
+## Select Histogram
+
+The visualization creates and updates a histogram to consider the distribution of one statistic for pokemon of the first generation. The idea is to start with a specific stat and allow to explore other metrics with a `<select>` element.
+
+The interactivity of the project works to illustrate the benefits of a utility or framework much further than previous examples. With only D3 the authoring experience starts to feel disjointed: 
+
+- at the top of the script you populate the DOM
+
+- in the body of the `plotMetric` function update the necessary elements
+
+The process is further complicated by the way D3 binds data to the different nodes. The concept of a data join is powerful, but challenging, and in the specific project asks you to differentiate the logic for the group elements describing the bins
+
+```js
+const updateGroups = binsGroup
+  .selectAll("g")
+  .data(bins);
+
+const enterGroups = updateGroups.enter();
+const exitGroups = updateGroups.exit();
+```
+
+For the enter selection, new group elements, you append a group element and then nest the necessary visuals.
+
+For the update selection, existing group elements, you update the `transform` property as well as any property of the nested elements which depends on the new values.
+
+For the exit selection, unnecessary group elements, you remove the entire lot.
+
