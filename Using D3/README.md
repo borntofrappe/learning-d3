@@ -131,3 +131,6 @@ For the update selection, existing group elements, you update the `transform` pr
 
 For the exit selection, unnecessary group elements, you remove the entire lot.
 
+### [Svelte](https://svelte.dev/repl/f6d37364973e48fd9c09ea439c13640d?version=3.44.1)
+
+With Svelte it is enough to rely on reactive declarations to have the change in metric cascade through the DOM.
