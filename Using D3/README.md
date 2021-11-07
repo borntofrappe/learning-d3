@@ -89,26 +89,20 @@ const circles = data.map((d, i) => (
 In the JSX returned by the component it is then possible to include the array directly.
 
 ```jsx
-return (<g>
-  {circles}
-</g>)
+return <g>{circles}</g>;
 ```
 
-Ultimately React raises a warning to include a `key` and differentiate the elements. For the simple project, I find it sufficient to include a short label with the  index of the observation.
+Ultimately React raises a warning to include a `key` and differentiate the elements. For the simple project, I find it sufficient to include a short label with the index of the observation.
 
 ```jsx
-const circles = data.map((d, i) => (
-  <circle
-    key={`circle-${i}}`}
-    />
-))
+const circles = data.map((d, i) => <circle key={`circle-${i}}`} />);
 ```
 
 ## Select Histogram
 
 The visualization creates and updates a histogram to consider the distribution of one statistic for pokemon of the first generation. The idea is to start with a specific stat and allow to explore other metrics with a `<select>` element.
 
-The interactivity of the project works to illustrate the benefits of a utility or framework much further than previous examples. With only D3 the authoring experience starts to feel disjointed: 
+The interactivity of the project works to illustrate the benefits of a utility or framework much further than previous examples. With only D3 the authoring experience starts to feel disjointed:
 
 - at the top of the script you populate the DOM
 
@@ -117,9 +111,7 @@ The interactivity of the project works to illustrate the benefits of a utility o
 The process is further complicated by the way D3 binds data to the different nodes. The concept of a data join is powerful, but challenging, and in the specific project asks you to differentiate the logic for the group elements describing the bins
 
 ```js
-const updateGroups = binsGroup
-  .selectAll("g")
-  .data(bins);
+const updateGroups = binsGroup.selectAll("g").data(bins);
 
 const enterGroups = updateGroups.enter();
 const exitGroups = updateGroups.exit();
@@ -134,3 +126,11 @@ For the exit selection, unnecessary group elements, you remove the entire lot.
 ### [Svelte](https://svelte.dev/repl/f6d37364973e48fd9c09ea439c13640d?version=3.44.1)
 
 With Svelte it is enough to rely on reactive declarations to have the change in metric cascade through the DOM.
+
+## Animated Lollipop
+
+Starting from a lollipop chart I first created with Svelte, the project illustrates the flexibility of the `.transition` function and the d3-only solution.
+
+### [Svelte](https://svelte.dev/repl/ee1e7ec839ac47f495be12251f04126a?version=3.44.1)
+
+The name of each player is positioned above the corresponding stem. Instead of a circle, the visualization renders a tennis ball using a bit of SVG trickery.
