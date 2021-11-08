@@ -1,0 +1,38 @@
+@import url("https://fonts.googleapis.com/css2?family=Sen:wght@400;700&display=swap");
+
+body {
+  color: hsl(0, 0%, 28%);
+  background: hsl(160, 20%, 94%);
+  font-family: "Sen", sans-serif;
+  padding: 0.5rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+main {
+  padding: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+article {
+  background: hsl(160, 20%, 100%);
+  padding: 0.25rem;
+  max-width: 21rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0.1rem 1rem -0.25rem hsl(0, 0%, 0%, 0.1);
+  border-radius: 1rem;
+}
+
+article > svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
