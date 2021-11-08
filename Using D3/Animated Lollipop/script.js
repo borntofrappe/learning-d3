@@ -177,7 +177,7 @@ const patternGroup = defs
 patternGroup
   .append("use")
   .attr("href", "#ball")
-  .attr("fill", "hsl(140, 33%, 45%)");
+  .attr("fill", "hsl(108, 48%, 64%)");
 
 patternGroup.append("use").attr("href", "#line");
 

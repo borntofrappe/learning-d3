@@ -12,13 +12,13 @@ main {
 
 select {
   color: inherit;
-	font-family: inherit;
-	font-size: inherit;
+  font-family: inherit;
+  font-size: inherit;
   background: none;
   border: none;
   border-bottom: 1px solid currentCOlor;
   font-weight: bold;
-	padding: 0.2rem;
+  padding: 0.2rem;
 }
 
 svg {
