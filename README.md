@@ -52,4 +52,4 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [F1 Race Lap Chart](https://codepen.io/borntofrappe/pen/yLMoYbY)              | line                       |
 | [Eurovision Votes](https://codepen.io/borntofrappe/pen/dyvJpOJ)               | sankey, scatterplot        |
 | [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)                    | sankey, radial             |
-| Atmospheric Composition                                                       | pie, arc                   |
+| [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)        | pie, arc                   |
