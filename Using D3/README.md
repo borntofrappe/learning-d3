@@ -134,3 +134,9 @@ Starting from a lollipop chart I first created with Svelte, the project illustra
 ### [Svelte](https://svelte.dev/repl/ee1e7ec839ac47f495be12251f04126a?version=3.44.1)
 
 The name of each player is positioned above the corresponding stem. Instead of a circle, the visualization renders a tennis ball using a bit of SVG trickery.
+
+### D3
+
+Instead of plotting the data in static visualizations, the project includes a single `<svg>` and updates the data according to the option selected between two buttons. The animation is included with a series of transition on the enter, update and exit selection, and while the approach works, it also demonstrates my lack of experience with the feature.
+
+At high level, the idea is to animate the enter and update selection together, staggering the individual data points based on their index. If there are elements in the exit selection, however, the idea is to first animate and remove these elements before continuing with the previous combination.

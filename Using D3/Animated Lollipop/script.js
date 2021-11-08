@@ -14,11 +14,11 @@ const data = {
       value: 20,
     },
     {
-      name: "Pete Sampras Wills",
+      name: "Pete Sampras",
       value: 14,
     },
     {
-      name: "Roy Emerson Evert",
+      name: "Roy Emerson",
       value: 12,
     },
     {
@@ -104,6 +104,16 @@ const data = {
 
 const { scaleLinear, scaleBand, min, max } = d3;
 
+const main = d3.select("body").append("main");
+
+main.append("h1").text("Grand Slam Winners");
+main.append("p").html("Let's consider singles career totals.");
+
+const buttonGroup = main.append("div");
+
+const buttonMen = buttonGroup.append("button").text("Men");
+const buttonWomen = buttonGroup.append("button").text("Women");
+
 const valueAccessor = (d) => d.value;
 const nameAccessor = (d) => d.name;
 
@@ -114,7 +124,7 @@ const dimensions = {
     top: 10,
     right: 35,
     bottom: 10,
-    left: 0,
+    left: 10,
   },
 };
 
@@ -123,20 +133,8 @@ dimensions.boundedWidth =
 dimensions.boundedHeight =
   dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-const valueScale = scaleLinear()
-  .domain([0, max(data.men, valueAccessor)])
-  .range([0, dimensions.boundedWidth]);
-
-const nameScale = scaleBand()
-  .domain(data.men.map((d) => nameAccessor(d)))
-  .range([0, dimensions.boundedHeight]);
-
-const radius = min([10, nameScale.bandwidth() / 2.5]);
-
-const main = d3.select("body").append("main");
-
-main.append("h1").text("Grand Slam Winners");
-main.append("p").html("Let's consider singles career totals.");
+const valueScale = scaleLinear().range([0, dimensions.boundedWidth]);
+const nameScale = scaleBand().range([0, dimensions.boundedHeight]);
 
 const wrapper = main
   .append("svg")
@@ -195,52 +193,189 @@ const bounds = wrapper
     `translate(${dimensions.margin.left} ${dimensions.margin.top})`
   );
 
-const groups = bounds
-  .append("g")
-  .selectAll("g")
-  .data(data.men)
-  .enter()
-  .append("g")
-  .attr(
-    "transform",
-    (d) =>
-      `translate(0 ${nameScale(nameAccessor(d)) + nameScale.bandwidth() / 2})`
-  );
+const dataGroup = bounds.append("g");
 
-groups
-  .append("text")
-  .attr("fill", "currentColor")
-  .attr("font-size", "13")
-  .attr("y", "-5")
-  .text((d) => nameAccessor(d));
+function plotData(data) {
+  valueScale.domain([0, max(data, valueAccessor)]);
+  nameScale.domain(data.map((d) => nameAccessor(d)));
+  const radius = min([10, nameScale.bandwidth() / 2.5]);
 
-groups
-  .append("text")
-  .attr("fill", "currentColor")
-  .attr("font-size", "14")
-  .attr("font-weight", "bold")
-  .attr("dominant-baseline", "middle")
-  .attr("x", (d) => valueScale(valueAccessor(d)) + radius + 4)
-  .attr("y", "1")
-  .text((d) => valueAccessor(d));
+  const updateGroups = dataGroup.selectAll("g").data(data);
+  const enterSelection = updateGroups.enter();
+  const exitSelection = updateGroups.exit();
 
-groups
-  .append("path")
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "2")
-  .attr("d", (d) => `M 0 0 h ${valueScale(valueAccessor(d))}`);
+  const unitDelay = 50;
 
-groups
-  .append("circle")
-  .attr("fill", "url(#tennis-ball")
-  .attr("stroke", "hsl(0, 0%, 100%)")
-  .attr("stroke-width", "2")
-  .attr("r", radius)
-  .attr(
-    "transform",
-    (d) =>
-      `translate(${valueScale(valueAccessor(d))} 0) rotate(${
-        Math.floor(Math.random() * 30) + 5
-      })`
-  );
+  const exitTransition = d3.transition().duration(1000);
+
+  let updateTransition;
+  let enterTransition;
+
+  if (exitSelection._groups[0].some((d) => d)) {
+    updateTransition = d3
+      .transition(exitTransition)
+      .transition()
+      .duration(1000);
+
+    enterTransition = d3.transition(exitTransition).transition().duration(1000);
+  } else {
+    updateTransition = d3.transition().duration(1000);
+    enterTransition = d3.transition().duration(1000);
+  }
+
+  exitSelection
+    .select("text:nth-of-type(1)")
+    .attr("opacity", 1)
+    .transition(exitTransition)
+    .attr("opacity", 0);
+
+  exitSelection
+    .select("text:nth-of-type(2)")
+    .attr("opacity", 1)
+    .transition(exitTransition)
+    .attr("opacity", 0);
+
+  exitSelection
+    .select("path")
+    .transition(exitTransition)
+    .attr("d", "M 0 0 h 0");
+
+  exitSelection
+    .select("circle")
+    .transition(exitTransition)
+    .attr("transform", "translate(0 0) rotate(0)");
+
+  exitSelection
+    .attr("opacity", 1)
+    .transition(exitTransition)
+    .attr("opacity", 0)
+    .remove();
+
+  updateGroups
+    .transition(updateTransition)
+    .attr(
+      "transform",
+      (d) =>
+        `translate(0 ${nameScale(nameAccessor(d)) + nameScale.bandwidth() / 2})`
+    );
+
+  updateGroups
+    .select("text:nth-of-type(1)")
+    .transition(updateTransition)
+    .attr("opacity", 0)
+    .transition()
+    .delay((_, i) => i * unitDelay)
+    .attr("opacity", 1)
+    .text((d) => nameAccessor(d));
+
+  updateGroups
+    .select("text:nth-of-type(2)")
+    .transition(updateTransition)
+    .attr("x", (d) => valueScale(valueAccessor(d)) + radius + 4)
+    .attr("opacity", 0)
+    .transition()
+    .delay((_, i) => i * unitDelay)
+    .attr("opacity", 1)
+    .text((d) => valueAccessor(d));
+
+  updateGroups
+    .select("path")
+    .transition(updateTransition)
+    .attr("d", (d) => `M 0 0 h ${valueScale(valueAccessor(d))}`);
+
+  updateGroups
+    .select("circle")
+    .transition(updateTransition)
+    .attr("r", radius)
+    .attr(
+      "transform",
+      (d) =>
+        `translate(${valueScale(valueAccessor(d))} 0) rotate(${
+          Math.floor(Math.random() * 30) + 5
+        })`
+    );
+
+  const enterGroups = enterSelection
+    .append("g")
+    .attr(
+      "transform",
+      (d) =>
+        `translate(0 ${nameScale(nameAccessor(d)) + nameScale.bandwidth() / 2})`
+    );
+
+  enterGroups.attr("opacity", 0).transition(enterTransition).attr("opacity", 1);
+
+  enterGroups
+    .append("text")
+    .attr("fill", "currentColor")
+    .attr("font-size", "13")
+    .attr("y", "-5")
+    .text((d) => nameAccessor(d))
+    .attr("opacity", 0)
+    .transition(enterTransition)
+    .delay((_, i) => i * unitDelay)
+    .transition()
+    .attr("opacity", 1);
+
+  enterGroups
+    .append("text")
+    .attr("fill", "currentColor")
+    .attr("font-size", "14")
+    .attr("font-weight", "bold")
+    .attr("dominant-baseline", "middle")
+    .attr("y", "1")
+    .text((d) => valueAccessor(d))
+    .attr("x", (d) => valueScale(valueAccessor(d)) + radius + 4)
+    .attr("opacity", 0)
+    .transition(enterTransition)
+    .delay((_, i) => i * unitDelay)
+    .transition()
+    .attr("opacity", 1);
+
+  enterGroups
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "2")
+    .attr("d", (d) => `M 0 0 h ${valueScale(valueAccessor(d))}`)
+    .attr("transform", "scale(0 1)")
+    .transition(enterTransition)
+    .delay((_, i) => i * unitDelay)
+    .attr("transform", "scale(1 1)");
+
+  enterGroups
+    .append("circle")
+    .attr("fill", "url(#tennis-ball")
+    .attr("stroke", "hsl(0, 0%, 100%)")
+    .attr("stroke-width", "2")
+    .attr("r", radius)
+    .attr("transform", "translate(0 0) rotate(0)")
+    .transition(enterTransition)
+    .delay((_, i) => i * unitDelay)
+    .attr(
+      "transform",
+      (d) =>
+        `translate(${valueScale(valueAccessor(d))} 0) rotate(${
+          Math.floor(Math.random() * 30) + 5
+        })`
+    );
+}
+
+plotData(data.men);
+buttonMen.attr("class", "active");
+
+buttonMen.on("click", () => {
+  if (buttonMen.attr("class") === "active") return;
+
+  buttonMen.attr("class", "active");
+  buttonWomen.attr("class", "");
+  plotData(data.men);
+});
+
+buttonWomen.on("click", () => {
+  if (buttonWomen.attr("class") === "active") return;
+
+  buttonMen.attr("class", "");
+  buttonWomen.attr("class", "active");
+  plotData(data.women);
+});

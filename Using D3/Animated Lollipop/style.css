@@ -1,3 +1,9 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 body {
   background: hsl(90, 50%, 97%);
   color: hsl(125, 90%, 7%);
@@ -7,10 +13,44 @@ body {
 
 main {
   max-width: 40rem;
+  margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main > * + * {
+  margin-top: 1em;
 }
 
 main svg {
   width: 100%;
   height: auto;
   display: block;
+}
+
+button {
+  background: none;
+  border: 0.15rem solid hsl(125, 90%, 7%);
+  padding: 0.25rem 0.75rem;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button:first-of-type {
+  border-right: none;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+button.active {
+  background: hsl(125, 90%, 7%);
+  color: hsl(90, 50%, 97%);
+}
+
+button:not(.active) {
+  cursor: pointer;
+}
+
+button:last-of-type {
+  border-radius: 0 0.5rem 0.5rem 0;
 }
