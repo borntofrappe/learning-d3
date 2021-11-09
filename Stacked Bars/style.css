@@ -1,0 +1,41 @@
+body {
+  color: hsl(214, 32%, 91%);
+  background: hsl(229, 32%, 13%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+main {
+  max-width: 42rem;
+  margin: 1rem auto;
+  text-align: center;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+}
+
+h1 {
+  font-size: 1.2rem;
+  text-align: initial;
+}
+
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+ul li::marker {
+  content: "";
+}
+
+ul li {
+  padding: 0.2rem 0.5rem;
+}
+
+a {
+  color: inherit;
+}
