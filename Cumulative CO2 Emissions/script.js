@@ -1,3 +1,6 @@
+/* inspiration from a thorough analysis @lemondefr
+https://www.lemonde.fr/les-decodeurs/article/2021/11/06/cop26-visualisez-les-emissions-cumulees-de-dioxyde-de-carbone-par-pays-depuis-1850_6101202_4355770.html
+*/
 const href =
   "https://www.carbonbrief.org/analysis-which-countries-are-historically-responsible-for-climate-change";
 
@@ -24,7 +27,7 @@ const data = {
   1869: { "Argentina": 994.047507, "Australia": 677.4938033, "Austria": 179.3680972, "Belgium": 331.5569502, "Brazil": 1051.361735, "Canada": 1540.511433, "Chile": 180.7235409, "China": 2713.875503, "Czech Republic": 174.6783737, "Danemark": 115.8619198, "Egypt": -3.001451704, "France": 1108.533439, "Germany": 1105.827806, "India": 1603.524916, "Indonesia": 3482.267478, "International transport": 0, "Iran": 131.8429358, "Iraq": 15.77321955, "Ireland": -3.284715544, "Italy": 169.907521, "Japan": 309.1720078, "Malaysia": 305.87181, "Mexico": 370.8312068, "Netherlands": 131.7005454, "New Zeland": 330.6163977, "Norway": 171.7592754, "Pakistan": 134.1603077, "Perù": 143.2944527, "Poland": 605.5710808, "Portugal": 66.48499842, "Qatar": -0.008320944, "Russia": 7117.668968, "Saudi Arabia": -2.0957164, "South Africa": 80.15865986, "South Korea": 102.8789315, "Spain": 307.00041, "Turkey": 158.9638033, "Ukraine": 1151.340294, "United Arab Emirates": 0.055148696, "United Kingdom": 3408.482285, "United States": 18645.82159 },
   1870: { "Argentina": 1054.848112, "Australia": 729.1640809, "Austria": 190.2348965, "Belgium": 356.9799091, "Brazil": 1114.391827, "Canada": 1625.932274, "Chile": 191.3891627, "China": 2804.716036, "Czech Republic": 185.7631416, "Danemark": 122.0688402, "Egypt": -2.930831768, "France": 1166.109634, "Germany": 1184.537182, "India": 1670.104561, "Indonesia": 3669.910362, "International transport": 0, "Iran": 140.2021667, "Iraq": 17.00333977, "Ireland": -3.489023848, "Italy": 176.8746188, "Japan": 326.6430224, "Malaysia": 322.4784174, "Mexico": 391.3359969, "Netherlands": 139.1218272, "New Zeland": 354.6050912, "Norway": 180.2817009, "Pakistan": 141.4739008, "Perù": 150.2128596, "Poland": 641.2443326, "Portugal": 70.04063928, "Qatar": -0.009557544, "Russia": 7483.395785, "Saudi Arabia": -2.195686808, "South Africa": 90.93981865, "South Korea": 107.8766806, "Spain": 320.3654527, "Turkey": 163.2617175, "Ukraine": 1217.179361, "United Arab Emirates": 0.057821584, "United Kingdom": 3652.667853, "United States": 19803.61508 },
 }
-
+  
 const {
   max,
   scaleLinear,
@@ -36,23 +39,20 @@ const {
   easeLinear,
 } = d3;
 
-const main = d3.select("body").append("main");
-
-main
-  .append("h1")
-  .text("Which countries are historically responsible for climate change?");
-main
-  .append("p")
-  .text(
-    "Cumulative CO2 emissions from fossil fuels, land use and forestry, 1850-2021 (million tonnes)"
-  );
-
 const years = Object.keys(data).map((year) => parseInt(year, 10));
 const countries = Object.keys(data[years[0]]);
 
-const colorScale = scaleOrdinal()
-  .domain(countries)
-  .range(countries.map((_, i, { length }) => interpolate(i / length)));
+years.forEach((year, i) => {
+  countries.forEach((country) => {
+    const current = data[year][country];
+    const previous =
+      i === 0 ? data[year][country] : data[year - 1][country].current;
+    data[year][country] = {
+      current,
+      previous,
+    };
+  });
+});
 
 const duration = 700;
 const dimensions = {
@@ -70,6 +70,31 @@ dimensions.boundedWidth =
   dimensions.width - (dimensions.margin.left + dimensions.margin.right);
 dimensions.boundedHeight =
   dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+const colorScale = scaleOrdinal()
+  .domain(countries)
+  .range(countries.map((_, i, { length }) => interpolate(i / length)));
+
+const xScale = scaleLinear().range([0, dimensions.boundedWidth]);
+const yScale = scaleBand().range([0, dimensions.boundedHeight]).padding(0.25);
+
+const formatTick = format(".2~s");
+const formatEmissions = format(",.0d");
+
+const xAxis = axisTop(xScale)
+  .ticks(5)
+  .tickFormat((d) => formatTick(d));
+
+const main = d3.select("body").append("main");
+
+main
+  .append("h1")
+  .text("Which countries are historically responsible for climate change?");
+main
+  .append("p")
+  .text(
+    "Cumulative CO2 emissions from fossil fuels, land use and forestry, 1850-2021 (million tonnes)."
+  );
 
 const wrapper = main
   .append("svg")
@@ -111,19 +136,15 @@ bounds
 const axisGroup = bounds.append("g");
 const countriesGroup = bounds.append("g").attr("clip-path", "url(#clip-data)");
 
-const xScale = scaleLinear().range([0, dimensions.boundedWidth]);
-const yScale = scaleBand().range([0, dimensions.boundedHeight]).padding(0.25);
-
-const xAxis = axisTop(xScale)
-  .ticks(5)
-  .tickFormat((d) => format(".2~s")(d));
-
 function plotYear(year) {
   const dataYear = Object.entries(data[year])
-    .sort((a, b) => b[1] - a[1])
+    .sort(
+      ([, emissionsA], [, emissionsB]) =>
+        emissionsB.current - emissionsA.current
+    )
     .slice(0, 10);
 
-  xScale.domain([0, max(dataYear, (d) => d[1])]);
+  xScale.domain([0, max(dataYear, ([, emissions]) => emissions.current)]);
 
   yScale.domain(dataYear.map(([country]) => country));
 
@@ -143,25 +164,22 @@ function plotYear(year) {
   update
     .select("rect")
     .transition(transition)
-
-    .attr("width", ([, emissions]) => xScale(emissions));
+    .attr("width", ([, emissions]) => xScale(emissions.current));
 
   update
     .select("text")
     .transition(transition)
     .attr(
       "transform",
-      ([, emissions]) => `translate(${xScale(emissions) + 5} 0)`
+      ([, emissions]) => `translate(${xScale(emissions.current) + 5} 0)`
     );
 
   update
     .select("text tspan:last-of-type")
     .transition(transition)
-    .textTween(([country, emissions]) => (t) => {
-      const previousEmissions = data[year - 1][country];
-      return format(",.0d")(
-        previousEmissions + (emissions - previousEmissions) * t
-      );
+    .textTween(([, emissions]) => (t) => {
+      const { current, previous } = emissions;
+      return formatEmissions(previous + (current - previous) * t);
     });
 
   const enterGroups = enter.append("g");
@@ -175,10 +193,10 @@ function plotYear(year) {
   const enterLabel = enterGroups
     .append("text")
     .attr("fill", "currentColor")
-    .attr("y", yScale.bandwidth() / 2 - 1)
+    .attr("y", yScale.bandwidth() / 2 - 2)
     .attr(
       "transform",
-      ([, emissions]) => `translate(${xScale(emissions) + 5} 0)`
+      ([, emissions]) => `translate(${xScale(emissions.current) + 5} 0)`
     );
 
   enterLabel
@@ -192,13 +210,13 @@ function plotYear(year) {
     .attr("font-size", "14")
     .attr("x", "0")
     .attr("dy", 16)
-    .text(([, emissions]) => format(".0d")(emissions));
+    .text(([, emissions]) => formatEmissions(emissions.current));
 
   enterGroups
     .append("rect")
     .attr("fill", ([country]) => colorScale(country))
     .attr("height", yScale.bandwidth())
-    .attr("width", ([, emissions]) => xScale(emissions));
+    .attr("width", ([, emissions]) => xScale(emissions.current));
 
   exit
     .transition(transition)
