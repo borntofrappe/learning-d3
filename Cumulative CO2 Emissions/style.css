@@ -30,3 +30,25 @@ a:hover,
 a:focus {
   border-bottom-color: hsl(0, 0%, 12%);
 }
+
+article {
+  position: relative;
+}
+
+article button {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+button {
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 1.25rem;
+  border-radius: 1rem;
+  color: hsl(160, 20%, 97%);
+  background: hsl(0, 0%, 12%);
+  border: none;
+}

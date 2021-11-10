@@ -20,8 +20,20 @@ The goal of this project is to replicate the visualization, animating the bar ch
 - unified transition, duration and easing
 - in the body of the function
 - on end, picking back up
+- enter selection transition selection
 
 ## Text transition
 
+- t [0, 1]
+
 
 ## Format
+
+- emissions separating the digits by thousands
+- ticks with k label
+
+## Button
+
+- d3.select e.target (v6)
+- remove
+- once

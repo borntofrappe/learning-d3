@@ -96,7 +96,14 @@ main
     "Cumulative CO2 emissions from fossil fuels, land use and forestry, 1850-2021 (million tonnes)."
   );
 
-const wrapper = main
+const article = main
+    .append('article');
+
+const button = article
+  .append('button')
+  .text('Run animation');
+
+const wrapper = article
   .append("svg")
   .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
   .attr("width", dimensions.width)
@@ -136,7 +143,7 @@ bounds
 const axisGroup = bounds.append("g");
 const countriesGroup = bounds.append("g").attr("clip-path", "url(#clip-data)");
 
-function plotYear(year) {
+function plotData({year = years[0], runAnimation = true } = {}) {
   const dataYear = Object.entries(data[year])
     .sort(
       ([, emissionsA], [, emissionsB]) =>
@@ -244,12 +251,13 @@ function plotYear(year) {
   currentYear.text(year);
 
   transition.on("end", () => {
-    if (year === years[years.length - 1]) return;
-    plotYear(year + 1);
+    if(runAnimation && year < years[years.length - 1]) {
+      plotData({year: year + 1});
+    }
   });
 }
 
-plotYear(years[0]);
+plotData({runAnimation: false});
 
 main
   .append("p")
@@ -258,3 +266,18 @@ main
   .append("a")
   .attr("href", href)
   .text("Carbon Brief");
+
+button
+.on('click', (e) => {
+    plotData();
+    d3
+      .select(e.target)
+      .style('opacity', "1")
+      .transition()
+      .duration(250)
+      .style('opacity', "0")
+      .remove()
+  }, {
+    once: true
+  }
+)
