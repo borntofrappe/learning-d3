@@ -6,11 +6,14 @@ const {
   select,
   contourDensity,
   Delaunay,
+  geoPath,
+  format,
 } = d3;
 
-const dataPoints = 60;
+const distanceFormatter = format(".2f");
 
-const n = 2;
+const dataPoints = 50;
+const n = 1.25;
 const domain = [0, n];
 const getRandom = () => randomIrwinHall(n)();
 
@@ -27,7 +30,7 @@ const data = Array(dataPoints)
 
 const dimensions = {
   size: 400,
-  margin: 30,
+  margin: 50,
 };
 
 dimensions.boundedSize = dimensions.size - dimensions.margin * 2;
@@ -46,7 +49,6 @@ const yScale = scaleLinear()
   .nice();
 
 const thresholds = 5;
-
 const contourGenerator = contourDensity()
   .x((d) => xScale(d.x))
   .y((d) => yScale(d.y))
@@ -60,9 +62,28 @@ const colorScheme = Array(contourData.length)
   .map((_, i, { length }) => interpolateGreens((1 / length) * i))
   .reverse();
 
+const delaunay = Delaunay.from(
+  data,
+  (d) => xScale(xAccessor(d)),
+  (d) => yScale(yAccessor(d))
+);
+
+const voronoi = delaunay.voronoi([
+  0,
+  0,
+  dimensions.boundedSize,
+  dimensions.boundedSize,
+]);
+
 const main = d3.select("body").append("main");
-main.append("h1").text("Target Practice");
-main.append("p").text("Four!");
+main.append("h1").text("Target practice");
+main.append("p").html(
+  `
+  ${dataPoints} data points, positioned at random with an <a href="https://en.wikipedia.org/wiki/Irwin%E2%80%93Hall_distribution">Irwin-Hall</a> distribution.
+  `
+);
+
+main.append("p").append("b").text("How close to the very center?");
 
 const wrapper = main
   .append("svg")
@@ -79,38 +100,26 @@ const dataGroup = bounds.append("g");
 const highlightGroup = bounds.append("g");
 const delaunayGroup = bounds.append("g");
 
-dataGroup
-  .selectAll("circle")
-  .data(data)
-  .join("circle")
-  .attr("r", "3")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "0.5")
-  .attr("fill", colorScheme[colorScheme.length - 1])
-  .attr("cx", (d) => xScale(xAccessor(d)))
-  .attr("cy", (d) => yScale(yAccessor(d)));
-
 contourGroup
   .selectAll("path")
   .data(contourData)
   .join("path")
-  .attr("d", d3.geoPath())
+  // .attr("d", (d) => geoPath()(d))
+  .attr("d", geoPath())
   .attr("fill", (d, i) => colorScheme[i])
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.1");
 
-const delaunay = Delaunay.from(
-  data,
-  (d) => xScale(xAccessor(d)),
-  (d) => yScale(yAccessor(d))
-);
-
-const voronoi = delaunay.voronoi([
-  0,
-  0,
-  dimensions.boundedSize,
-  dimensions.boundedSize,
-]);
+dataGroup
+  .selectAll("circle")
+  .data(data)
+  .join("circle")
+  .attr("cx", (d) => xScale(xAccessor(d)))
+  .attr("cy", (d) => yScale(yAccessor(d)))
+  .attr("r", "4")
+  .attr("fill", colorScheme[colorScheme.length - 1])
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "0.5");
 
 delaunayGroup
   .selectAll("path")
@@ -120,14 +129,65 @@ delaunayGroup
   .attr("fill", "transparent")
   // .attr("stroke", "currentColor")
   // .attr("stroke-width", "1")
-  .on("mouseenter", (e, d) => {
-    highlightGroup
-      .append("circle")
-      .attr("r", "4")
-      .attr("fill", "currentColor")
-      .attr("cx", xScale(xAccessor(d)))
-      .attr("cy", yScale(yAccessor(d)));
-  })
-  .on("mouseleave", (e, d) => {
-    highlightGroup.select("circle").remove();
+  .on("mouseenter", (_, d) => {
+    highlight(d);
   });
+
+highlightGroup.attr("opacity", "0");
+
+highlightGroup
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("stroke-dasharray", "3 5");
+
+highlightGroup
+  .append("circle")
+  .attr("r", "5")
+  .attr("fill", colorScheme[colorScheme.length - 1])
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "2");
+
+highlightGroup
+  .append("circle")
+  .attr("cx", dimensions.boundedSize / 2)
+  .attr("cy", dimensions.boundedSize / 2)
+  .attr("r", "4")
+  .attr("fill", "currentColor");
+
+const distanceGroup = highlightGroup
+  .append("g")
+  .attr("transform", `translate(0 -${dimensions.margin})`)
+  .attr("fill", "currentColor");
+
+distanceGroup
+  .append("text")
+  .attr("y", "26")
+  .attr("font-size", "26")
+  .attr("font-weight", "bold");
+
+distanceGroup
+  .append("text")
+  .attr("y", 26 + 14)
+  .attr("font-size", "12")
+  .text("pixels");
+
+function highlight(d) {
+  const x1 = xScale(xAccessor(d));
+  const y1 = yScale(yAccessor(d));
+  const x2 = dimensions.boundedSize / 2;
+  const y2 = dimensions.boundedSize / 2;
+
+  const distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5;
+
+  highlightGroup.select("text").text(distanceFormatter(distance));
+
+  highlightGroup.select("circle").attr("cx", x1).attr("cy", y1);
+
+  highlightGroup.select("path").attr("d", `M ${x1} ${y1} L ${x2} ${y2}`);
+
+  highlightGroup.attr("opacity", "1");
+}
+
+highlight(data[Math.floor(Math.random() * data.length)]);

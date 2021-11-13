@@ -145,9 +145,7 @@ At high level, the idea is to animate the enter and update selection together, s
 
 ## Interactive Density Plot
 
-The visualization works to show how D3 manages event like `mouseenter` and `mouseleave` in order to display more information as the reader explores the chart.
-
-The data points are difficult to select individually, so that the script includes a projection with `d3.Delaunay`. Remove the comments to see how the projection works by layering a series of triangles above the data .
+The project works to show how D3 manages event like `mouseenter to update the visualization following the reader's interactions. The data points are difficult to select individually, so that the script includes a projection with `d3.Delaunay`. Remove the comments to see how the projection works by layering a series of triangles above the data.
 
 ```js
 // .attr("stroke", "currentColor")
@@ -156,4 +154,4 @@ The data points are difficult to select individually, so that the script include
 
 Past the data points, making up a scatterplot, the visualization includes a 2D density plot with the [`d3-contour`](https://github.com/d3/d3-contour) module.
 
-For the data, it is created using a function from [`d3-random`](https://github.com/d3/d3-random) module and specifically [`randomIrvinHall`](https://observablehq.com/@d3/d3-random#irwinHall). The function is helpful to have a series of points around the center since it receives an argument `n` and tends to concentrate the values around `n/2`.
+For the data, the script populates an array with a function from [`d3-random`](https://github.com/d3/d3-random) module and specifically [`randomIrvinHall`](https://observablehq.com/@d3/d3-random#irwinHall). The method is helpful to have a series of points around the center since it receives an argument `n` and tends to concentrate the values around `n/2`. The higher the argument the higher the concetration of the points.
