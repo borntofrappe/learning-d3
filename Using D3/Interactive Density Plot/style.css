@@ -1,12 +1,12 @@
 body {
-  color: hsl(0, 0%, 28%);
-  background: hsl(160, 20%, 97%);
+  color: hsl(235, 78%, 13%);
+  background: hsl(150, 34%, 85%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
 main {
-  max-width: 40rem;
+  max-width: 30rem;
   margin: 0 auto;
 }
 
