@@ -143,7 +143,7 @@ Instead of plotting the data in static visualizations, the project includes a si
 
 At high level, the idea is to animate the enter and update selection together, staggering the individual data points based on their index. If there are elements in the exit selection, however, the idea is to first animate and remove these elements before continuing with the previous combination.
 
-## Interactive Density Plot
+## [Interactive Density Plot](https://codepen.io/borntofrappe/pen/KKvGzYL)
 
 The project works to show how D3 manages event like `mouseenter to update the visualization following the reader's interactions. The data points are difficult to select individually, so that the script includes a projection with `d3.Delaunay`. Remove the comments to see how the projection works by layering a series of triangles above the data.
 
@@ -155,3 +155,29 @@ The project works to show how D3 manages event like `mouseenter to update the vi
 Past the data points, making up a scatterplot, the visualization includes a 2D density plot with the [`d3-contour`](https://github.com/d3/d3-contour) module.
 
 For the data, the script populates an array with a function from [`d3-random`](https://github.com/d3/d3-random) module and specifically [`randomIrvinHall`](https://observablehq.com/@d3/d3-random#irwinHall). The method is helpful to have a series of points around the center since it receives an argument `n` and tends to concentrate the values around `n/2`. The higher the argument the higher the concetration of the points.
+
+### [Svelte](https://svelte.dev/repl/78df67d8be3d4ce0ae29f7ed302a8722?version=3.44.1)
+
+With a tool like Svelte the approach to show, to highlight a data point changes by using the `on:mouseenter` directive.
+
+```svelte
+{#each data as d, i}
+  <path on:mouseenter={() => { highlight = d }} />
+{/each}
+```
+
+The difference is quite minimal given the scope of the demo.
+
+Past the interaction, the Svelte demo puts a spotlight on the `.geoPath` function. In the D3-only demo the method is used directly as follows:
+
+```js
+contourGroup.join("path").attr("d", geoPathGenerator);
+```
+
+The syntax is however a convenience over the longer form.
+
+```js
+contourGroup.join("path").attr("d", (d) => geoPathGenerator()(d));
+```
+
+D3 implicitly passes the data point to the generator function.

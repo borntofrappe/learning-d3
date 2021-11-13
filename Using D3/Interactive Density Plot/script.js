@@ -2,7 +2,6 @@ const {
   randomIrwinHall,
   interpolateGreens,
   scaleLinear,
-  extent,
   select,
   contourDensity,
   Delaunay,
@@ -11,6 +10,7 @@ const {
 } = d3;
 
 const distanceFormatter = format(".2f");
+const geoPathGenerator = geoPath();
 
 const dataPoints = 50;
 const n = 1.25;
@@ -104,8 +104,8 @@ contourGroup
   .selectAll("path")
   .data(contourData)
   .join("path")
-  // .attr("d", (d) => geoPath()(d))
-  .attr("d", geoPath())
+  // .attr("d", (d) => geoPathGenerator(d))
+  .attr("d", geoPathGenerator)
   .attr("fill", (d, i) => colorScheme[i])
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.1");
