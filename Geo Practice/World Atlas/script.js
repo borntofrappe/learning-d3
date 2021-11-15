@@ -1,4 +1,4 @@
-const { json, geoPath, geoAzimuthalEqualArea } = d3;
+const { select, json, geoPath, geoAzimuthalEqualArea } = d3;
 const { feature } = topojson;
 
 const dimensions = {
@@ -29,9 +29,7 @@ dimensions.boundedHeight = y1;
 dimensions.height =
   dimensions.boundedHeight + (dimensions.margin.top + dimensions.margin.bottom);
 
-const main = d3.select("body").append("main");
-
-const wrapper = main
+const wrapper = select("body")
   .append("svg")
   .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
   .attr("width", dimensions.width)
@@ -61,7 +59,7 @@ bounds
   .append("text")
   .text("Loading data")
   .attr("fill", "currentColor")
-  .attr("font-size", "28")
+  .attr("font-size", "32")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "middle")
   .attr("x", dimensions.boundedWidth / 2)
@@ -70,7 +68,7 @@ bounds
 
 const timeout = setTimeout(() => {
   drawWorld();
-}, 500);
+}, 750);
 
 async function drawWorld() {
   const world = await json(
