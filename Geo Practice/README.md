@@ -19,3 +19,7 @@ The second project shows how the projection can be customized to show different 
 - `.rotate` allows to shift the projection in one of the three available axis
 
 - `.reflextX` reflects the `x` dimension
+
+### [Around the World in 80 Days](https://codepen.io/borntofrappe/pen/yLoZyEa)
+
+The third project illustrates how to plot a series of landmarks using the chosen projection.
