@@ -1,6 +1,8 @@
 const { json, geoPath, geoOrthographic: projection, geoGraticule10 } = d3;
 const { feature } = topojson;
 
+const href = "https://en.wikipedia.org/wiki/Antipodes";
+
 const dimensions = {
   width: 600,
   margin: {
@@ -46,7 +48,13 @@ main.append("h1").text("Antipodes");
 main
   .append("p")
   .text(
-    "There may not be antipathies on the opposite side of the Earth, but there is certainly a word for the concept."
+    "Today I learn that there may not be antipathies on the opposite side of the Earth, but there is certainly a word for the concept."
+  );
+
+main
+  .append("p")
+  .html(
+    `<a href="${href}">Wikipedia</a> has plenty more information, including a very nice picture of these opposing points.`
   );
 
 const wrapper = main
@@ -85,12 +93,6 @@ bounds
   .attr("x", dimensions.boundedWidth / 2)
   .attr("y", dimensions.boundedHeight / 2)
   .attr("font-weight", "bold");
-
-// main
-//   .append("p")
-//   .append("a")
-//   .attr("href", "https://en.wikipedia.org/wiki/Antipodes")
-//   .text("Source");
 
 const timeout = setTimeout(() => {
   drawWorld();
@@ -138,14 +140,50 @@ async function drawWorld() {
   const input = main
     .append("input")
     .attr("type", "range")
-    .attr("min", "0")
-    .attr("max", "360")
-    .attr("value", "0");
+    .attr("min", 0)
+    .attr("max", 360)
+    .attr("value", 0);
 
-  // input.transition().delay(200).duration(2000).attr("value", "360");
+  let handle;
+
+  function animate() {
+    const angle = parseInt(input.attr("value"), 10);
+    defs.select("path").attr("d", getPathGenerator([angle, 0])(land));
+
+    bounds
+      .select("path:nth-of-type(2)")
+      .attr("d", getPathGenerator([angle, 0])(graticule));
+
+    worldGroup
+      .select("path:nth-of-type(1)")
+      .attr("d", getPathGenerator([angle, 0])(land));
+
+    worldGroup
+      .select("path:nth-of-type(2)")
+      .attr("d", getPathGenerator([angle, 180], true)(land));
+
+    worldGroup
+      .select("path:nth-of-type(3)")
+      .attr("d", getPathGenerator([angle, 180], true)(land));
+
+    handle = requestAnimationFrame(animate);
+  }
+
+  input
+    .transition()
+    .delay(800)
+    .duration(4200)
+    .attr("value", 360)
+    .on("start", () => {
+      animate();
+    })
+    .on("end", () => {
+      cancelAnimationFrame(handle);
+    });
 
   input.on("input", (e) => {
-    // input.interrupt();
+    input.interrupt();
+    cancelAnimationFrame(handle);
 
     const angle = parseInt(e.target.value, 10);
 

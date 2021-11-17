@@ -1,15 +1,21 @@
 # Geo Practice
 
-<!-- ## [Live Demo](LIVE_DEMO_URL) -->
-
 ## Notes
 
-The `d3-geo` module allows to map data to geographies. The goal of this project folder is to create several visualizations to rehearse the possibilities introduced by the repository.
+The `d3-geo` module map data to geographies. The goal of this project folder is to create a few visualizations to practice with this challenging part of the D3 API.
 
 ### [World Atlas](https://codepen.io/borntofrappe/pen/gOxQXRK)
 
-The goal is to render the world according to a hard-coded projection. The project introduces data from the `world-atlas` module and `topojson` to convert the data from topoJSON to geoJSON, the format expected by `d3-geo`.
+The first project lays the foundation by creating a world atlas.
 
-### Antipodes
+- `world-atlas` provides the data necessary to draw the world, in JSON and specifically topoJSON
 
-Building on top of `World Atlas` the demo illustrates how a projection can be modified to show different sides of the same geography.
+- `topojson` allows to convert the data from topoJSON to geoJSON, understood by the `d3-geo` module
+
+### [Antipodes](https://codepen.io/borntofrappe/pen/eYEbPML)
+
+The second project shows how the projection can be customized to show different parts of the world.
+
+- `.rotate` allows to shift the projection in one of the three available axis
+
+- `.reflextX` reflects the `x` dimension
