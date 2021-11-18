@@ -23,3 +23,7 @@ The second project shows how the projection can be customized to show different 
 ### [Around the World in 80 Days](https://codepen.io/borntofrappe/pen/yLoZyEa)
 
 The third project illustrates how to plot a series of landmarks using the chosen projection.
+
+### Choropleth Map
+
+The fourth project maps actual data to the `fill` attribute of the `<path>` elements describing world countries.

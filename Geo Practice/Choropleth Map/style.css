@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: hsl(213, 58%, 30%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+main {
+  max-width: 46rem;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
