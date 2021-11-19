@@ -32,6 +32,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | [School Closures Choropleth Map](https://codepen.io/borntofrappe/pen/oNBaKdw) | geo, topojson           |
 | Using D3                                                                      | utilities               |
 | [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)        | data binding, stack     |
+| Geo Practice                                                                  | geo, topojson           |
 
 A table worth of projects leaning on D3 to create interesting visualizations.
 
