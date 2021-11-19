@@ -11,7 +11,7 @@ const {
 } = d3;
 const { feature } = topojson;
 
-// https://ourworldindata.org/
+// https://ourworldindata.org/ looking at people fully vaccinated per hundred
 const data = {
   Afghanistan: {
     date: "2021-11-14",
@@ -672,13 +672,14 @@ const sphere = { type: "Sphere" };
 
 const projection = geoLarrivee()
   .fitSize([dimensions.width, dimensions.height], sphere)
+  // crop out antartica and increase the scale
   .translate([dimensions.width / 2, dimensions.height / 1.45])
   .scale(140)
   .rotate([-10, 0]);
 
 const pathGenerator = geoPath(projection);
 
-// one additional color for missing data
+// add one additional color for missing data
 // not used in the scale
 const colorStops = 5;
 const colors = Array(colorStops + 1)
@@ -704,12 +705,6 @@ svg
   .attr("y", dimensions.height / 2)
   .attr("font-weight", "bold");
 
-const legendRect = {
-  width: 60,
-  height: 10,
-  margin: 5,
-};
-
 svg
   .append("text")
   .attr("y", "32")
@@ -733,6 +728,12 @@ async function drawWorld() {
   svg.select("text").transition().attr("opacity", "0").remove();
 
   const dataGroup = svg.append("g");
+
+  const legendRect = {
+    width: 60,
+    height: 10,
+    margin: 5,
+  };
 
   const legendGroup = dataGroup
     .append("g")
@@ -780,7 +781,6 @@ async function drawWorld() {
     .text((d) => colorScale.invertExtent(d)[0]);
 
   worldGroup
-    .append("g")
     .selectAll("path")
     .data(countries.features)
     .join("path")
@@ -791,34 +791,7 @@ async function drawWorld() {
         : colors[0]
     )
     .attr("stroke", colors[0])
-    .attr("stroke-width", "0.5")
-    .on("mouseenter", (e, d) => {
-      const { name } = d.properties;
-      const country = data[name];
-      if (country) {
-        text.select("tspan").text(name);
-        text.select("tspan:nth-of-type(2)").text(` ${country.value}%`);
-        textGroup
-          .select("text:nth-of-type(2)")
-          .text(`Dated ${formatDate(parseDate(`${country.date}`))}`);
-
-        highlightGroup.select("path").attr("d", pathGenerator(d));
-
-        const [x, y] = pathGenerator.centroid(d);
-        console.log(x, y);
-
-        highlightGroup
-          .select("path:nth-of-type(2)")
-          .attr(
-            "d",
-            `M ${highlightPosition.x} ${highlightPosition.y} v 30 L ${x} ${y}`
-          );
-
-        highlightGroup
-          .select("circle")
-          .attr("transform", `translate(${x} ${y})`);
-      }
-    });
+    .attr("stroke-width", "0.5");
 
   const highlight = Object.entries(data).sort(
     (a, b) => b[1].value - a[1].value
@@ -826,7 +799,7 @@ async function drawWorld() {
 
   const highlightPosition = {
     x: dimensions.width - 5,
-    y: 70,
+    y: 65,
   };
 
   const textGroup = highlightGroup
@@ -888,7 +861,34 @@ async function drawWorld() {
       `translate(${highlightPosition.x} ${highlightPosition.y})`
     );
 
-  /*
+  // /* mouseenter on the countries
+  worldGroup.selectAll("path").on("mouseenter", (_, d) => {
+    const { name } = d.properties;
+    const country = data[name];
+    if (country) {
+      text.select("tspan").text(name);
+      text.select("tspan:nth-of-type(2)").text(` ${country.value}%`);
+      textGroup
+        .select("text:nth-of-type(2)")
+        .text(`Dated ${formatDate(parseDate(`${country.date}`))}`);
+
+      highlightGroup.select("path").attr("d", pathGenerator(d));
+
+      const [x, y] = pathGenerator.centroid(d);
+
+      highlightGroup
+        .select("path:nth-of-type(2)")
+        .attr(
+          "d",
+          `M ${highlightPosition.x} ${highlightPosition.y} v 30 L ${x} ${y}`
+        );
+
+      highlightGroup.select("circle").attr("transform", `translate(${x} ${y})`);
+    }
+  });
+  /* */
+
+  /* mouseenter on path elements from Delaunay's triangulation (personally I prefer the path elements for the individual countries)
   const delaunayGroup = svg.append("g");
 
   const delaunay = Delaunay.from(
@@ -918,9 +918,22 @@ async function drawWorld() {
           .text(`Dated ${formatDate(parseDate(`${country.date}`))}`);
 
         highlightGroup.select("path").attr("d", pathGenerator(d));
+
+        const [x, y] = pathGenerator.centroid(d);
+
+        highlightGroup
+          .select("path:nth-of-type(2)")
+          .attr(
+            "d",
+            `M ${highlightPosition.x} ${highlightPosition.y} v 30 L ${x} ${y}`
+          );
+
+        highlightGroup
+          .select("circle")
+          .attr("transform", `translate(${x} ${y})`);
       }
     });
-  */
+  /* */
 
   dataGroup
     .attr("opacity", "0")

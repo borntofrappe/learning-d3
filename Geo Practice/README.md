@@ -24,6 +24,6 @@ The second project shows how the projection can be customized to show different 
 
 The third project illustrates how to plot a series of landmarks using the chosen projection.
 
-### Choropleth Map
+### [Global Vaccination Map](https://codepen.io/borntofrappe/pen/RwZdKMK)
 
 The fourth project maps actual data to the `fill` attribute of the `<path>` elements describing world countries.
