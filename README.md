@@ -56,3 +56,4 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)                    | sankey, radial             |
 | [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)        | pie, arc                   |
 | [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)       | bar, transition, animation |
+| Ideal Lap Analysis                                                            | dashboard                  |
