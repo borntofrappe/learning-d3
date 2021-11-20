@@ -9,3 +9,7 @@ A recent article [on the F1 website](https://www.formula1.com/en/latest/article.
 ### Dotplot
 
 The first type of chart is a variation of a lollipop chart, itself a variation of a barplot. Instead of bars, instead of lines culminating in circles, the idea is to plot only the circles at the coordinate specified by the lap time.
+
+### Barplot
+
+The more conventional bar plot highlights the gap to the ideal lap.
