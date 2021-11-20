@@ -33,6 +33,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | Using D3                                                                      | utilities               |
 | [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)        | data binding, stack     |
 | Geo Practice                                                                  | geo, topojson           |
+| [Ideal Lap Analysis](https://codepen.io/borntofrappe/pen/YzxMKXj)             | structure               |
 
 A table worth of projects leaning on D3 to create interesting visualizations.
 
@@ -56,4 +57,3 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)                    | sankey, radial             |
 | [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)        | pie, arc                   |
 | [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)       | bar, transition, animation |
-| Ideal Lap Analysis                                                            | dashboard                  |

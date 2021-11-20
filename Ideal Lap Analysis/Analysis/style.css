@@ -15,10 +15,11 @@ body {
 
 main {
   max-width: 52rem;
-  margin: 1rem auto;
+  margin: 0rem auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem 0.5rem;
+  padding: 1rem;
 }
 
 main svg {

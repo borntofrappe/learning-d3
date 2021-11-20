@@ -158,7 +158,9 @@ function drawDotplot({ title, label, data, fill = "currentColor" }) {
     .nice();
 
   const yScale = scaleBand()
-    .domain(data.sort((a, b) => a.value - b.value).map((d) => yAccessor(d)))
+    .domain(
+      data.sort((a, b) => xAccessor(a) - xAccessor(b)).map((d) => yAccessor(d))
+    )
     .range([0, dimensions.boundedHeight]);
 
   const xAxis = axisBottom(xScale)
@@ -172,6 +174,10 @@ function drawDotplot({ title, label, data, fill = "currentColor" }) {
     .attr("width", dimensions.width)
     .attr("height", dimensions.height);
 
+  wrapper.attr("tabindex", "0").attr("role", "figure");
+
+  wrapper.append("title").text(title);
+
   const bounds = wrapper
     .append("g")
     .attr(
@@ -182,13 +188,26 @@ function drawDotplot({ title, label, data, fill = "currentColor" }) {
   const dataGroup = bounds.append("g");
   const axisGroup = bounds.append("g");
 
+  dataGroup
+    .attr("tabindex", "0")
+    .attr("role", "list")
+    .attr("aria-label", "F1 drivers data");
+
   const dataGroups = dataGroup
     .selectAll("g")
-    .data(data)
+    .data([...data.sort((a, b) => xAccessor(a) - xAccessor(b))])
     .join("g")
     .attr(
       "transform",
       (d) => `translate(0 ${yScale(yAccessor(d)) + yScale.bandwidth() / 2})`
+    );
+
+  dataGroups
+    .attr("tabindex", "0")
+    .attr("role", "listitem")
+    .attr(
+      "aria-label",
+      (d) => `${yAccessor(d)} recorded a lap of ${xAccessor(d)} seconds`
     );
 
   dataGroups
@@ -266,6 +285,8 @@ function drawDotplot({ title, label, data, fill = "currentColor" }) {
     .attr("d", "M 0 0 h 5")
     .attr("fill", "none")
     .attr("stroke", "currentColor");
+
+  wrapper.selectAll("text").attr("aria-hidden", "true");
 }
 
 function drawBarplot({ title, label, data }) {
@@ -312,6 +333,10 @@ function drawBarplot({ title, label, data }) {
     .attr("width", dimensions.width)
     .attr("height", dimensions.height);
 
+  wrapper.attr("tabindex", "0").attr("role", "figure");
+
+  wrapper.append("title").text(title);
+
   const bounds = wrapper
     .append("g")
     .attr(
@@ -322,6 +347,11 @@ function drawBarplot({ title, label, data }) {
   const dataGroup = bounds.append("g");
   const axisGroup = bounds.append("g");
 
+  dataGroup
+    .attr("tabindex", "0")
+    .attr("role", "list")
+    .attr("aria-label", "F1 drivers data");
+
   const dataGroups = dataGroup
     .selectAll("g")
     .data(data)
@@ -329,6 +359,14 @@ function drawBarplot({ title, label, data }) {
     .attr(
       "transform",
       (d) => `translate(${xScale(xAccessor(d))} ${yScale(yAccessor(d))})`
+    );
+
+  dataGroups
+    .attr("tabindex", "0")
+    .attr("role", "listitem")
+    .attr(
+      "aria-label",
+      (d) => `${xAccessor(d)} gap to the idea lap was ${yAccessor(d)} seconds`
     );
 
   dataGroups
@@ -410,6 +448,8 @@ function drawBarplot({ title, label, data }) {
     .attr("d", "M 0 0 h 5")
     .attr("fill", "none")
     .attr("stroke", "currentColor");
+
+  wrapper.selectAll("text").attr("aria-hidden", "true");
 }
 
 drawDotplot({
