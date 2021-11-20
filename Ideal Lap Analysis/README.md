@@ -13,3 +13,7 @@ The first type of chart is a variation of a lollipop chart, itself a variation o
 ### Barplot
 
 The more conventional bar plot highlights the gap to the ideal lap.
+
+### Dashboard
+
+The previous demos coalesce into a dashboard made of three separate `<svg>` element. There could be an argument for incorporating all visuals in the same parent SVG, but I believe this approach provides more flexibility. By having separare containers the layout is deferred to CSS and it's possible to configure the charts using responsive best practices. In terms of D3, I also believe it's easier to create multiple visualizations, as you don't have to structure and over-engineer the `<svg>` element and the dimensions for each separate component.
