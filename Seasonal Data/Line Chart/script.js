@@ -432,6 +432,8 @@ const {
   timeParse,
   timeFormat,
   line,
+  pointer,
+  least,
 } = d3;
 
 const main = d3.select("body").append("main");
@@ -505,6 +507,7 @@ function drawLinechart(key) {
 
   const dataGroup = bounds.append("g");
   const axisGroup = bounds.append("g");
+  const highlightGroup = bounds.append("g");
 
   dataGroup
     .append("path")
@@ -533,6 +536,97 @@ function drawLinechart(key) {
 
   xAxisGroup.select("path").attr("stroke", "hsl(0, 0%, 68%)");
   xAxisGroup.selectAll("text").attr("y", "6");
+
+  highlightGroup.append("path");
+
+  highlightGroup.append("path");
+
+  highlightGroup
+    .selectAll("path")
+    .attr("fill", "none")
+    .attr("stroke", "hsl(207, 90%, 54%)")
+    .attr("stroke-width", "1.2")
+    .attr("stroke-dasharray", "3 5")
+    .attr("opacity", "0");
+
+  highlightGroup
+    .append("circle")
+    .attr("r", "10")
+    .attr("fill", "hsl(207, 90%, 54%)")
+    .attr("opacity", "0.2")
+    .attr("transform", "scale(0)");
+
+  highlightGroup
+    .append("circle")
+    .attr("r", "6")
+    .attr("fill", "hsl(207, 90%, 54%)")
+    .attr("transform", "scale(0)");
+
+  highlightGroup.append("text").attr("font-size", "24");
+
+  highlightGroup.append("text").attr("font-size", "18");
+
+  highlightGroup
+    .selectAll("text")
+    .attr("fill", "currentColor")
+    .attr("font-family", "inherit")
+    .attr("font-weight", "bold")
+    .attr("opacity", "0");
+
+  bounds
+    .append("rect")
+    .attr("width", dimensions.boundedWidth)
+    .attr("height", dimensions.boundedHeight)
+    .attr("opacity", "0")
+    .on("mouseenter", () => {
+      highlightGroup.selectAll("path").transition().attr("opacity", "1");
+      highlightGroup.selectAll("text").transition().attr("opacity", "1");
+      highlightGroup
+        .selectAll("circle")
+        .transition()
+        .attr("transform", "scale(1)");
+    })
+    .on("mouseleave", () => {
+      highlightGroup.selectAll("path").transition().attr("opacity", "0");
+      highlightGroup.selectAll("text").transition().attr("opacity", "0");
+      highlightGroup
+        .selectAll("circle")
+        .transition()
+        .attr("transform", "scale(0)");
+    })
+    .on("mousemove", (e) => {
+      const [x] = pointer(e);
+      const date = xScale.invert(x);
+      const d = least(
+        data,
+        (a, b) => Math.abs(xAccessor(a) - date) - Math.abs(xAccessor(b) - date)
+      );
+
+      const dx = xScale(xAccessor(d));
+      const dy = yScale(yAccessor(d));
+
+      highlightGroup.attr("transform", `translate(${dx} ${dy})`);
+
+      highlightGroup
+        .select("path")
+        .attr("d", `M 0 0 v ${dimensions.boundedHeight - dy}`);
+
+      highlightGroup.select("path:nth-of-type(2)").attr("d", `M 0 0 h -${dx}`);
+
+      highlightGroup
+        .select("text")
+        .attr("x", -dx)
+        .attr("y", dy > dimensions.boundedHeight / 2 ? "-10" : "30")
+        .text(yAccessor(d));
+
+      highlightGroup
+        .select("text:nth-of-type(2)")
+        .attr("x", dx > dimensions.boundedWidth / 2 ? "-8" : "8")
+        .attr("y", dimensions.boundedHeight - dy - 5)
+        .attr("text-anchor", dx > dimensions.boundedWidth / 2 ? "end" : "start")
+
+        .text(formatDate(xAccessor(d)));
+    });
 }
 
 drawLinechart("sun");
