@@ -453,8 +453,8 @@ const icons = {
     </defs>
 
     <g transform="translate(-5 0) rotate(-20)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
-      <path fill="hsl(244, 97%, 53%)" stroke="hsl(244, 97%, 53%)" d="M 20 -25 A 30 30 0 1 0 20 25 32.5 32.5 0 0 1 20 -25" />
-      <path fill="hsl(242, 98%, 50%)" stroke="hsl(242, 98%, 50%)" mask="url(#mm)" d="M 20 -25 A 30 30 0 1 0 20 25 32.5 32.5 0 0 1 20 -25" />
+      <path fill="hsl(284, 97%, 43%)" stroke="hsl(284, 97%, 43%)" d="M 20 -25 A 30 30 0 1 0 20 25 32.5 32.5 0 0 1 20 -25" />
+      <path fill="hsl(282, 98%, 40%)" stroke="hsl(282, 98%, 40%)" mask="url(#mm)" d="M 20 -25 A 30 30 0 1 0 20 25 32.5 32.5 0 0 1 20 -25" />
     </g>
   </svg>
 `,
@@ -470,10 +470,24 @@ header.append("h1").text("Seasonal Data")
 header
   .append("p")
   .html(
-    "<time datetime='2021-11-22'>Over the span of twelve months</time> Google Trends highlights an interesting pattern for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
+    "Over the span of twelve months, beginning <time datetime='2020-11-22'>November 22nd, 2020</time>, Google Trends highlights an interesting pattern for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
   )
 
-function draw({ title, description, key }) {
+plotData({
+  title: "sun",
+  description:
+    "Search interest steadily grows and then recedes without changing excessively.",
+  key: "sun",
+})
+
+plotData({
+  title: "moon",
+  description:
+    "Search interest fluctuates continuously in smaller, month-long periods.",
+  key: "moon",
+})
+
+function plotData({ title, description, key }) {
   const data = dataset[key]
 
   const parseDate = timeParse("%Y-%m-%d")
@@ -482,6 +496,12 @@ function draw({ title, description, key }) {
   const xAccessor = (d) => parseDate(d.date)
   const yAccessor = (d) => d.value
 
+  /* the <svg> is created with a specific viewBox 220 by 450, with 10 dedicated to margin on either side
+  the height of 430 is split in three areas
+    0-120 icon (the icon is 200 tall, so that the visual ends at most at 320)
+    20 line (starting at 320, ending at 340)
+    80 text (starting at 350 to give some space from the line
+  */
   const yIconScale = scaleLinear().domain([0, 100]).range([120, 0])
 
   const xLineScale = scaleTime().domain(extent(data, xAccessor)).range([0, 200])
@@ -497,15 +517,15 @@ function draw({ title, description, key }) {
 
   const wrapper = article
     .append("svg")
-    .attr("viewBox", `0 0 230 450`)
-    .attr("width", 230)
+    .attr("viewBox", `0 0 220 450`)
+    .attr("width", 220)
     .attr("height", 450)
 
   const bounds = wrapper.append("g").attr("transform", `translate(10 10)`)
 
   const iconGroup = bounds.append("g")
   const lineGroup = bounds.append("g").attr("transform", "translate(0 320)")
-  const textGroup = bounds.append("g").attr("transform", "translate(200 390)")
+  const textGroup = bounds.append("g").attr("transform", "translate(200 350)")
 
   iconGroup.append("g").html(icons[key])
 
@@ -520,13 +540,15 @@ function draw({ title, description, key }) {
     .attr("fill", "currentColor")
     .attr("font-family", "inherit")
 
-  textGroup.append("text").attr("font-size", "56").attr("font-weight", "bold")
+  textGroup
+    .append("text")
+    .attr("font-size", "56")
+    .attr("y", "46")
+    .attr("font-weight", "bold")
 
-  textGroup.append("text").attr("y", "30").attr("font-size", "22")
+  textGroup.append("text").attr("y", "76").attr("font-size", "22")
 
   iconGroup.attr("transform", `translate(0 ${yIconScale(yAccessor(data[0]))})`)
-
-  lineGroup.select("path").attr("d", lineGenerator(data.slice(0, 0)))
 
   textGroup.select("text").text(yAccessor(data[0]))
 
@@ -548,7 +570,7 @@ function draw({ title, description, key }) {
   function animate(value = 0) {
     transition = d3.transition().duration(250).ease(d3.easeLinear)
 
-    lineGroup.select("path").attr("d", lineGenerator(data.slice(0, value)))
+    lineGroup.select("path").attr("d", lineGenerator(data.slice(0, value + 1)))
 
     textGroup.select("text").text(yAccessor(data[value]))
 
@@ -556,7 +578,8 @@ function draw({ title, description, key }) {
       .select("text:nth-of-type(2)")
       .text(formatDate(xAccessor(data[value])))
 
-    input.attr("value", value)
+    // it seems insufficient to set the attribute with D3
+    input.nodes()[0].value = value
 
     iconGroup
       .transition(transition)
@@ -568,7 +591,6 @@ function draw({ title, description, key }) {
 
   button.on("click", () => {
     iconGroup.interrupt()
-
     animate()
   })
 
@@ -579,7 +601,9 @@ function draw({ title, description, key }) {
     .on("input", (e) => {
       const value = parseInt(e.currentTarget.value, 10)
 
-      lineGroup.select("path").attr("d", lineGenerator(data.slice(0, value)))
+      lineGroup
+        .select("path")
+        .attr("d", lineGenerator(data.slice(0, value + 1)))
 
       textGroup.select("text").text(yAccessor(data[value]))
 
@@ -596,17 +620,3 @@ function draw({ title, description, key }) {
         .attr("transform", `translate(0 ${yIconScale(yAccessor(data[value]))})`)
     })
 }
-
-draw({
-  title: "sun",
-  description:
-    "Search interest steadily grows and then recedes without changing excessively.",
-  key: "sun",
-})
-
-draw({
-  title: "moon",
-  description:
-    "Search interest fluctuates continuously in smaller, month-long periods.",
-  key: "moon",
-})

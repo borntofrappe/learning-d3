@@ -419,7 +419,7 @@ const dataset = {
       value: 66,
     },
   ],
-};
+}
 
 const {
   select,
@@ -434,18 +434,23 @@ const {
   line,
   pointer,
   least,
-} = d3;
+} = d3
 
-const main = d3.select("body").append("main");
-main.append("h1").text("Seasonal Data");
-main
+const root = d3.select("body").append("div").attr("id", "root")
+
+const header = root.append("header")
+header.append("h1").text("Seasonal Data")
+header
   .append("p")
   .html(
-    "Google Trends highlights an interesting pattern in search interest for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
-  );
+    "Over the span of twelve months, beginning <time datetime='2020-11-22'>November 22nd, 2020</time>, Google Trends highlights an interesting pattern for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
+  )
+
+drawLinechart("sun")
+drawLinechart("moon")
 
 function drawLinechart(key) {
-  const data = dataset[key];
+  const data = dataset[key]
 
   const dimensions = {
     width: 800,
@@ -456,90 +461,90 @@ function drawLinechart(key) {
       bottom: 30,
       left: 30,
     },
-  };
+  }
 
   dimensions.boundedWidth =
-    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right)
   dimensions.boundedHeight =
-    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
 
-  const parseDate = timeParse("%Y-%m-%d");
-  const formatDate = timeFormat("%B %d, %Y");
+  const parseDate = timeParse("%Y-%m-%d")
+  const formatDate = timeFormat("%B %d, %Y")
 
-  const xAccessor = (d) => parseDate(d.date);
-  const yAccessor = (d) => d.value;
+  const xAccessor = (d) => parseDate(d.date)
+  const yAccessor = (d) => d.value
 
   const xScale = scaleTime()
     .domain(extent(data, xAccessor))
     .range([0, dimensions.boundedWidth])
-    .nice();
+    .nice()
 
   const yScale = scaleLinear()
     .domain([0, 100])
-    .range([dimensions.boundedHeight, 0]);
+    .range([dimensions.boundedHeight, 0])
 
   const lineGenerator = line()
     .x((d) => xScale(xAccessor(d)))
-    .y((d) => yScale(yAccessor(d)));
+    .y((d) => yScale(yAccessor(d)))
 
   const xAxis = axisBottom(xScale)
     .ticks(5)
     .tickSize(0)
-    .tickFormat((d) => formatDate(d));
+    .tickFormat((d) => formatDate(d))
 
-  const yAxis = axisLeft(yScale).ticks(4).tickSize(0);
+  const yAxis = axisLeft(yScale).ticks(4).tickSize(0)
 
-  const article = main.append("article");
-  article.append("h2").text(`Interest over time: ${key}`);
+  const article = root.append("article")
+  article.append("h2").text(`Interest over time: ${key}`)
 
   const wrapper = article
     .append("svg")
     .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
     .attr("width", dimensions.width)
-    .attr("height", dimensions.height);
+    .attr("height", dimensions.height)
 
   const bounds = wrapper
     .append("g")
     .attr(
       "transform",
       `translate(${dimensions.margin.left} ${dimensions.margin.top})`
-    );
+    )
 
-  const dataGroup = bounds.append("g");
-  const axisGroup = bounds.append("g");
-  const highlightGroup = bounds.append("g");
+  const dataGroup = bounds.append("g")
+  const axisGroup = bounds.append("g")
+  const highlightGroup = bounds.append("g")
 
   dataGroup
     .append("path")
     .attr("d", lineGenerator(data))
     .attr("fill", "none")
     .attr("stroke", "hsl(207, 90%, 54%)")
-    .attr("stroke-width", "3");
+    .attr("stroke-width", "3")
 
   const xAxisGroup = axisGroup
     .append("g")
     .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
-    .call(xAxis);
+    .call(xAxis)
 
-  const yAxisGroup = axisGroup.append("g").call(yAxis);
+  const yAxisGroup = axisGroup.append("g").call(yAxis)
 
-  axisGroup.selectAll("text").attr("fill", "hsl(0, 0%, 58%)");
+  axisGroup.selectAll("text").attr("fill", "hsl(0, 0%, 58%)")
 
-  yAxisGroup.select("path").remove();
-  yAxisGroup.select("g.tick").remove();
+  yAxisGroup.select("path").remove()
+  yAxisGroup.select("g.tick").remove()
   yAxisGroup
     .selectAll("g.tick")
     .append("path")
     .attr("d", `M 0 0 h ${dimensions.boundedWidth}`)
     .attr("stroke-width", "0.5")
-    .attr("stroke", "hsl(0, 0%, 84%)");
+    .attr("stroke", "hsl(0, 0%, 84%)")
 
-  xAxisGroup.select("path").attr("stroke", "hsl(0, 0%, 68%)");
-  xAxisGroup.selectAll("text").attr("y", "6");
+  xAxisGroup.select("path").attr("stroke", "hsl(0, 0%, 68%)")
+  xAxisGroup.selectAll("text").attr("y", "6")
 
-  highlightGroup.append("path");
+  highlightGroup.append("path")
 
-  highlightGroup.append("path");
+  highlightGroup.append("path")
 
   highlightGroup
     .selectAll("path")
@@ -547,31 +552,31 @@ function drawLinechart(key) {
     .attr("stroke", "hsl(207, 90%, 54%)")
     .attr("stroke-width", "1.2")
     .attr("stroke-dasharray", "3 5")
-    .attr("opacity", "0");
+    .attr("opacity", "0")
 
   highlightGroup
     .append("circle")
     .attr("r", "10")
     .attr("fill", "hsl(207, 90%, 54%)")
     .attr("opacity", "0.2")
-    .attr("transform", "scale(0)");
+    .attr("transform", "scale(0)")
 
   highlightGroup
     .append("circle")
     .attr("r", "6")
     .attr("fill", "hsl(207, 90%, 54%)")
-    .attr("transform", "scale(0)");
+    .attr("transform", "scale(0)")
 
-  highlightGroup.append("text").attr("font-size", "24");
+  highlightGroup.append("text").attr("font-size", "24")
 
-  highlightGroup.append("text").attr("font-size", "18");
+  highlightGroup.append("text").attr("font-size", "18")
 
   highlightGroup
     .selectAll("text")
     .attr("fill", "currentColor")
     .attr("font-family", "inherit")
     .attr("font-weight", "bold")
-    .attr("opacity", "0");
+    .attr("opacity", "0")
 
   bounds
     .append("rect")
@@ -579,45 +584,45 @@ function drawLinechart(key) {
     .attr("height", dimensions.boundedHeight)
     .attr("opacity", "0")
     .on("mouseenter", () => {
-      highlightGroup.selectAll("path").transition().attr("opacity", "1");
-      highlightGroup.selectAll("text").transition().attr("opacity", "1");
+      highlightGroup.selectAll("path").transition().attr("opacity", "1")
+      highlightGroup.selectAll("text").transition().attr("opacity", "1")
       highlightGroup
         .selectAll("circle")
         .transition()
-        .attr("transform", "scale(1)");
+        .attr("transform", "scale(1)")
     })
     .on("mouseleave", () => {
-      highlightGroup.selectAll("path").transition().attr("opacity", "0");
-      highlightGroup.selectAll("text").transition().attr("opacity", "0");
+      highlightGroup.selectAll("path").transition().attr("opacity", "0")
+      highlightGroup.selectAll("text").transition().attr("opacity", "0")
       highlightGroup
         .selectAll("circle")
         .transition()
-        .attr("transform", "scale(0)");
+        .attr("transform", "scale(0)")
     })
     .on("mousemove", (e) => {
-      const [x] = pointer(e);
-      const date = xScale.invert(x);
+      const [x] = pointer(e)
+      const date = xScale.invert(x)
       const d = least(
         data,
         (a, b) => Math.abs(xAccessor(a) - date) - Math.abs(xAccessor(b) - date)
-      );
+      )
 
-      const dx = xScale(xAccessor(d));
-      const dy = yScale(yAccessor(d));
+      const dx = xScale(xAccessor(d))
+      const dy = yScale(yAccessor(d))
 
-      highlightGroup.attr("transform", `translate(${dx} ${dy})`);
+      highlightGroup.attr("transform", `translate(${dx} ${dy})`)
 
       highlightGroup
         .select("path")
-        .attr("d", `M 0 0 v ${dimensions.boundedHeight - dy}`);
+        .attr("d", `M 0 0 v ${dimensions.boundedHeight - dy}`)
 
-      highlightGroup.select("path:nth-of-type(2)").attr("d", `M 0 0 h -${dx}`);
+      highlightGroup.select("path:nth-of-type(2)").attr("d", `M 0 0 h -${dx}`)
 
       highlightGroup
         .select("text")
         .attr("x", -dx)
         .attr("y", dy > dimensions.boundedHeight / 2 ? "-10" : "30")
-        .text(yAccessor(d));
+        .text(yAccessor(d))
 
       highlightGroup
         .select("text:nth-of-type(2)")
@@ -625,9 +630,6 @@ function drawLinechart(key) {
         .attr("y", dimensions.boundedHeight - dy - 5)
         .attr("text-anchor", dx > dimensions.boundedWidth / 2 ? "end" : "start")
 
-        .text(formatDate(xAccessor(d)));
-    });
+        .text(formatDate(xAccessor(d)))
+    })
 }
-
-drawLinechart("sun");
-drawLinechart("moon");

@@ -11,22 +11,28 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-main {
+::selection {
+  background: hsl(0, 0%, 20%, 0.2);
+}
+
+#root {
   max-width: 52rem;
-  margin: 1rem auto;
+  padding: 1rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-h1 {
-  font-size: 1.5rem;
-}
-
-main > * + * {
+#root > * + * {
   margin-top: 0.75em;
 }
 
-main > article {
+#root > article {
   margin-top: 1.25em;
   margin-bottom: 1.25em;
+}
+
+header > * + * {
+  margin-top: 0.5em;
 }
 
 article {

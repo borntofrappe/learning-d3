@@ -11,9 +11,15 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
+::selection {
+  background: hsl(0, 0%, 20%, 0.2);
+}
+
 #root {
-  max-width: 42rem;
-  margin: 1rem auto;
+  max-width: 44rem;
+  padding: 1rem;
+  margin-left: auto;
+  margin-right: auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
   justify-items: center;

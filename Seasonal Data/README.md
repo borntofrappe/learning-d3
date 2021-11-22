@@ -10,10 +10,10 @@
 
 Ultimately, I've chosen to focus on two separate arrays describing search interest for [sun](https://trends.google.com/trends/explore?q=sun) and [moon](https://trends.google.com/trends/explore?q=moon). I fear considering both has the effect of focusing the attention on the comparison more than the evolution of the individual variable.
 
-## Line Chart
+## [Line Chart](https://codepen.io/borntofrappe/pen/XWaQwKN)
 
-The project replicates the visualization from the cited Google Trends, illustrating how a line chart might be simple, but is often the most effective type of visualization. It is possible to assess the trend immediately and with mouse interaction it is also possible to highlight individual data points. Considering mouse interaction I've chosen to include the data in the `<svg>` element instead of a separate `<div>`, a tooltip.
+The project replicates the visualization from the cited Google Trends, illustrating how a line chart might be simple, but is often the most effective type of visualization. It is possible to assess the overall trend immediately and with mouse interaction it is also possible to highlight individual data points. Considering mouse interaction I've chosen to include the data in the `<svg>` element instead of a separate `<div>`, a tooltip.
 
-## Generative Visualization
+## [Generative Visualization](https://codepen.io/borntofrappe/pen/BadEeLE)
 
-In place of a line chart the data is illustrated with `<svg>` elements animating the vertical coordinate of an icon over time. The data points are preserved in the visualization, but otherwise the project removes any visual present in the previous demo.
+In place of a line chart the data is illustrated with a bespoke `<svg>` element, designed to incorporate an icon, a small line chart and the individual data point. Over time, the idea is to animate the vertical coordinate of the icon, incrementally draw the line and update the text values.
