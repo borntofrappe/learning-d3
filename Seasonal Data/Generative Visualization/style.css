@@ -1,6 +1,72 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
 body {
   color: hsl(0, 0%, 20%);
   background: hsl(0, 0%, 97%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  max-width: 42rem;
+  margin: 1rem auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  justify-items: center;
+  gap: 1.5rem;
+}
+
+header {
+  grid-column: 1/-1;
+}
+
+header > * + * {
+  margin-top: 0.5em;
+}
+
+article {
+  padding: 1rem;
+  background: hsl(0, 0%, 100%);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0.1rem 0.5rem -0.15rem hsl(0, 0%, 20%, 0.1);
+}
+
+article > * + * {
+  margin-top: 0.5em;
+}
+
+article svg {
+  align-self: center;
+  max-width: 12rem;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+article div {
+  display: flex;
+  align-items: center;
+  gap: 0 0.5rem;
+}
+
+article div input {
+  flex-grow: 1;
+}
+
+button {
+  background: hsl(0, 0%, 20%);
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  color: hsl(0, 0%, 97%);
+  font-family: inherit;
+}
+
+input {
+  accent-color: currentColor;
 }

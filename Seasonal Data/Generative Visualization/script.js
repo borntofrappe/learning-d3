@@ -460,14 +460,17 @@ const icons = {
 `,
 }
 
-const { select, scaleLinear, timeParse, timeFormat } = d3
+const { select, scaleLinear, timeParse, timeFormat, scaleTime, extent, line } =
+  d3
 
-const main = d3.select("body").append("main")
-main.append("h1").text("Seasonal Data")
-main
+const root = d3.select("body").append("div").attr("id", "root")
+
+const header = root.append("header")
+header.append("h1").text("Seasonal Data")
+header
   .append("p")
   .html(
-    "<time datetime='2021-11-20'>Over the span of twelve months</time> Google Trends highlights an interesting pattern for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
+    "<time datetime='2021-11-22'>Over the span of twelve months</time> Google Trends highlights an interesting pattern for the keywords <a href='https://trends.google.com/trends/explore?q=sun'>sun</a> and <a href='https://trends.google.com/trends/explore?q=moon'>moon</a>."
   )
 
 function draw({ title, description, key }) {
@@ -479,25 +482,38 @@ function draw({ title, description, key }) {
   const xAccessor = (d) => parseDate(d.date)
   const yAccessor = (d) => d.value
 
-  const yScale = scaleLinear().domain([0, 100]).range([180, 0])
+  const yIconScale = scaleLinear().domain([0, 100]).range([120, 0])
 
-  const article = main.append("article")
+  const xLineScale = scaleTime().domain(extent(data, xAccessor)).range([0, 200])
+  const yLineScale = scaleLinear().domain(yIconScale.domain()).range([20, 0])
+
+  const lineGenerator = line()
+    .x((d) => xLineScale(xAccessor(d)))
+    .y((d) => yLineScale(yAccessor(d)))
+
+  const article = root.append("article")
   article.append("h2").text(title).style("text-transform", "capitalize")
   article.append("p").text(description)
 
   const wrapper = article
     .append("svg")
-    .attr("viewBox", `0 0 250 500`)
-    .attr("width", 250)
-    .attr("height", 500)
+    .attr("viewBox", `0 0 230 450`)
+    .attr("width", 230)
+    .attr("height", 450)
 
-  const bounds = wrapper.append("g").attr("transform", `translate(25 25)`)
+  const bounds = wrapper.append("g").attr("transform", `translate(10 10)`)
 
   const iconGroup = bounds.append("g")
-  const lineGroup = bounds.append("g").attr("transform", "translate(0 380)")
-  const textGroup = bounds.append("g").attr("transform", "translate(200 420)")
+  const lineGroup = bounds.append("g").attr("transform", "translate(0 320)")
+  const textGroup = bounds.append("g").attr("transform", "translate(200 390)")
 
   iconGroup.append("g").html(icons[key])
+
+  lineGroup
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "2")
 
   textGroup
     .attr("text-anchor", "end")
@@ -508,15 +524,20 @@ function draw({ title, description, key }) {
 
   textGroup.append("text").attr("y", "30").attr("font-size", "22")
 
-  iconGroup.attr("transform", `translate(0 ${yScale(yAccessor(data[0]))})`)
+  iconGroup.attr("transform", `translate(0 ${yIconScale(yAccessor(data[0]))})`)
+
+  lineGroup.select("path").attr("d", lineGenerator(data.slice(0, 0)))
 
   textGroup.select("text").text(yAccessor(data[0]))
 
   textGroup.select("text:nth-of-type(2)").text(formatDate(xAccessor(data[0])))
 
-  const button = article.append("button").text("Run animation")
+  const controls = article.append("div")
+  const button = controls.append("button")
 
-  const input = article
+  button.append("span").text("Animate")
+
+  const input = controls
     .append("input")
     .attr("type", "range")
     .attr("min", 0)
@@ -526,31 +547,39 @@ function draw({ title, description, key }) {
   let transition
   function animate(value = 0) {
     transition = d3.transition().duration(250).ease(d3.easeLinear)
+
+    lineGroup.select("path").attr("d", lineGenerator(data.slice(0, value)))
+
     textGroup.select("text").text(yAccessor(data[value]))
 
     textGroup
       .select("text:nth-of-type(2)")
       .text(formatDate(xAccessor(data[value])))
 
+    input.attr("value", value)
+
     iconGroup
       .transition(transition)
-      .attr("transform", `translate(0 ${yScale(yAccessor(data[value]))})`)
+      .attr("transform", `translate(0 ${yIconScale(yAccessor(data[value]))})`)
       .on("end", () => {
         if (value < data.length - 1) animate(value + 1)
       })
-
-    input.attr("value", value)
   }
 
   button.on("click", () => {
+    iconGroup.interrupt()
+
     animate()
   })
 
   input
-    .on("input", (e) => {
+    .on("mousedown", () => {
       iconGroup.interrupt()
-
+    })
+    .on("input", (e) => {
       const value = parseInt(e.currentTarget.value, 10)
+
+      lineGroup.select("path").attr("d", lineGenerator(data.slice(0, value)))
 
       textGroup.select("text").text(yAccessor(data[value]))
 
@@ -564,7 +593,7 @@ function draw({ title, description, key }) {
       // if run on input I feel the transition is run too frequently and changes are less apparent
       iconGroup
         .transition()
-        .attr("transform", `translate(0 ${yScale(yAccessor(data[value]))})`)
+        .attr("transform", `translate(0 ${yIconScale(yAccessor(data[value]))})`)
     })
 }
 
