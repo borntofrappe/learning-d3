@@ -1,5 +1,5 @@
 // https://www.ssa.gov/oact/babynames/limits.html [2000,2020]
-const data = {
+const dataset = {
   female: [
     {
       name: "Olivia",
@@ -524,7 +524,184 @@ const data = {
       ],
     },
   ],
-};
+}
 
-const main = d3.select("body").append("main");
-main.append("h1").text("Spaghetti Plot");
+const {
+  select,
+  scaleLinear,
+  scaleTime,
+  scaleOrdinal,
+  extent,
+  max,
+  line,
+  timeParse,
+  timeFormat,
+  interpolateRainbow,
+  axisLeft,
+  axisBottom,
+} = d3
+
+const main = select("body").append("main")
+main.append("h1").text("Spaghetti Plot")
+
+function drawSpaghettiPlot({ title, key }) {
+  const data = dataset[key].sort(
+    (a, b) =>
+      b.values[b.values.length - 1].value - a.values[a.values.length - 1].value
+  )
+
+  const timeParser = timeParse("%Y")
+
+  const xAccessor = (d) => timeParser(d.year)
+  const yAccessor = (d) => d.value
+
+  const dimensions = {
+    width: 600,
+    height: 250,
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 25,
+      left: 50,
+    },
+    legend: {
+      width: 55,
+    },
+  }
+
+  dimensions.boundedWidth =
+    dimensions.width -
+    (dimensions.margin.left + dimensions.margin.right + dimensions.legend.width)
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
+
+  const xScale = scaleTime()
+    .domain(extent(data[0].values, xAccessor))
+    .range([0, dimensions.boundedWidth])
+
+  const yScale = scaleLinear()
+    .domain([
+      0,
+      max(
+        data.reduce((acc, curr) => [...acc, ...curr.values], []),
+        yAccessor
+      ),
+    ])
+    .range([dimensions.boundedHeight, 0])
+
+  const xAxis = axisBottom(xScale).ticks(6).tickSize(0).tickPadding(15)
+
+  const yAxis = axisLeft(yScale).ticks(5).tickSize(0).tickPadding(10)
+
+  const names = data.map(({ name }) => name)
+  const colorScale = scaleOrdinal()
+    .domain(names)
+    .range(
+      names.map((_, i, { length }) => interpolateRainbow((1 / length) * i))
+    )
+
+  const lineGenerator = line()
+    .x((d) => xScale(xAccessor(d)))
+    .y((d) => yScale(yAccessor(d)))
+
+  const article = main.append("article")
+  article.append("h2").text(title)
+
+  const wrapper = article
+    .append("svg")
+    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height)
+
+  const bounds = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    )
+
+  const linesGroup = bounds.append("g")
+  const axisGroup = bounds.append("g")
+  const legendGroup = bounds
+    .append("g")
+    .attr("transform", `translate(${dimensions.boundedWidth + 5} 0)`)
+
+  const lineGroups = linesGroup.selectAll("g").data(data).join("g")
+
+  lineGroups
+    .append("path")
+    .attr("d", (d) => lineGenerator(d.values))
+    .attr("fill", "none")
+    .attr("stroke", (d) => colorScale(d.name))
+    .attr("stroke-width", 2)
+
+  const xAxisGroup = axisGroup
+    .append("g")
+    .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
+    .call(xAxis)
+
+  const yAxisGroup = axisGroup.append("g").call(yAxis)
+
+  axisGroup.selectAll("path").remove()
+
+  axisGroup
+    .selectAll("text")
+    .attr("font-size", "12")
+    .attr("font-family", "inherit")
+    .attr("fill", "currentColor")
+
+  xAxisGroup
+    .selectAll("g.tick")
+    .filter((_, i, { length }) => i > 0 && i < length - 1)
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.5")
+    .attr("opacity", "0.2")
+    .attr("d", `M 0 0 v -${dimensions.boundedHeight}`)
+
+  yAxisGroup
+    .selectAll("g.tick")
+    .filter((_, i, { length }) => i > 0 && i < length - 1)
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.5")
+    .attr("opacity", "0.2")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`)
+
+  const legendGroups = legendGroup
+    .selectAll("g")
+    .data(names)
+    .join("g")
+    .attr(
+      "transform",
+      (_, i, { length }) =>
+        `translate(0 ${(dimensions.boundedHeight / length) * i})`
+    )
+
+  legendGroups
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", (d) => colorScale(d))
+    .attr("stroke-width", "2")
+    .attr("d", "M 0 0 h 8")
+
+  legendGroups
+    .append("text")
+    .attr("fill", "currentColor")
+    .attr("x", "14")
+    .attr("y", "1")
+    .attr("dominant-baseline", "middle")
+    .attr("font-size", "12")
+    .text((d) => d)
+}
+
+drawSpaghettiPlot({
+  title: "Female",
+  key: "female",
+})
+drawSpaghettiPlot({
+  title: "Male",
+  key: "male",
+})
