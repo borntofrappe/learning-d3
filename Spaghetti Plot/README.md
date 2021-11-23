@@ -1,23 +1,19 @@
 # Spaghetti Plot
 
-<!-- ## [Live Demo](LIVE_DEMO_URL) -->
+## [Live Demo](https://codepen.io/borntofrappe/pen/XWawvgw)
 
 ## Notes
 
-When a line chart plots multiple variables it is often described as a [spaghetti plot](https://www.data-to-viz.com/caveat/spaghetti.html). The term is discouraging, as it becomes more difficult to parse the information and the effectiveness of the line chart diminishes.
+When a line chart plots multiple variables it is often described as a [spaghetti plot](https://www.data-to-viz.com/caveat/spaghetti.html); the term is meant to be discouraging, as the information becomes more difficult to parse than individual, dedicated lines.
 
-With this project the goal is to immediately recreate the plot highlighting ten variables and then try to cope with its shortcomings. This is achieved in at least two ways:
+With this project the goal is to create such a plot and try to cope with its shortcomings with a legend and mouse interaction.
 
-- allow to toggle the variable on and off
+## Data
 
-- plot the variables in individual, dedicated line charts, or area charts
+Data is collected from [the US social security website](https://www.ssa.gov/oact/babynames/limits.html), considering the years from 1981 up to 2020.
 
 ## Improvements
 
-- mousemover legend, decrease the importance all lines but the selected one; highlight group instead of changing the opacity of all but the identified path
+Past the line chart, plotting one line for each variable, each `<svg>` element is equipped with a legend, positioned on the very right end. The idea is to include in this section every piece of information meant to simplify the visualization: the names and the values for a specific year, by default the most recent values.
 
-- mouseover line chart, circles
-
-- click, toggle visibility
-
-- individual line charts
+It is possible to hover on the line chart, illustrating a year different from the default one. It is also possible to hover on the legend, focusing on a single line.

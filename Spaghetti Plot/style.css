@@ -10,6 +10,10 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
+p {
+  line-height: 1.5;
+}
+
 #root {
   margin: 0rem auto;
   max-width: 44rem;
@@ -22,15 +26,11 @@ body {
 
 header > * + *,
 article > * + * {
-  margin-top: 0.5em;
+  margin-top: 0.25em;
 }
 
 article svg {
   width: 100%;
   height: auto;
   display: block;
-}
-
-p {
-  line-height: 1.5;
 }

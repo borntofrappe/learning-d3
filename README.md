@@ -34,6 +34,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)        | data binding, stack     |
 | Geo Practice                                                                  | geo, topojson           |
 | [Ideal Lap Analysis](https://codepen.io/borntofrappe/pen/YzxMKXj)             | structure               |
+| [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)                 | line, interaction       |
 
 A table worth of projects leaning on D3 to create interesting visualizations.
 

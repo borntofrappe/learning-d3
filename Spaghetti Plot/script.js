@@ -1,4 +1,4 @@
-// https://www.ssa.gov/oact/babynames/limits.html [1981,2020]
+// https://www.ssa.gov/oact/babynames/limits.html
 const dataset = {
   female: [
     {
@@ -928,34 +928,35 @@ const {
 const root = select("body").append("div").attr("id", "root")
 
 const header = root.append("header")
-header.append("h1").text("Baby names").style("text-transform", "capitalize")
+header
+  .append("h1")
+  .text("Popular Baby names")
+  .style("text-transform", "capitalize")
 
 header
   .append("p")
-  .text("Popular names in 2020 were certainly different forty years before.")
-
-const dataFemale = [...dataset.female].sort(
-  (a, b) =>
-    b.values[b.values.length - 1].value - a.values[a.values.length - 1].value
-)
+  .text(
+    "The names most used in 2020 highlight a considerable shift over the span of forty years."
+  )
 
 plotData({
   title: "Female",
   description:
     "Olivia edged out Emma, even if both choices followed a decreasing trend. The popularity of all names is quite recent, being used at most a thousand times in 1981.",
-  data: dataFemale,
+  data: [...dataset.female].sort(
+    (a, b) =>
+      b.values[b.values.length - 1].value - a.values[a.values.length - 1].value
+  ),
 })
-
-const dataMale = [...dataset.male].sort(
-  (a, b) =>
-    b.values[b.values.length - 1].value - a.values[a.values.length - 1].value
-)
 
 plotData({
   title: "Male",
   description:
-    "Liam climbed above Noah by a small margin. While most names emerged out of the four previous decades, other fell considerably out of favour.",
-  data: dataMale,
+    "Liam climbed above Noah by a small margin. While most names emerged out of the four previous decades, other fell notably out of favour, like William and James.",
+  data: [...dataset.male].sort(
+    (a, b) =>
+      b.values[b.values.length - 1].value - a.values[a.values.length - 1].value
+  ),
 })
 
 function plotData({ title, description, data }) {
@@ -986,6 +987,7 @@ function plotData({ title, description, data }) {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
 
+  // include an additional year to let the mousemove event consider the last year as well
   const xScale = scaleTime()
     .domain([
       min(data[0].values, xAccessor),
@@ -1005,7 +1007,6 @@ function plotData({ title, description, data }) {
     .nice()
 
   const xAxis = axisBottom(xScale).ticks(6).tickSize(0).tickPadding(15)
-
   const yAxis = axisLeft(yScale).ticks(5).tickSize(0).tickPadding(10)
 
   const names = data.map(({ name }) => name)
@@ -1039,7 +1040,9 @@ function plotData({ title, description, data }) {
 
   const linesGroup = bounds.append("g")
   const axisGroup = bounds.append("g")
+  // elements shown when hovering on the bounded area
   const highlightBoundsGroup = bounds.append("g")
+  // elements shown when hovering on the legend
   const highlightLegendGroup = bounds.append("g")
   const legendGroup = bounds.append("g")
 
@@ -1071,25 +1074,25 @@ function plotData({ title, description, data }) {
     .selectAll("g.tick")
     .filter((_, i, { length }) => i > 0 && i < length - 1)
     .append("path")
-    .attr("fill", "none")
-    .attr("stroke", "currentColor")
-    .attr("stroke-width", "0.5")
-    .attr("opacity", "0.2")
     .attr("d", `M 0 0 v -${dimensions.boundedHeight}`)
 
   yAxisGroup
     .selectAll("g.tick")
-    .filter((_, i, { length }) => i > 0 && i < length - 1)
+    .filter((_, i) => i > 0)
     .append("path")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`)
+
+  axisGroup
+    .selectAll("path")
     .attr("fill", "none")
     .attr("stroke", "currentColor")
     .attr("stroke-width", "0.5")
     .attr("opacity", "0.2")
-    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`)
 
   legendGroup.attr("transform", `translate(${dimensions.boundedWidth} 0)`)
 
   const legendHeight = dimensions.boundedHeight / names.length
+  const { year: lastYear } = data[0].values[data[0].values.length - 1]
 
   legendGroup
     .append("text")
@@ -1100,12 +1103,13 @@ function plotData({ title, description, data }) {
     .attr("dominant-baseline", "middle")
     .attr("font-size", "12")
     .attr("font-weight", "bold")
-    .text("2020")
+    .text(lastYear)
 
   const legendGroups = legendGroup
     .selectAll("g")
     .data(names)
     .join("g")
+    .attr("id", (d) => `legend-${d}`)
     .attr("transform", (_, i) => `translate(0 ${legendHeight * (i + 1)})`)
 
   legendGroups
@@ -1134,7 +1138,7 @@ function plotData({ title, description, data }) {
     .attr("font-size", "12")
     .text((d) => {
       const { values } = data.find(({ name }) => name === d)
-      return valueFormatter(values[values.length - 1].value)
+      return valueFormatter(values.find(({ year }) => year === lastYear).value)
     })
 
   legendGroups
@@ -1143,8 +1147,12 @@ function plotData({ title, description, data }) {
     .attr("width", dimensions.legend.width)
     .attr("height", legendHeight)
     .attr("opacity", "0")
+    .style("cursor", "pointer")
     .on("mouseenter", (_, d) => {
       linesGroup.attr("opacity", "0.1")
+      legendGroups.attr("opacity", "0.1")
+      legendGroup.select(`#legend-${d}`).attr("opacity", "1")
+
       highlightLegendGroup.selectAll("*").remove()
       highlightLegendGroup
         .append("path")
@@ -1153,10 +1161,11 @@ function plotData({ title, description, data }) {
         .attr("stroke", colorScale(d))
         .attr("stroke-width", 2)
     })
-    .style("cursor", "pointer")
 
   legendGroup.on("mouseleave", () => {
     linesGroup.attr("opacity", "1")
+
+    legendGroups.attr("opacity", "1")
     highlightLegendGroup.selectAll("*").remove()
   })
 
@@ -1165,6 +1174,7 @@ function plotData({ title, description, data }) {
     .attr("width", dimensions.boundedWidth)
     .attr("height", dimensions.boundedHeight)
     .attr("opacity", "0")
+    .style("cursor", "pointer")
     .on("mousemove", (e) => {
       const [hoverX] = pointer(e)
       const hoverYear = parseInt(timeFormatter(xScale.invert(hoverX)), 10)
@@ -1208,11 +1218,13 @@ function plotData({ title, description, data }) {
 
       highlightBoundsGroup.selectAll("*").remove()
 
-      legendGroup.select("text").text("2020")
+      legendGroup.select("text").text(lastYear)
 
       legendGroups.select("text:nth-of-type(2)").text((d) => {
         const { values } = data.find(({ name }) => name === d)
-        return valueFormatter(values[values.length - 1].value)
+        return valueFormatter(
+          values.find(({ year }) => year === lastYear).value
+        )
       })
     })
 }
