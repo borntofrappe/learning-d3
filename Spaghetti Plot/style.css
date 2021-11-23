@@ -10,19 +10,27 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-main {
-  margin: 1rem auto;
-  max-width: 42rem;
+#root {
+  margin: 0rem auto;
+  max-width: 44rem;
+  padding: 1rem;
 }
 
-main svg {
+#root > * + * {
+  margin-top: 1.5em;
+}
+
+header > * + *,
+article > * + * {
+  margin-top: 0.5em;
+}
+
+article svg {
   width: 100%;
   height: auto;
   display: block;
-  margin-top: 1em;
-  margin-bottom: 1em;
 }
 
-main > * + * {
-  margin-top: 0.5em;
+p {
+  line-height: 1.5;
 }

@@ -11,3 +11,13 @@ With this project the goal is to immediately recreate the plot highlighting ten 
 - allow to toggle the variable on and off
 
 - plot the variables in individual, dedicated line charts, or area charts
+
+## Improvements
+
+- mousemover legend, decrease the importance all lines but the selected one; highlight group instead of changing the opacity of all but the identified path
+
+- mouseover line chart, circles
+
+- click, toggle visibility
+
+- individual line charts
