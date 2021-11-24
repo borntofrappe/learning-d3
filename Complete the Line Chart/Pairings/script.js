@@ -43,4 +43,124 @@ const data = [
     name: "Lance Stroll",
     points: [0, 6, 12, 2, 8, 12, 2, 15, 0, 0, 0, 0, 0, 2, 0, 15, 1],
   },
-]
+].map(({ name, points }) => ({
+  name,
+  points: points.reduce(
+    (acc, curr) =>
+      acc[acc.length - 1] !== undefined
+        ? [...acc, curr + acc[acc.length - 1]]
+        : [curr],
+    []
+  ),
+}))
+
+const dataPairs = data.reduce((acc, curr, currentIndex) => {
+  return [
+    ...acc,
+    ...data
+      .filter((d, i) => i > currentIndex)
+      .map((opponent) => [
+        {
+          name: curr.name,
+          points: [...curr.points],
+        },
+        {
+          name: opponent.name,
+          points: [...opponent.points],
+        },
+      ]),
+  ]
+}, [])
+
+const { select, scaleLinear, scalePoint, min, max, extent, line, curveBasis } =
+  d3
+
+const root = select("body").append("div").attr("id", "root")
+root.append("h1").text("Pairings")
+root
+  .append("p")
+  .text(
+    "Focus on interesting pairs. See something interesting to compare with a dedicated 'Complete the Line Chart' chart type?"
+  )
+
+const main = root.append("main")
+
+const dimensions = {
+  width: 450,
+  height: 400,
+  margin: {
+    top: 20,
+    right: 20,
+    bottom: 20,
+    left: 20,
+  },
+}
+
+dimensions.boundedWidth =
+  dimensions.width - (dimensions.margin.left + dimensions.margin.right)
+dimensions.boundedHeight =
+  dimensions.height - (dimensions.margin.top + dimensions.margin.bottom)
+
+const xScale = scalePoint()
+  .domain(
+    Array(17)
+      .fill()
+      .map((_, i) => i)
+  )
+  .range([0, dimensions.boundedWidth])
+
+// domain depends on the max values in the pairs
+
+function plotLines(data) {
+  const yScale = scaleLinear()
+    .domain([
+      0,
+      max(
+        data.reduce(
+          (acc, curr) => [...acc, curr.points[curr.points.length - 1]],
+          []
+        )
+      ),
+    ])
+    .range([dimensions.boundedHeight, 0])
+    .nice()
+
+  const lineGenerator = line()
+    .x((_, i) => xScale(i))
+    .y((d) => yScale(d))
+    .curve(curveBasis)
+
+  const wrapper = main
+    .append("svg")
+    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height)
+
+  const bounds = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    )
+
+  const dataGroup = bounds.append("g")
+
+  const dataGroups = dataGroup.selectAll("g").data(data).join("g")
+
+  dataGroups
+    .append("text")
+    .attr("y", (_, i) => 38 * (i + 1))
+    .attr("fill", "currentColor")
+    .attr("font-size", "32")
+    .attr("font-weight", "bold")
+    .text((d) => d.name)
+
+  dataGroups
+    .append("path")
+    .attr("d", (d) => lineGenerator(d.points))
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 2)
+}
+
+dataPairs.forEach((pair) => plotLines(pair))
