@@ -1,6 +1,6 @@
 # Complete the Line Chart
 
-<!-- ## [Live Demo](LIVE_DEMO_URL) -->
+## [Live Demo](LIVE_DEMO_URL)
 
 ## Notes
 

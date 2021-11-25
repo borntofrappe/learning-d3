@@ -19,7 +19,7 @@ h2 {
 }
 
 p {
-  line-height: 1.35;
+  line-height: 1.5;
 }
 
 a {
@@ -35,6 +35,10 @@ a {
 
 #root > * + * {
   margin-top: 1.5em;
+}
+
+header > * + * {
+  margin-top: 0.5em;
 }
 
 article {
