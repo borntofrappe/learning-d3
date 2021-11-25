@@ -407,6 +407,7 @@ function drawdataGroup({ title, description, names }) {
                   .attr("opacity", "1")
 
                 // area chart
+                // points vs selectedPoints
               })
 
             article
