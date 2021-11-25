@@ -97,12 +97,12 @@ const gradient = wrapper
 gradient
   .append("stop")
   .attr("offset", "0")
-  .attr("stop-color", "hsl(0, 0%, 60%)")
+  .attr("stop-color", "hsl(0, 0%, 90%)")
 
 gradient
   .append("stop")
   .attr("offset", "0.5")
-  .attr("stop-color", "hsl(0, 0%, 60%)")
+  .attr("stop-color", "hsl(0, 0%, 90%)")
 
 gradient
   .append("stop")
@@ -129,7 +129,6 @@ dataGroup
   .attr("d", areaGenerator(data[0].map((v, i) => [v, data[1][i]])))
   .attr("fill", "url(#g)")
   .attr("stroke", "none")
-  .attr("opacity", "0.25")
 
 dataGroup
   .append("g")

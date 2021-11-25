@@ -40,9 +40,7 @@ const {
   scaleLinear,
   scalePoint,
   scaleOrdinal,
-  min,
   max,
-  extent,
   line,
   curveBasis,
   schemeSet1,
@@ -50,7 +48,6 @@ const {
   axisLeft,
   easeQuadInOut,
   pointer,
-  least,
 } = d3
 
 const root = select("body").append("div").attr("id", "root")
@@ -108,7 +105,7 @@ function drawdataGroup({ title, description, names }) {
       left: 40,
     },
     legend: {
-      height: 40,
+      height: 60,
     },
   }
 
@@ -137,7 +134,7 @@ function drawdataGroup({ title, description, names }) {
           (acc, curr) => [...acc, curr.points[curr.points.length - 1]],
           []
         )
-      ),
+      ) * 1.1,
     ])
     .range([dimensions.boundedHeight, 0])
     .nice()
@@ -177,6 +174,37 @@ function drawdataGroup({ title, description, names }) {
     .attr("width", dimensions.width)
     .attr("height", dimensions.height)
 
+  const gradient = wrapper
+    .append("defs")
+    .append("linearGradient")
+    .attr("id", "g")
+    .attr("gradientUnits", "userSpaceOnUse")
+    .attr("spreadMethod", "repeat")
+    .attr("x1", "0")
+    .attr("x2", "4")
+    .attr("y1", "0")
+    .attr("y2", "4")
+
+  gradient
+    .append("stop")
+    .attr("offset", "0")
+    .attr("stop-color", "hsl(0, 0%, 90%)")
+
+  gradient
+    .append("stop")
+    .attr("offset", "0.5")
+    .attr("stop-color", "hsl(0, 0%, 90%)")
+
+  gradient
+    .append("stop")
+    .attr("offset", "0.5")
+    .attr("stop-color", "hsl(0, 0%, 100%)")
+
+  gradient
+    .append("stop")
+    .attr("offset", "1")
+    .attr("stop-color", "hsl(0, 0%, 100%)")
+
   const bounds = wrapper
     .append("g")
     .attr(
@@ -192,7 +220,7 @@ function drawdataGroup({ title, description, names }) {
     .attr(
       "transform",
       (d, i, { length }) =>
-        `translate(0 ${(dimensions.legend.height / length) * (i + 1)})`
+        `translate(0 ${(dimensions.legend.height / length) * i})`
     )
 
   legendGroups
@@ -218,13 +246,15 @@ function drawdataGroup({ title, description, names }) {
     .attr("transform", `translate(0 ${dimensions.legend.height})`)
 
   const axisGroup = dataGroup.append("g")
-  const referenceGroup = dataGroup.append("g")
 
   const missingGroup = dataGroup
     .append("g")
     .attr("transform", `translate(${xScale(index)} 0)`)
+  const areaGroup = missingGroup.append("g")
   const interactionGroup = missingGroup.append("g")
   const autoGroup = missingGroup.append("g")
+
+  const referenceGroup = dataGroup.append("g")
 
   const referenceGroups = referenceGroup
     .selectAll("g")
@@ -362,14 +392,19 @@ function drawdataGroup({ title, description, names }) {
         const [x, y] = pointer(e)
         const round = Math.floor(x / roundWidth)
         if (!interactionPoints[round]) {
-          interactionPoints[round] = Math.floor(yScale.invert(y))
+          for (let r = 0; r <= round; r += 1) {
+            if (!interactionPoints[r]) {
+              interactionPoints[r] = Math.floor(yScale.invert(y))
+            }
+          }
 
           const points = Object.values(interactionPoints).filter((d) => d)
+          const coordinates = points.map((d, i) => [xScale(i + 1), yScale(d)])
 
           interactionGroup.select("path").attr(
             "d",
-            points.reduce(
-              (acc, curr, i) => `${acc} ${xScale(i + 1)} ${yScale(curr)}`,
+            coordinates.reduce(
+              (acc, curr) => `${acc} ${curr[0]} ${curr[1]}`,
               `M ${xScale(0)} ${yScale(data[data.length - 1].points[index])}`
             )
           )
@@ -406,8 +441,23 @@ function drawdataGroup({ title, description, names }) {
                   .transition()
                   .attr("opacity", "1")
 
-                // area chart
-                // points vs selectedPoints
+                console.log()
+
+                areaGroup
+                  .append("path")
+                  .attr(
+                    "d",
+                    autoGroup.select("path").attr("d") +
+                      [...coordinates.reverse()].reduce(
+                        (acc, curr) => `${acc} ${curr[0]} ${curr[1]}`,
+                        ""
+                      )
+                  )
+                  .attr("fill", "url(#g)")
+                  .attr("stroke", "none")
+                  .attr("opacity", "0")
+                  .transition()
+                  .attr("opacity", "1")
               })
 
             article
