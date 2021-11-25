@@ -191,12 +191,12 @@ function drawLineChart({ title, description, names }) {
   gradient
     .append("stop")
     .attr("offset", "0")
-    .attr("stop-color", "hsl(0, 0%, 90%)")
+    .attr("stop-color", "hsl(0, 0%, 88%)")
 
   gradient
     .append("stop")
     .attr("offset", "0.25")
-    .attr("stop-color", "hsl(0, 0%, 90%)")
+    .attr("stop-color", "hsl(0, 0%, 88%)")
 
   gradient
     .append("stop")
@@ -223,7 +223,7 @@ function drawLineChart({ title, description, names }) {
 
   const axisGroup = dataGroup.append("g")
 
-  // before the initial data, but positioned alongide the additional data
+  // the area is translated similar to the additional data, but should be displayed before the initial data
   const areaGroup = dataGroup
     .append("g")
     .attr("transform", `translate(${xScale(initialIndex)} 0)`)
@@ -320,8 +320,6 @@ function drawLineChart({ title, description, names }) {
     .attr("stroke", "currentColor")
     .attr("stroke-width", "0.1")
 
-  areaGroup.append("path").attr("fill", "url(#g)").attr("stroke", "none")
-
   automaticGroup
     .append("path")
     .attr("fill", "none")
@@ -384,6 +382,10 @@ function drawLineChart({ title, description, names }) {
   const columns = data[data.length - 1].points.length - initialIndex
   const columnWidth = xScale(1)
 
+  /*
+  { 0: undefined, 1: undefined, 2: undefined ...}
+  the idea is to fill in the object considering mouse coordinates
+  */
   const columnsPoints = Object.fromEntries(
     Array(columns)
       .fill()
@@ -446,7 +448,7 @@ function drawLineChart({ title, description, names }) {
         areaGroup.attr("opacity", "0")
 
         areaGroup
-          .select("path")
+          .append("path")
           .attr(
             "d",
             automaticGroup.select("path").attr("d") +
@@ -455,6 +457,8 @@ function drawLineChart({ title, description, names }) {
                 ""
               )
           )
+          .attr("fill", "url(#g)")
+          .attr("stroke", "none")
 
         automaticGroup
           .select("path")

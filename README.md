@@ -59,4 +59,4 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)        | pie, arc                   |
 | [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)       | bar, transition, animation |
 | [Seasonal Data](https://codepen.io/borntofrappe/pen/BadEeLE)                  | line chart, redesign       |
-| [Complete the Line Chart]()                                                   | line chart, interaction    |
+| [Complete the F1 Season](https://codepen.io/borntofrappe/pen/QWMeGWV)         | line chart, interaction    |
