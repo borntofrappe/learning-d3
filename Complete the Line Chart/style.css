@@ -22,6 +22,10 @@ p {
   line-height: 1.35;
 }
 
+a {
+  color: currentColor;
+}
+
 #root {
   max-width: 42rem;
   margin-left: auto;
@@ -30,11 +34,16 @@ p {
 }
 
 #root > * + * {
-  margin-top: 1em;
+  margin-top: 1.5em;
+}
+
+article {
+  display: flex;
+  flex-direction: column;
 }
 
 article > * + * {
-  margin-top: 0.5em;
+  margin-top: 0.75em;
 }
 
 article svg {
@@ -44,4 +53,20 @@ article svg {
   width: 100%;
   height: auto;
   display: block;
+}
+
+.notice {
+  align-self: center;
+  font-size: 0.9rem;
+  background: hsl(0, 0%, 20%, 0.08);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  border-bottom: 0.1rem solid currentColor;
 }

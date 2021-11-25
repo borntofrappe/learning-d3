@@ -48,35 +48,53 @@ const {
   schemeSet1,
   axisBottom,
   axisLeft,
+  easeQuadInOut,
 } = d3
 
 const root = select("body").append("div").attr("id", "root")
 root.append("h1").text("Complete the Line Chart")
-root.append("p").text("Let's focus on three battles in the 2020 F1 season.")
+root
+  .append("p")
+  .text(
+    "The 2020 F1 season crowned Lewis Hamilton with a seventh, record-equalliing title. Behind the dominating performance, it is possible to highlight a few interesting battles with interactive line charts."
+  )
 
-drawLineChart({
-  title: "Down to the wire",
+drawdataGroup({
+  title: "Who's on second?",
   description:
-    "Bottas and Verstappen were neck and neck leading up to round 7. Do you remember who took the lead in the second half of the season?",
+    "Bottas started out strong, with a victory in the very first round. Verstappen caught up by round 4, but stalled briefly at round 7. Who took the lead in the second half of the season?",
   names: ["Bottas", "Verstappen"],
 })
 
-drawLineChart({
-  title: "Change places",
+drawdataGroup({
+  title: "Change places!",
   description:
-    "Albon and Leclerc swapped places multiple times. Care to guess who eventually came out on top, perhaps even how?",
+    "Albon and Leclerc swapped places multiple times through the championship. Who made the deciding overtake in the very last rounds?",
   names: ["Albon", "Leclerc"],
 })
 
-drawLineChart({
-  title: "Equal terms",
+drawdataGroup({
+  title: "All tied up",
   description:
-    "Gasly and Stroll finished both with 75 points. Can you make up how Stroll reached the same level?",
-  names: ["Gasly", "Stroll"],
+    "Stroll and Gasly wrapped up the championship with 75 points each. How did Gasly achieve the same level?",
+  names: ["Stroll", "Gasly"],
 })
 
-function drawLineChart({ title, description, names }) {
+function drawdataGroup({ title, description, names }) {
   const data = names.map((name) => dataset.find((d) => d.name === name))
+
+  // draw a smaller set of points for the last driver
+  const referenceData = data.map((d, i, { length }) =>
+    Object.assign({}, d, {
+      points:
+        i < length - 1
+          ? d.points
+          : d.points.slice(0, Math.floor(d.points.length / 2)),
+    })
+  )
+
+  // the reference helps to 1. position the group for the second half and 2. extract the points for the last driver
+  const index = referenceData[referenceData.length - 1].points.length - 1
 
   const dimensions = {
     width: 450,
@@ -84,11 +102,11 @@ function drawLineChart({ title, description, names }) {
     margin: {
       top: 20,
       right: 20,
-      bottom: 30,
+      bottom: 25,
       left: 40,
     },
     legend: {
-      height: 50,
+      height: 40,
     },
   }
 
@@ -102,12 +120,13 @@ function drawLineChart({ title, description, names }) {
 
   const xScale = scalePoint()
     .domain(
-      Array(17)
+      Array(referenceData[0].points.length)
         .fill()
         .map((_, i) => i)
     )
     .range([0, dimensions.boundedWidth])
 
+  // the points describe the cumulative measure so it's enough to consider the last value
   const yScale = scaleLinear()
     .domain([
       0,
@@ -140,6 +159,15 @@ function drawLineChart({ title, description, names }) {
   const article = root.append("article")
   article.append("h2").text(title)
   article.append("p").text(description)
+
+  article
+    .append("div")
+    .attr("class", "notice")
+    .html(
+      `Complete the curve starting from round ${
+        index + 1
+      } and/or <button>show the line</button>.`
+    )
 
   const wrapper = article
     .append("svg")
@@ -174,7 +202,7 @@ function drawLineChart({ title, description, names }) {
 
   legendGroups
     .append("text")
-    .attr("fill", "currentColor")
+    .attr("fill", "hsl(0, 0%, 24%)")
     .attr("font-family", "inherit")
     .attr("font-size", "14")
     .attr("font-weight", "bold")
@@ -183,23 +211,28 @@ function drawLineChart({ title, description, names }) {
     .attr("y", "1")
     .text((d) => d.name)
 
-  const chartGroup = bounds
+  const dataGroup = bounds
     .append("g")
     .attr("transform", `translate(0 ${dimensions.legend.height})`)
 
-  const axisGroup = chartGroup.append("g")
-  const dataGroup = chartGroup.append("g")
+  const axisGroup = dataGroup.append("g")
+  const referenceGroup = dataGroup.append("g")
+  const highlightGroup = dataGroup.append("g")
 
-  const dataGroups = dataGroup.selectAll("g").data(data).join("g")
+  const referenceGroups = referenceGroup
+    .selectAll("g")
+    .data(referenceData)
+    .join("g")
 
-  dataGroups
+  referenceGroups
     .append("path")
     .attr("d", (d) => lineGenerator(d.points))
     .attr("fill", "none")
     .attr("stroke", (d) => colorScale(d))
     .attr("stroke-width", 2)
 
-  dataGroups
+  // add one circle for each end of the line
+  referenceGroups
     .append("circle")
     .attr("transform", (d) => `translate(${xScale(0)} ${yScale(d.points[0])})`)
     .attr("r", "4")
@@ -207,15 +240,7 @@ function drawLineChart({ title, description, names }) {
     .attr("stroke", (d) => colorScale(d))
     .attr("stroke-width", "2")
 
-  dataGroups
-    .append("circle")
-    .attr("transform", (d) => `translate(${xScale(0)} ${yScale(d.points[0])})`)
-    .attr("r", "4")
-    .attr("fill", "hsl(0, 0%, 100%)")
-    .attr("stroke", (d) => colorScale(d))
-    .attr("stroke-width", "2")
-
-  dataGroups
+  referenceGroups
     .append("circle")
     .attr(
       "transform",
@@ -239,7 +264,7 @@ function drawLineChart({ title, description, names }) {
   axisGroup.selectAll("path").remove()
   axisGroup
     .selectAll("text")
-    .attr("fill", "currentColor")
+    .attr("fill", "hsl(0, 0%, 42%)")
     .attr("font-family", "inherit")
     .attr("font-size", "12")
 
@@ -250,4 +275,76 @@ function drawLineChart({ title, description, names }) {
     .attr("fill", "none")
     .attr("stroke", "currentColor")
     .attr("stroke-width", "0.1")
+
+  highlightGroup.attr("transform", `translate(${xScale(index)} 0)`)
+
+  // highlightGroup
+  //   .append("rect")
+  //   .attr("width", dimensions.boundedWidth - xScale(index))
+  //   .attr("height", dimensions.boundedHeight)
+  //   .attr("opacity", "0")
+
+  // auto complete
+  article
+    .select("button")
+    .style("cursor", "pointer")
+    .on(
+      "click",
+      (e) => {
+        const d = data[data.length - 1]
+        const points = d.points.slice(index)
+
+        // add the path _before_ the circles
+        highlightGroup.append("path")
+
+        highlightGroup
+          .append("circle")
+          .attr("transform", (d) => `translate(0 ${yScale(points[0])})`)
+          .attr("r", "4")
+          .attr("fill", "hsl(0, 0%, 100%)")
+          .attr("stroke", colorScale(d.name))
+          .attr("stroke-width", "2")
+
+        highlightGroup
+          .append("circle")
+          .attr(
+            "transform",
+            (d) =>
+              `translate(${xScale(points.length - 1)} ${yScale(
+                points[points.length - 1]
+              )})`
+          )
+          .attr("r", "4")
+          .attr("fill", "hsl(0, 0%, 100%)")
+          .attr("stroke", colorScale(d.name))
+          .attr("stroke-width", "2")
+          .attr("opacity", "0")
+
+        highlightGroup
+          .select("path")
+          .attr("fill", "none")
+          .attr("stroke", colorScale(d.name))
+          .attr("stroke-width", "2")
+          .attr("d", lineGenerator(points))
+          .attr("stroke-dasharray", function () {
+            return this.getTotalLength()
+          })
+          .attr("stroke-dashoffset", function () {
+            return this.getTotalLength()
+          })
+          .transition()
+          .duration(1500)
+          .ease(easeQuadInOut)
+          .attr("stroke-dashoffset", 0)
+          .on("end", () => {
+            highlightGroup
+              .select("circle:nth-of-type(2)")
+              .transition()
+              .attr("opacity", "1")
+          })
+
+        select(e.currentTarget).style("cursor", "initial")
+      },
+      { once: true }
+    )
 }
