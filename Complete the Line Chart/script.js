@@ -49,6 +49,8 @@ const {
   axisBottom,
   axisLeft,
   easeQuadInOut,
+  pointer,
+  least,
 } = d3
 
 const root = select("body").append("div").attr("id", "root")
@@ -217,7 +219,12 @@ function drawdataGroup({ title, description, names }) {
 
   const axisGroup = dataGroup.append("g")
   const referenceGroup = dataGroup.append("g")
-  const highlightGroup = dataGroup.append("g")
+
+  const missingGroup = dataGroup
+    .append("g")
+    .attr("transform", `translate(${xScale(index)} 0)`)
+  const interactionGroup = missingGroup.append("g")
+  const autoGroup = missingGroup.append("g")
 
   const referenceGroups = referenceGroup
     .selectAll("g")
@@ -276,13 +283,141 @@ function drawdataGroup({ title, description, names }) {
     .attr("stroke", "currentColor")
     .attr("stroke-width", "0.1")
 
-  highlightGroup.attr("transform", `translate(${xScale(index)} 0)`)
+  // interaction
+  const selectedData = data[data.length - 1]
+  const selectedPoints = selectedData.points.slice(index)
 
-  // highlightGroup
-  //   .append("rect")
-  //   .attr("width", dimensions.boundedWidth - xScale(index))
-  //   .attr("height", dimensions.boundedHeight)
-  //   .attr("opacity", "0")
+  autoGroup
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", colorScale(selectedData.name))
+    .attr("stroke-width", "2")
+    .attr("d", lineGenerator(selectedPoints))
+    .attr("stroke-dasharray", function () {
+      return this.getTotalLength()
+    })
+    .attr("stroke-dashoffset", function () {
+      return this.getTotalLength()
+    })
+
+  autoGroup
+    .append("circle")
+    .attr("transform", `translate(0 ${yScale(selectedPoints[0])})`)
+    .attr("r", "4")
+    .attr("fill", "hsl(0, 0%, 100%)")
+    .attr("stroke", colorScale(selectedData.name))
+    .attr("stroke-width", "2")
+
+  autoGroup
+    .append("circle")
+    .attr(
+      "transform",
+
+      `translate(${xScale(selectedPoints.length - 1)} ${yScale(
+        selectedPoints[selectedPoints.length - 1]
+      )})`
+    )
+    .attr("r", "4")
+    .attr("fill", "hsl(0, 0%, 100%)")
+    .attr("stroke", colorScale(selectedData.name))
+    .attr("stroke-width", "2")
+    .attr("opacity", "0")
+
+  // interaction
+  const interactionRounds = xScale.domain().length - index - 1
+  const interactionPoints = Object.fromEntries(
+    Array(interactionRounds)
+      .fill()
+      .map((_, i) => [i])
+  )
+
+  interactionGroup
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", colorScale(selectedData.name))
+    .attr("stroke-width", "1.5")
+
+  let isMousedown = false
+  const interactionWidth = dimensions.boundedWidth - xScale(index)
+  const roundWidth = interactionWidth / interactionRounds
+
+  missingGroup
+    .append("rect")
+    .attr("width", interactionWidth)
+    .attr("height", dimensions.boundedHeight)
+    .attr("opacity", "0")
+    .style("cursor", "pointer")
+    .on("mousedown", (e) => {
+      e.preventDefault()
+      isMousedown = true
+    })
+    .on("mouseup", (e) => {
+      isMousedown = false
+    })
+    .on("mouseleave", () => {
+      isMousedown = false
+    })
+    .on("mousemove", (e) => {
+      if (isMousedown) {
+        const [x, y] = pointer(e)
+        const round = Math.floor(x / roundWidth)
+        if (!interactionPoints[round]) {
+          interactionPoints[round] = Math.floor(yScale.invert(y))
+
+          const points = Object.values(interactionPoints).filter((d) => d)
+
+          interactionGroup.select("path").attr(
+            "d",
+            points.reduce(
+              (acc, curr, i) => `${acc} ${xScale(i + 1)} ${yScale(curr)}`,
+              `M ${xScale(0)} ${yScale(data[data.length - 1].points[index])}`
+            )
+          )
+
+          interactionGroup
+            .selectAll("circle")
+            .data(points)
+            .join("circle")
+            .attr(
+              "transform",
+              (d, i) => `translate(${xScale(i + 1)} ${yScale(d)})`
+            )
+            .attr("r", "3")
+            .attr("fill", colorScale(selectedData.name))
+
+          if (points.length === interactionRounds) {
+            select(e.currentTarget)
+              .style("cursor", "initial")
+              .on("mousedown", null)
+              .on("mouseup", null)
+              .on("mouseleave", null)
+              .on("mousemove", null)
+
+            autoGroup
+              .select("path")
+              .transition()
+              .delay(150)
+              .duration(1500)
+              .ease(easeQuadInOut)
+              .attr("stroke-dashoffset", 0)
+              .on("end", () => {
+                autoGroup
+                  .select("circle:nth-of-type(2)")
+                  .transition()
+                  .attr("opacity", "1")
+
+                // area chart
+              })
+
+            article
+              .select("button")
+              .style("cursor", "initial")
+              .style("border-bottom-color", "transparent")
+              .on("click", null)
+          }
+        }
+      }
+    })
 
   // auto complete
   article
@@ -291,59 +426,30 @@ function drawdataGroup({ title, description, names }) {
     .on(
       "click",
       (e) => {
-        const d = data[data.length - 1]
-        const points = d.points.slice(index)
-
-        // add the path _before_ the circles
-        highlightGroup.append("path")
-
-        highlightGroup
-          .append("circle")
-          .attr("transform", (d) => `translate(0 ${yScale(points[0])})`)
-          .attr("r", "4")
-          .attr("fill", "hsl(0, 0%, 100%)")
-          .attr("stroke", colorScale(d.name))
-          .attr("stroke-width", "2")
-
-        highlightGroup
-          .append("circle")
-          .attr(
-            "transform",
-            (d) =>
-              `translate(${xScale(points.length - 1)} ${yScale(
-                points[points.length - 1]
-              )})`
-          )
-          .attr("r", "4")
-          .attr("fill", "hsl(0, 0%, 100%)")
-          .attr("stroke", colorScale(d.name))
-          .attr("stroke-width", "2")
-          .attr("opacity", "0")
-
-        highlightGroup
+        autoGroup
           .select("path")
-          .attr("fill", "none")
-          .attr("stroke", colorScale(d.name))
-          .attr("stroke-width", "2")
-          .attr("d", lineGenerator(points))
-          .attr("stroke-dasharray", function () {
-            return this.getTotalLength()
-          })
-          .attr("stroke-dashoffset", function () {
-            return this.getTotalLength()
-          })
           .transition()
           .duration(1500)
           .ease(easeQuadInOut)
           .attr("stroke-dashoffset", 0)
           .on("end", () => {
-            highlightGroup
+            autoGroup
               .select("circle:nth-of-type(2)")
               .transition()
               .attr("opacity", "1")
           })
 
-        select(e.currentTarget).style("cursor", "initial")
+        missingGroup
+          .select("rect")
+          .style("cursor", "initial")
+          .on("mousedown", null)
+          .on("mouseup", null)
+          .on("mouseleave", null)
+          .on("mousemove", null)
+
+        select(e.currentTarget)
+          .style("cursor", "initial")
+          .style("border-bottom-color", "transparent")
       },
       { once: true }
     )
