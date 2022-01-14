@@ -406,5 +406,140 @@ function drawViolinPlot() {
   xAxisGroup.selectAll("text").attr("font-size", 12);
 }
 
+function drawDensityPlot(keys) {
+  const dataKeys = data.filter(({ key }) => keys.includes(key));
+  console.log(dataKeys);
+
+  const dimensions = {
+    width: 600,
+    height: 500,
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 40,
+      left: 20,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, 100])
+    .range([0, dimensions.boundedWidth]);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain([
+      0,
+      d3.max(dataKeys.map(({ points }) => d3.max(points, (d) => d[1]))),
+    ])
+    .range([dimensions.boundedHeight, 0])
+    .nice();
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(data.map(({ key }) => key))
+    .range(
+      data.map((_, i, { length }) => d3.interpolateRainbow((1 / length) * i))
+    );
+
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
+  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+
+  const article = main.append("article");
+  article.append("h2").text("Density plot");
+
+  const wrapper = article
+    .append("svg")
+    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height);
+
+  const bounds = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
+
+  const axisGroup = bounds.append("g");
+  const dataGroup = bounds.append("g");
+
+  const densityPlots = dataGroup.selectAll("g").data(dataKeys).join("g");
+
+  const densityPlot = densityPlots
+    .append("g")
+    .style("color", ({ key }) => colorScale(key));
+
+  const line = d3
+    .line()
+    .x((d) => xScale(d[0]))
+    .y((d) => yScale(d[1]))
+    .curve(d3.curveCatmullRom);
+
+  const area = d3
+    .area()
+    .x((d) => xScale(d[0]))
+    .y0(yScale(0))
+    .y1((d) => yScale(d[1]))
+    .curve(d3.curveCatmullRom);
+
+  densityPlot
+    .append("path")
+    .attr("fill", "currentColor")
+    .attr("d", ({ points }) => area(points))
+    .attr("opacity", 0.5);
+
+  densityPlot
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 2)
+    .attr("d", ({ points }) => line(points));
+
+  const xAxisGroup = axisGroup
+    .append("g")
+    .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
+    .call(xAxis);
+
+  const yAxisGroup = axisGroup.append("g").call(yAxis);
+
+  axisGroup.selectAll("path").remove();
+
+  xAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 0.1)
+    .attr("d", `M 0 0 v -${dimensions.boundedHeight}`);
+
+  xAxisGroup
+    .selectAll("text")
+    .attr("font-size", 12)
+    .attr("font-family", "inherit")
+    .attr("fill", "currentColor");
+
+  yAxisGroup.selectAll("text").remove();
+
+  yAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.1")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`);
+}
+
 drawBoxPlot();
 drawViolinPlot();
+drawDensityPlot([
+  "Almost No Chance",
+  "About Even",
+  "Probable",
+  "Almost Certainly",
+]);
