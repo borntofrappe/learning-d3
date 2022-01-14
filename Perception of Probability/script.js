@@ -102,6 +102,16 @@ const data = Object.entries(dataset)
     const variance = d3.variance(values);
     const deviation = d3.deviation(values);
 
+    const points = Array(20)
+      .fill()
+      .map((_, i, { length }) => {
+        const x = min + ((max - min) * i) / (length - 1);
+        const y =
+          (1 / (deviation * (2 * Math.PI) ** 0.5)) *
+          2.71828 ** ((-1 / 2) * ((x - mean) / deviation) ** 2);
+        return [x, y];
+      });
+
     return {
       key,
       values,
@@ -113,6 +123,7 @@ const data = Object.entries(dataset)
       deviation,
       min,
       max,
+      points,
     };
   })
   .sort((a, b) => b.mean > a.mean);
@@ -275,4 +286,125 @@ function drawBoxPlot() {
   xAxisGroup.selectAll("text").attr("font-size", 12);
 }
 
+function drawViolinPlot() {
+  const dimensions = {
+    width: 600,
+    height: 600,
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 140,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+  const yAccessor = (d) => d.key;
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, 100])
+    .range([0, dimensions.boundedWidth]);
+
+  const yScale = d3
+    .scaleBand()
+    .domain(data.map(yAccessor))
+    .range([0, dimensions.boundedHeight]);
+
+  const sizeScale = d3
+    .scaleLinear()
+    .domain([0, d3.max(data.map(({ points }) => d3.max(points, (d) => d[1])))])
+    .range([0, yScale.bandwidth()]);
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(data.map(({ key }) => key))
+    .range(
+      data.map((_, i, { length }) => d3.interpolateRainbow((1 / length) * i))
+    );
+
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
+  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+
+  const article = main.append("article");
+  article.append("h2").text("Box plot");
+
+  const wrapper = article
+    .append("svg")
+    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height);
+
+  const bounds = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
+
+  const axisGroup = bounds.append("g");
+  const dataGroup = bounds.append("g");
+
+  const violinPlots = dataGroup
+    .selectAll("g")
+    .data(data)
+    .join("g")
+    .attr(
+      "transform",
+      (d) => `translate(0 ${yScale(yAccessor(d)) + yScale.bandwidth() / 2})`
+    );
+
+  const violinPlot = violinPlots.append("g");
+
+  const area = d3
+    .area()
+    .x((d) => xScale(d[0]))
+    .y0((d) => sizeScale(d[1]) * -1)
+    .y1((d) => sizeScale(d[1]));
+
+  console.log(sizeScale.domain());
+
+  violinPlot
+    .append("path")
+    .attr("fill", ({ key }) => colorScale(key))
+    .attr("d", ({ points }) => area(points)); // kernel density function
+
+  const xAxisGroup = axisGroup
+    .append("g")
+    .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
+    .call(xAxis);
+
+  const yAxisGroup = axisGroup.append("g").call(yAxis);
+
+  axisGroup.selectAll("path").remove();
+
+  xAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 0.1)
+    .attr("d", `M 0 0 v -${dimensions.boundedHeight}`);
+
+  yAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.1")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`);
+
+  axisGroup
+    .selectAll("text")
+    .attr("font-size", 14)
+    .attr("font-family", "inherit")
+    .attr("fill", "currentColor");
+
+  xAxisGroup.selectAll("text").attr("font-size", 12);
+}
+
 drawBoxPlot();
+drawViolinPlot();
