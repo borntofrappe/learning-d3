@@ -1,4 +1,4 @@
-const data = {
+const dataset = {
   "Almost Certainly": [
     95.0, 95.0, 95.0, 95.0, 98.0, 95.0, 85.0, 97.0, 95.0, 90.0, 90.0, 99.0,
     60.0, 88.7, 99.0, 95.0, 97.0, 99.0, 95.0, 95.0, 90.0, 92.0, 98.0, 98.0,
@@ -90,3 +90,189 @@ const data = {
     2.0, 5.0,
   ],
 };
+
+const data = Object.entries(dataset)
+  .map(([key, values]) => {
+    const mean = d3.mean(values);
+    const min = d3.min(values);
+    const max = d3.max(values);
+    const q1 = d3.quantile(values, 0.25);
+    const q3 = d3.quantile(values, 0.75);
+    const iqr = q3 - q1;
+    const variance = d3.variance(values);
+    const deviation = d3.deviation(values);
+
+    return {
+      key,
+      values,
+      mean,
+      q1,
+      q3,
+      iqr,
+      variance,
+      deviation,
+      min,
+      max,
+    };
+  })
+  .sort((a, b) => b.mean > a.mean);
+
+const main = d3.select("body").append("main");
+main.append("h1").text("Perception of Probability");
+
+function drawBoxPlot() {
+  const dimensions = {
+    width: 600,
+    height: 600,
+    margin: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 140,
+    },
+  };
+
+  dimensions.boundedWidth =
+    dimensions.width - (dimensions.margin.left + dimensions.margin.right);
+  dimensions.boundedHeight =
+    dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
+
+  const yAccessor = (d) => d.key;
+  const xScale = d3
+    .scaleLinear()
+    .domain([0, 100])
+    .range([0, dimensions.boundedWidth]);
+
+  const yScale = d3
+    .scaleBand()
+    .domain(data.map(yAccessor))
+    .range([0, dimensions.boundedHeight])
+    .padding(0.35);
+
+  const colorScale = d3
+    .scaleOrdinal()
+    .domain(data.map(({ key }) => key))
+    .range(
+      data.map((_, i, { length }) =>
+        d3.interpolateRainbow(0.15 + (1 / length) * 0.7 * i)
+      )
+    );
+
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
+  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+
+  const article = main.append("article");
+  article.append("h2").text("Box plot");
+
+  const wrapper = article
+    .append("svg")
+    .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+    .attr("width", dimensions.width)
+    .attr("height", dimensions.height);
+
+  const bounds = wrapper
+    .append("g")
+    .attr(
+      "transform",
+      `translate(${dimensions.margin.left} ${dimensions.margin.top})`
+    );
+
+  const axisGroup = bounds.append("g");
+  const dataGroup = bounds.append("g");
+
+  const boxPlots = dataGroup
+    .selectAll("g")
+    .data(data)
+    .join("g")
+    .attr(
+      "transform",
+      (d) => `translate(0 ${yScale(yAccessor(d)) + yScale.bandwidth() / 2})`
+    );
+
+  /*
+  boxPlots
+    .append("text")
+    .attr("x", -5)
+    .attr("fill", "currentColor")
+    .attr("text-anchor", "end")
+    .attr("dominant-baseline", "middle")
+    .text((d) => yAccessor(d));
+  */
+
+  const boxPlot = boxPlots.append("g");
+
+  boxPlot
+    .append("path")
+    .attr("fill", ({ key }) => colorScale(key))
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 1)
+    .attr("d", ({ q1, mean, q3, iqr }) => {
+      const [min, max] = xScale.domain();
+      const o1 = d3.max([min, mean - iqr * 1.5]);
+      const o2 = d3.min([max, mean + iqr * 1.5]);
+
+      return `M ${xScale(o1)} 0 H ${xScale(q1)} v ${
+        yScale.bandwidth() / 2
+      } H ${xScale(q3)} v -${yScale.bandwidth() / 2} H ${xScale(o2)} H ${xScale(
+        q3
+      )} v -${yScale.bandwidth() / 2} H ${xScale(q1)} v ${
+        yScale.bandwidth() / 2
+      }`;
+    });
+
+  boxPlot
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 3)
+    .attr(
+      "d",
+      ({ mean }) =>
+        `M ${xScale(mean)} -${yScale.bandwidth() / 2} v ${yScale.bandwidth()}`
+    );
+
+  boxPlot
+    .selectAll("circle")
+    .data(({ values, mean, iqr }) =>
+      values.filter((d) => d < mean - iqr * 1.5 || d > mean + iqr * 1.5)
+    )
+    .join("circle")
+    .attr("fill", "currentColor")
+    .attr("r", 2)
+    .attr("transform", (d) => `translate(${xScale(d)} 0)`);
+
+  const xAxisGroup = axisGroup
+    .append("g")
+    .attr("transform", `translate(0 ${dimensions.boundedHeight})`)
+    .call(xAxis);
+
+  const yAxisGroup = axisGroup.append("g").call(yAxis);
+
+  axisGroup.selectAll("path").remove();
+
+  xAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", 0.1)
+    .attr("d", `M 0 0 v -${dimensions.boundedHeight}`);
+
+  yAxisGroup
+    .selectAll("g.tick")
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.1")
+    .attr("d", `M 0 0 h ${dimensions.boundedWidth}`);
+
+  axisGroup
+    .selectAll("text")
+    .attr("font-size", 14)
+    .attr("font-family", "inherit")
+    .attr("fill", "currentColor");
+
+  xAxisGroup.selectAll("text").attr("font-size", 12);
+}
+
+drawBoxPlot();
