@@ -91,55 +91,59 @@ const dataset = {
   ],
 };
 
-const data = Object.entries(dataset)
-  .map(([key, values]) => {
-    const mean = d3.mean(values);
-    const min = d3.min(values);
-    const max = d3.max(values);
-    const q1 = d3.quantile(values, 0.25);
-    const q3 = d3.quantile(values, 0.75);
-    const iqr = q3 - q1;
-    const variance = d3.variance(values);
-    const deviation = d3.deviation(values);
-
-    const points = Array(20)
-      .fill()
-      .map((_, i, { length }) => {
-        const x = min + ((max - min) * i) / (length - 1);
-        const y =
-          (1 / (deviation * (2 * Math.PI) ** 0.5)) *
-          2.71828 ** ((-1 / 2) * ((x - mean) / deviation) ** 2);
-        return [x, y];
-      });
-
-    return {
-      key,
-      values,
-      mean,
-      q1,
-      q3,
-      iqr,
-      variance,
-      deviation,
-      min,
-      max,
-      points,
-    };
-  })
-  .sort((a, b) => b.mean > a.mean);
+function normalDistribution(x, mean, deviation) {
+  return (
+    (1 / (deviation * (2 * Math.PI) ** 0.5)) *
+    2.71828 ** ((-1 / 2) * ((x - mean) / deviation) ** 2)
+  );
+}
 
 const main = d3.select("body").append("main");
 main.append("h1").text("Perception of Probability");
+main
+  .append("p")
+  .html(
+    "<a href='https://www.data-to-viz.com/story/OneNumOneCatSeveralObs.html'>From data to Viz</a> highlights several types of visualizations to analyse numerical and categorical variables."
+  );
+
+const keys = Object.keys(dataset);
+
+const colorScale = d3
+  .scaleOrdinal()
+  .domain(keys)
+  .range(
+    keys.map((_, i, { length }) =>
+      d3.interpolateRainbow((1 / (length + 1)) * i)
+    )
+  );
 
 function drawBoxPlot() {
+  const data = Object.entries(dataset)
+    .map(([key, values]) => {
+      const mean = d3.mean(values);
+      const q1 = d3.quantile(values, 0.25);
+      const q3 = d3.quantile(values, 0.75);
+      const iqr = q3 - q1;
+
+      return {
+        key,
+        values,
+        mean,
+        q1,
+        q3,
+        iqr,
+      };
+    })
+    .sort((a, b) => b.mean > a.mean);
+
   const dimensions = {
     width: 600,
     height: 600,
     margin: {
       top: 20,
       right: 20,
-      bottom: 20,
-      left: 140,
+      bottom: 45,
+      left: 120,
     },
   };
 
@@ -148,32 +152,31 @@ function drawBoxPlot() {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-  const yAccessor = (d) => d.key;
   const xScale = d3
     .scaleLinear()
     .domain([0, 100])
     .range([0, dimensions.boundedWidth]);
 
+  const [min, max] = xScale.domain();
+
   const yScale = d3
     .scaleBand()
-    .domain(data.map(yAccessor))
+    .domain(data.map(({ key }) => key))
     .range([0, dimensions.boundedHeight])
     .padding(0.35);
 
-  const colorScale = d3
-    .scaleOrdinal()
-    .domain(data.map(({ key }) => key))
-    .range(
-      data.map((_, i, { length }) =>
-        d3.interpolateRainbow(0.15 + (1 / length) * 0.7 * i)
-      )
-    );
+  const bandwidth = yScale.bandwidth();
 
-  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
-  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(5);
+  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(5);
 
   const article = main.append("article");
   article.append("h2").text("Box plot");
+  article
+    .append("p")
+    .text(
+      "A box plot summarises the distribution of the numerical variable through its main features: mean, first and last quartiles, outliers."
+    );
 
   const wrapper = article
     .append("svg")
@@ -189,6 +192,7 @@ function drawBoxPlot() {
     );
 
   const axisGroup = bounds.append("g");
+  const labelsGroup = bounds.append("g");
   const dataGroup = bounds.append("g");
 
   const boxPlots = dataGroup
@@ -197,17 +201,17 @@ function drawBoxPlot() {
     .join("g")
     .attr(
       "transform",
-      (d) => `translate(0 ${yScale(yAccessor(d)) + yScale.bandwidth() / 2})`
+      ({ key }) => `translate(0 ${yScale(key) + bandwidth / 2})`
     );
 
-  /*
+  /* labels are included through the axis
   boxPlots
     .append("text")
     .attr("x", -5)
     .attr("fill", "currentColor")
     .attr("text-anchor", "end")
     .attr("dominant-baseline", "middle")
-    .text((d) => yAccessor(d));
+    .text(({key}) => key);
   */
 
   const boxPlot = boxPlots.append("g");
@@ -216,26 +220,23 @@ function drawBoxPlot() {
     .append("path")
     .attr("fill", ({ key }) => colorScale(key))
     .attr("stroke", "currentColor")
-    .attr("stroke-width", 1)
-    .attr("d", ({ q1, mean, q3, iqr }) => {
-      const [min, max] = xScale.domain();
+    .attr("stroke-width", 0.75)
+    .attr("d", ({ mean, q1, q3, iqr }) => {
       const o1 = d3.max([min, mean - iqr * 1.5]);
       const o2 = d3.min([max, mean + iqr * 1.5]);
 
-      return `M ${xScale(o1)} 0 H ${xScale(q1)} v ${
-        yScale.bandwidth() / 2
-      } H ${xScale(q3)} v -${yScale.bandwidth() / 2} H ${xScale(o2)} H ${xScale(
+      return `M ${xScale(o1)} 0 H ${xScale(q1)} v ${bandwidth / 2} H ${xScale(
         q3
-      )} v -${yScale.bandwidth() / 2} H ${xScale(q1)} v ${
-        yScale.bandwidth() / 2
-      }`;
+      )} v -${bandwidth / 2} H ${xScale(o2)} H ${xScale(q3)} v -${
+        bandwidth / 2
+      } H ${xScale(q1)} v ${bandwidth / 2}`;
     });
 
   boxPlot
     .append("path")
     .attr("fill", "none")
     .attr("stroke", "currentColor")
-    .attr("stroke-width", 3)
+    .attr("stroke-width", 2)
     .attr(
       "d",
       ({ mean }) =>
@@ -249,7 +250,7 @@ function drawBoxPlot() {
     )
     .join("circle")
     .attr("fill", "currentColor")
-    .attr("r", 2)
+    .attr("r", 2.5)
     .attr("transform", (d) => `translate(${xScale(d)} 0)`);
 
   const xAxisGroup = axisGroup
@@ -279,22 +280,56 @@ function drawBoxPlot() {
 
   axisGroup
     .selectAll("text")
-    .attr("font-size", 14)
+    .attr("font-size", 13)
     .attr("font-family", "inherit")
     .attr("fill", "currentColor");
 
-  xAxisGroup.selectAll("text").attr("font-size", 12);
+  labelsGroup
+    .append("text")
+    .attr(
+      "transform",
+      `translate(${dimensions.boundedWidth} ${
+        dimensions.boundedHeight + dimensions.margin.bottom - 5
+      })`
+    )
+    .attr("fill", "currentColor")
+    .attr("font-size", 15)
+    .attr("text-anchor", "end")
+    .text("Assigned probability (%)");
 }
 
 function drawViolinPlot() {
+  const data = Object.entries(dataset)
+    .map(([key, values]) => {
+      const mean = d3.mean(values);
+      const min = d3.min(values);
+      const max = d3.max(values);
+      const deviation = d3.deviation(values);
+
+      const points = Array(20)
+        .fill()
+        .map((_, i, { length }) => {
+          const x = min + ((max - min) * i) / (length - 1);
+          const y = normalDistribution(x, mean, deviation);
+          return [x, y];
+        });
+
+      return {
+        key,
+        mean,
+        points,
+      };
+    })
+    .sort((a, b) => b.mean > a.mean);
+
   const dimensions = {
     width: 600,
     height: 600,
     margin: {
       top: 20,
       right: 20,
-      bottom: 20,
-      left: 140,
+      bottom: 45,
+      left: 120,
     },
   };
 
@@ -303,7 +338,6 @@ function drawViolinPlot() {
   dimensions.boundedHeight =
     dimensions.height - (dimensions.margin.top + dimensions.margin.bottom);
 
-  const yAccessor = (d) => d.key;
   const xScale = d3
     .scaleLinear()
     .domain([0, 100])
@@ -311,26 +345,33 @@ function drawViolinPlot() {
 
   const yScale = d3
     .scaleBand()
-    .domain(data.map(yAccessor))
+    .domain(data.map(({ key }) => key))
     .range([0, dimensions.boundedHeight]);
+
+  const bandwidth = yScale.bandwidth();
 
   const sizeScale = d3
     .scaleLinear()
-    .domain([0, d3.max(data.map(({ points }) => d3.max(points, (d) => d[1])))])
-    .range([0, yScale.bandwidth()]);
+    .domain([0, d3.max(data.map(({ points }) => d3.max(points, ([, y]) => y)))])
+    .range([0, bandwidth]);
 
-  const colorScale = d3
-    .scaleOrdinal()
-    .domain(data.map(({ key }) => key))
-    .range(
-      data.map((_, i, { length }) => d3.interpolateRainbow((1 / length) * i))
-    );
+  const area = d3
+    .area()
+    .x(([x]) => xScale(x))
+    .y0(([, y]) => sizeScale(y * -1))
+    .y1(([, y]) => sizeScale(y))
+    .curve(d3.curveCatmullRom);
 
-  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
-  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(5);
+  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(5);
 
   const article = main.append("article");
-  article.append("h2").text("Box plot");
+  article.append("h2").text("Violin plot");
+  article
+    .append("p")
+    .text(
+      "A violin plot focuses on the distribution of the numerical variable with the inclusion of kernel density plots."
+    );
 
   const wrapper = article
     .append("svg")
@@ -346,6 +387,7 @@ function drawViolinPlot() {
     );
 
   const axisGroup = bounds.append("g");
+  const labelsGroup = bounds.append("g");
   const dataGroup = bounds.append("g");
 
   const violinPlots = dataGroup
@@ -354,23 +396,15 @@ function drawViolinPlot() {
     .join("g")
     .attr(
       "transform",
-      (d) => `translate(0 ${yScale(yAccessor(d)) + yScale.bandwidth() / 2})`
+      ({ key }) => `translate(0 ${yScale(key) + bandwidth / 2})`
     );
 
   const violinPlot = violinPlots.append("g");
 
-  const area = d3
-    .area()
-    .x((d) => xScale(d[0]))
-    .y0((d) => sizeScale(d[1]) * -1)
-    .y1((d) => sizeScale(d[1]));
-
-  console.log(sizeScale.domain());
-
   violinPlot
     .append("path")
     .attr("fill", ({ key }) => colorScale(key))
-    .attr("d", ({ points }) => area(points)); // kernel density function
+    .attr("d", ({ points }) => area(points));
 
   const xAxisGroup = axisGroup
     .append("g")
@@ -399,25 +433,58 @@ function drawViolinPlot() {
 
   axisGroup
     .selectAll("text")
-    .attr("font-size", 14)
+    .attr("font-size", 13)
     .attr("font-family", "inherit")
     .attr("fill", "currentColor");
 
-  xAxisGroup.selectAll("text").attr("font-size", 12);
+  labelsGroup
+    .append("text")
+    .attr(
+      "transform",
+      `translate(${dimensions.boundedWidth} ${
+        dimensions.boundedHeight + dimensions.margin.bottom - 5
+      })`
+    )
+    .attr("fill", "currentColor")
+    .attr("font-size", 15)
+    .attr("text-anchor", "end")
+    .text("Assigned probability (%)");
 }
 
 function drawDensityPlot(keys) {
-  const dataKeys = data.filter(({ key }) => keys.includes(key));
-  console.log(dataKeys);
+  const data = Object.entries(dataset)
+    .filter(([key]) => keys.includes(key))
+    .map(([key, values]) => {
+      const mean = d3.mean(values);
+      const min = d3.min(values);
+      const max = d3.max(values);
+      const deviation = d3.deviation(values);
+
+      const points = Array(20)
+        .fill()
+        .map((_, i, { length }) => {
+          const x = min + ((max - min) * i) / (length - 1);
+          const y = normalDistribution(x, mean, deviation);
+          return [x, y];
+        });
+
+      return {
+        key,
+        mean,
+        deviation,
+        points,
+      };
+    })
+    .sort((a, b) => b.mean > a.mean);
 
   const dimensions = {
-    width: 600,
-    height: 500,
+    width: 400,
+    height: 300,
     margin: {
       top: 20,
       right: 20,
-      bottom: 40,
-      left: 20,
+      bottom: 20,
+      left: 60,
     },
   };
 
@@ -433,25 +500,20 @@ function drawDensityPlot(keys) {
 
   const yScale = d3
     .scaleLinear()
-    .domain([
-      0,
-      d3.max(dataKeys.map(({ points }) => d3.max(points, (d) => d[1]))),
-    ])
+    .domain([0, d3.max(data.map(({ points }) => d3.max(points, ([, y]) => y)))])
     .range([dimensions.boundedHeight, 0])
     .nice();
 
-  const colorScale = d3
-    .scaleOrdinal()
-    .domain(data.map(({ key }) => key))
-    .range(
-      data.map((_, i, { length }) => d3.interpolateRainbow((1 / length) * i))
-    );
-
-  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(10);
-  const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(7.5);
+  const xAxis = d3.axisBottom(xScale).ticks(6).tickSize(0).tickPadding(7.5);
+  const yAxis = d3.axisLeft(yScale).ticks(5).tickSize(0).tickPadding(7.5);
 
   const article = main.append("article");
-  article.append("h2").text("Density plot");
+  article.append("h2").text("Kernel density plot");
+  article
+    .append("p")
+    .text(
+      "A kernel density plot is effective to illustrate and compare the distribution for a handful of categories."
+    );
 
   const wrapper = article
     .append("svg")
@@ -467,9 +529,10 @@ function drawDensityPlot(keys) {
     );
 
   const axisGroup = bounds.append("g");
+  const labelsGroup = bounds.append("g");
   const dataGroup = bounds.append("g");
 
-  const densityPlots = dataGroup.selectAll("g").data(dataKeys).join("g");
+  const densityPlots = dataGroup.selectAll("g").data(data).join("g");
 
   const densityPlot = densityPlots
     .append("g")
@@ -477,15 +540,15 @@ function drawDensityPlot(keys) {
 
   const line = d3
     .line()
-    .x((d) => xScale(d[0]))
-    .y((d) => yScale(d[1]))
+    .x(([x]) => xScale(x))
+    .y(([, y]) => yScale(y))
     .curve(d3.curveCatmullRom);
 
   const area = d3
     .area()
-    .x((d) => xScale(d[0]))
+    .x(([x]) => xScale(x))
     .y0(yScale(0))
-    .y1((d) => yScale(d[1]))
+    .y1(([, y]) => yScale(y))
     .curve(d3.curveCatmullRom);
 
   densityPlot
@@ -500,6 +563,21 @@ function drawDensityPlot(keys) {
     .attr("stroke", "currentColor")
     .attr("stroke-width", 2)
     .attr("d", ({ points }) => line(points));
+
+  densityPlot
+    .append("text")
+    .attr("font-weight", "bold")
+    .attr("transform", ({ mean, deviation }) => {
+      return `translate(${xScale(mean)} ${
+        yScale(normalDistribution(mean, mean, deviation)) - 7
+      })`;
+    })
+    .attr("font-size", 14)
+    .attr("text-anchor", ({ mean }) =>
+      xScale(mean) > dimensions.boundedWidth / 2 ? "end" : "start"
+    )
+    .attr("fill", ({ key }) => colorScale(key))
+    .text(({ key }) => key);
 
   const xAxisGroup = axisGroup
     .append("g")
@@ -518,14 +596,6 @@ function drawDensityPlot(keys) {
     .attr("stroke-width", 0.1)
     .attr("d", `M 0 0 v -${dimensions.boundedHeight}`);
 
-  xAxisGroup
-    .selectAll("text")
-    .attr("font-size", 12)
-    .attr("font-family", "inherit")
-    .attr("fill", "currentColor");
-
-  yAxisGroup.selectAll("text").remove();
-
   yAxisGroup
     .selectAll("g.tick")
     .append("path")
@@ -533,6 +603,23 @@ function drawDensityPlot(keys) {
     .attr("stroke", "currentColor")
     .attr("stroke-width", "0.1")
     .attr("d", `M 0 0 h ${dimensions.boundedWidth}`);
+
+  axisGroup
+    .selectAll("text")
+    .attr("font-size", 13)
+    .attr("font-family", "inherit")
+    .attr("fill", "currentColor");
+
+  labelsGroup
+    .append("text")
+    .attr(
+      "transform",
+      `translate(${-dimensions.margin.left + 15} 0) rotate(-90)`
+    )
+    .attr("fill", "currentColor")
+    .attr("font-size", 15)
+    .attr("text-anchor", "end")
+    .text("Assigned probability (%)");
 }
 
 drawBoxPlot();
