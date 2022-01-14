@@ -512,7 +512,7 @@ function drawDensityPlot(keys) {
   article
     .append("p")
     .text(
-      "A kernel density plot is effective to illustrate and compare the distribution for a handful of categories."
+      "A single kernel density plot is effective to illustrate and compare the distribution for a handful of categories."
     );
 
   const wrapper = article

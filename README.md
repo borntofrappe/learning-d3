@@ -35,6 +35,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | Geo Practice                                                                  | geo, topojson           |
 | [Ideal Lap Analysis](https://codepen.io/borntofrappe/pen/YzxMKXj)             | structure               |
 | [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)                 | line, interaction       |
+| [Perception of Probability](https://codepen.io/borntofrappe/pen/LYzqpwX)      | numerical, categorical  |
 
 A table worth of projects leaning on D3 to create interesting visualizations.
 
