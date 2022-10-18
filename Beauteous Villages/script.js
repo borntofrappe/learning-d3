@@ -23,12 +23,13 @@ svg
 
 // REQUIRE A SERVER TO BYPASS CORS
 (async () => {
-  const json = await d3.json("france.json");
+  const dataGeo = await d3.json("geo.json");
+  const dataVillages = await d3.json("villages.json");
 
   const projection = d3
     .geoIdentity()
     .reflectY(true)
-    .fitSize([size, size], json);
+    .fitSize([size, size], dataGeo);
 
   const path = d3.geoPath().projection(projection);
 
@@ -42,22 +43,44 @@ svg
     .attr("opacity", "0")
     .remove()
     .on("end", () => {
-      const group = svg.append("g");
+      const groupData = svg.append("g");
+      const groupGeo = groupData.append("g");
+      const groupVillages = groupData.append("g");
 
-      group
+      groupData
         .attr("opacity", "0")
         .transition()
         .duration(500)
         .ease(d3.easeQuadIn)
         .attr("opacity", "1");
 
-      group
+      groupGeo
         .selectAll("path")
-        .data(json.features)
+        .data(dataGeo.features)
         .enter()
         .append("path")
         .attr("d", path)
-        .attr("fill", "hsl(0, 0%, 37%)")
-        .attr("stroke", "hsl(0, 0%, 97%)");
+        .attr("fill", "hsl(0, 0%, 92%)")
+        .attr("stroke", "hsl(0, 0%, 27%)")
+        .attr("stroke-width", "0.75");
+
+      const groupsVillages = groupVillages
+        .selectAll("g")
+        .data(dataVillages.values)
+        .enter()
+        .append("g")
+        .attr(
+          "transform",
+          ({ longitude, latitude }) =>
+            `translate(${projection([
+              parseFloat(longitude),
+              parseFloat(latitude),
+            ])})`
+        );
+
+      groupsVillages
+        .append("circle")
+        .attr("r", "3")
+        .attr("fill", "hsl(0, 0%, 27%)");
     });
 })();
