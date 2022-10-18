@@ -4,14 +4,17 @@ const header = div.append("header");
 header.append("h1").text("Beauteous Villages");
 header
   .append("p")
-  .html("Let us focus on small, beautiful villages in continental France");
+  .html(
+    '<a href="https://www.les-plus-beaux-villages-de-france.org">Les Plus Beaux Village de France</a> celebrates the most beautiful villages of France. In these communities of less than 2000 inhabitants the association promotes sites of historical importance as well as peculiar landscapes and local traditions.'
+  );
+
+header
+  .append("p")
+  .text("Let's try to highlight the certification through continental France.");
 
 const size = 600;
 
-const svg = div
-  .append("svg")
-  .attr("viewBox", `0 0 ${size} ${size}`)
-  .style("max-width", "40rem");
+const svg = div.append("svg").attr("viewBox", `0 0 ${size} ${size}`);
 
 svg
   .append("g")
@@ -44,15 +47,46 @@ svg
     .remove()
     .on("end", () => {
       const groupData = svg.append("g");
+
+      const groupIntro = groupData.append("g");
       const groupGeo = groupData.append("g");
       const groupVillages = groupData.append("g");
 
+      const enterTransition = d3.transition().duration(500).ease(d3.easeQuadIn);
+      const counterDuration = 2500;
+      const counterTransition = d3
+        .transition(enterTransition)
+        .transition()
+        .duration(counterDuration);
+
       groupData
         .attr("opacity", "0")
-        .transition()
-        .duration(500)
-        .ease(d3.easeQuadIn)
+        .transition(enterTransition)
         .attr("opacity", "1");
+
+      const textIntro = groupIntro
+        .append("text")
+        .attr("font-size", "18")
+        .attr("transform", "translate(0 24)");
+      textIntro.append("tspan").text("As of October 2022 there are");
+
+      const counter = textIntro
+        .append("tspan")
+        .attr("dx", "5")
+        .attr("font-size", "24")
+        .attr("font-weight", "bold");
+
+      counter
+        .text(0)
+        .transition(counterTransition)
+        .textTween(() => (t) => Math.floor(t * dataVillages.values.length));
+
+      textIntro
+        .append("tspan")
+        .attr("x", "0")
+        .attr("font-style", "italic")
+        .attr("y", "22")
+        .text("beautiful villages");
 
       groupGeo
         .selectAll("path")
@@ -80,7 +114,12 @@ svg
 
       groupsVillages
         .append("circle")
-        .attr("r", "3")
-        .attr("fill", "hsl(0, 0%, 27%)");
+        .attr("fill", "hsl(0, 0%, 27%)")
+        .attr("r", "0")
+        .transition(enterTransition)
+        .transition()
+        .delay((_, i, { length }) => (counterDuration / length) * i)
+        .ease(d3.easeBounceOut)
+        .attr("r", "3");
     });
 })();
