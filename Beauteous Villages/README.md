@@ -84,5 +84,3 @@ In `dataVillages` store the array of values for the villages listed in the cited
     ])})`
 );
 ```
-
-### Zoom

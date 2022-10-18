@@ -51,6 +51,8 @@ svg
       const groupIntro = groupData.append("g");
       const groupGeo = groupData.append("g");
       const groupVillages = groupData.append("g");
+      const groupOutro = groupData.append("g");
+      const groupZoom = groupData.append("g");
 
       const enterTransition = d3.transition().duration(500).ease(d3.easeQuadIn);
       const counterDuration = 2500;
@@ -88,6 +90,15 @@ svg
         .attr("y", "22")
         .text("beautiful villages");
 
+      const textOutro = groupOutro
+        .append("text")
+        .attr("font-size", "18")
+        .attr("transform", `translate(0 ${size - 20})`);
+
+      textOutro
+        .append("tspan")
+        .text("Zoom in to discover the names of these beautiful locations.");
+
       groupGeo
         .selectAll("path")
         .data(dataGeo.features)
@@ -121,5 +132,63 @@ svg
         .delay((_, i, { length }) => (counterDuration / length) * i)
         .ease(d3.easeBounceOut)
         .attr("r", "3");
+
+      groupsVillages
+        .append("text")
+        .attr("x", "8")
+        .attr("dominant-baseline", "middle")
+        .attr("fill", "hsl(0, 0%, 27%)")
+        .attr("font-size", "12")
+        .text(({ locality }) => locality)
+        .attr("opacity", "0");
+
+      groupsVillages
+        .select("text")
+        .filter(
+          ({ longitude }) =>
+            projection([parseFloat(longitude), 0])[0] > size / 2
+        )
+        .attr("x", "-8")
+        .attr("text-anchor", "end");
+
+      const initialScale = projection.scale();
+      const [initialX, initialY] = projection.translate();
+
+      const zoom = d3
+        .zoom()
+        .scaleExtent([0.9, 8])
+        .on("zoom", (e) => {
+          const { x, y, k } = e.transform;
+
+          projection.translate([x, y]).scale(k * initialScale);
+
+          groupGeo.selectAll("path").attr("d", path);
+
+          groupVillages
+            .selectAll("g")
+            .attr(
+              "transform",
+              ({ longitude, latitude }) =>
+                `translate(${projection([longitude, latitude])})`
+            );
+
+          if (k >= 5) {
+            if (groupVillages.select("text").attr("opacity") === "0") {
+              groupVillages.selectAll("text").transition().attr("opacity", "1");
+            }
+          } else {
+            if (groupVillages.select("text").attr("opacity") === "1") {
+              groupVillages.selectAll("text").transition().attr("opacity", "0");
+            }
+          }
+        });
+
+      groupZoom
+        .append("rect")
+        .attr("width", size)
+        .attr("height", size)
+        .attr("opacity", "0")
+        .call(zoom)
+        .call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY));
     });
 })();
