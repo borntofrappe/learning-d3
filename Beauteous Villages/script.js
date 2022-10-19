@@ -143,6 +143,39 @@ svg
         .attr("font-weight", "bold")
         .text(locality);
 
+      const delaunay = d3.Delaunay.from(
+        villages.map(({ longitude, latitude }) =>
+          projection([parseFloat(longitude), parseFloat(latitude)])
+        )
+      );
+
+      const voronoi = delaunay.voronoi([0, 0, size, size]);
+
+      // groupInteraction
+      //   .append("path")
+      //   .attr("d", voronoi.render())
+      //   .attr("fill", "none")
+      //   .attr("stroke", "hsl(0, 0%, 27%)")
+      //   .attr("stroke-width", 1);
+
+      // groupInteraction
+      //   .append("path")
+      //   .attr("d", voronoi.renderBounds())
+      //   .attr("fill", "none")
+      //   .attr("stroke", "hsl(0, 0%, 27%)")
+      //   .attr("stroke-width", 1);
+
+      groupInteraction
+        .append("g")
+        .selectAll("path")
+        .data(villages)
+        .enter()
+        .append("path")
+        .attr("opacity", 0)
+        .attr("d", (d, i) => voronoi.renderCell(i));
+
+      return;
+      // transition
       const transitionData = d3.transition().duration(500).ease(d3.easeQuadIn);
       const durationTransitionVillages = 2500;
 
