@@ -38,12 +38,12 @@ svg
 
   svg
     .select("g")
-    .attr("opacity", "1")
+    .style("opacity", 1)
     .transition()
     .delay(500)
     .duration(500)
     .ease(d3.easeQuadOut)
-    .attr("opacity", "0")
+    .style("opacity", 0)
     .remove()
     .on("end", () => {
       const groupData = svg.append("g");
@@ -112,7 +112,7 @@ svg
         .attr("fill", "none")
         .attr("stroke", "hsl(0, 0%, 27%)")
         .attr("stroke-width", "1")
-        .attr("d", `M ${hX} ${hY} v -12 L ${x} ${y}`);
+        .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
 
       groupInteraction
         .append("circle")
@@ -143,10 +143,7 @@ svg
         .attr("font-weight", "bold")
         .text(locality);
 
-      /*
-        
-        const transitionData = d3.transition().duration(500).ease(d3.easeQuadIn);
-
+      const transitionData = d3.transition().duration(500).ease(d3.easeQuadIn);
       const durationTransitionVillages = 2500;
 
       const transitionVillages = d3
@@ -156,34 +153,41 @@ svg
 
       const transitionInteraction = d3
         .transition(transitionVillages)
-        .transition();
+        .transition()
+        .duration(500)
+        .delay(1000);
 
       groupData
-        .attr("opacity", "0")
+        .style("opacity", 0)
         .transition(transitionData)
-        .attr("opacity", "1");
+        .style("opacity", 1);
 
       numberIntro
-      .text(0)
-      .transition(transitionVillages)
-      .textTween(() => (t) => Math.floor(t * villages.length));
+        .text(0)
+        .transition(transitionVillages)
+        .textTween(() => (t) => Math.floor(t * villages.length));
 
-            groupsVillages
-        .select("circle")
-        .attr("r", "0")
+      groupVillages
+        .selectAll("circle")
+        .attr("r", 0)
         .transition(transitionData)
         .transition()
         .delay((_, i, { length }) => (durationTransitionVillages / length) * i)
         .ease(d3.easeBounceOut)
-        .attr("r", "3");
+        .attr("r", 3);
 
-        groupInteraction
+      groupInteraction
+        .select("path")
+        .attr("pathLength", 1)
+        .attr("stroke-dasharray", 1)
+        .attr("stroke-dashoffset", 1);
+
+      groupInteraction.select("circle").attr("r", 0);
+
+      groupInteraction
         .style("opacity", 0)
         .style("visibility", "hidden")
-        .transition(transitionVillages)
-        .transition()
-        .duration(500)
-        .delay(1000)
+        .transition(transitionInteraction)
         .style("opacity", 1)
         .style("visibility", "visible")
         .on("end", () => {
@@ -191,21 +195,16 @@ svg
 
           groupInteraction
             .select("path")
-            .attr("d", `M ${hX} ${hY} v -12 L ${x} ${y}`)
-            .attr("pathLength", 1)
-            .attr("stroke-dasharray", 1)
             .attr("stroke-dashoffset", 1)
             .transition(transition)
             .attr("stroke-dashoffset", 0);
 
           groupInteraction
             .select("circle")
-            .attr("transform", `translate(${x} ${y})`)
-            .attr("r", "0")
+            .attr("r", 0)
             .transition(transition)
             .transition()
-            .attr("r", "7");
+            .attr("r", 6);
         });
-      */
     });
 })();
