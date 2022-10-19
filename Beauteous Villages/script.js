@@ -27,7 +27,7 @@ svg
 // REQUIRE A SERVER TO BYPASS CORS
 (async () => {
   const dataGeo = await d3.json("geo.json");
-  const dataVillages = await d3.json("villages.json");
+  const { values: villages } = await d3.json("villages.json");
 
   const projection = d3
     .geoIdentity()
@@ -51,8 +51,7 @@ svg
       const groupIntro = groupData.append("g");
       const groupGeo = groupData.append("g");
       const groupVillages = groupData.append("g");
-      const groupOutro = groupData.append("g");
-      const groupZoom = groupData.append("g");
+      const groupInteraction = groupData.append("g");
 
       const enterTransition = d3.transition().duration(500).ease(d3.easeQuadIn);
       const counterDuration = 2500;
@@ -81,23 +80,14 @@ svg
       counter
         .text(0)
         .transition(counterTransition)
-        .textTween(() => (t) => Math.floor(t * dataVillages.values.length));
+        .textTween(() => (t) => Math.floor(t * villages.length));
 
       textIntro
         .append("tspan")
         .attr("x", "0")
         .attr("font-style", "italic")
-        .attr("y", "22")
+        .attr("y", "26")
         .text("beautiful villages");
-
-      const textOutro = groupOutro
-        .append("text")
-        .attr("font-size", "18")
-        .attr("transform", `translate(0 ${size - 20})`);
-
-      textOutro
-        .append("tspan")
-        .text("Zoom in to discover the names of these beautiful locations.");
 
       groupGeo
         .selectAll("path")
@@ -111,7 +101,7 @@ svg
 
       const groupsVillages = groupVillages
         .selectAll("g")
-        .data(dataVillages.values)
+        .data(villages)
         .enter()
         .append("g")
         .attr(
@@ -133,62 +123,73 @@ svg
         .ease(d3.easeBounceOut)
         .attr("r", "3");
 
-      groupsVillages
-        .append("text")
-        .attr("x", "8")
-        .attr("dominant-baseline", "middle")
+      groupInteraction
+        .append("path")
+        .attr("fill", "none")
+        .attr("stroke", "hsl(0, 0%, 27%)")
+        .attr("stroke-width", "1");
+
+      groupInteraction
+        .append("circle")
         .attr("fill", "hsl(0, 0%, 27%)")
-        .attr("font-size", "12")
-        .text(({ locality }) => locality)
-        .attr("opacity", "0");
+        .attr("stroke", "hsl(0, 0%, 97%)")
+        .attr("stroke-width", "1")
+        .attr("r", "0");
 
-      groupsVillages
-        .select("text")
-        .filter(
-          ({ longitude }) =>
-            projection([parseFloat(longitude), 0])[0] > size / 2
-        )
-        .attr("x", "-8")
-        .attr("text-anchor", "end");
+      const hX = 5;
+      const hY = size - 24;
+      const groupHighlight = groupInteraction
+        .append("g")
+        .attr("transform", `translate(${hX} ${hY})`);
 
-      const initialScale = projection.scale();
-      const [initialX, initialY] = projection.translate();
+      groupHighlight.append("circle").attr("r", "5");
 
-      const zoom = d3
-        .zoom()
-        .scaleExtent([0.9, 8])
-        .on("zoom", (e) => {
-          const { x, y, k } = e.transform;
+      const textInteraction = groupHighlight
+        .append("text")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", "18")
+        .attr("x", "10");
 
-          projection.translate([x, y]).scale(k * initialScale);
+      const { locality, longitude, latitude } =
+        villages[Math.floor(Math.random() * villages.length)];
+      const [x, y] = projection([parseFloat(longitude), parseFloat(latitude)]);
 
-          groupGeo.selectAll("path").attr("d", path);
+      textInteraction.append("tspan").text("Villages such as ");
+      textInteraction
+        .append("tspan")
+        .attr("dx", "1")
+        .attr("font-size", "24")
+        .attr("font-weight", "bold")
+        .text(locality);
 
-          groupVillages
-            .selectAll("g")
-            .attr(
-              "transform",
-              ({ longitude, latitude }) =>
-                `translate(${projection([longitude, latitude])})`
-            );
+      groupInteraction
+        .style("opacity", 0)
+        .style("visibility", "hidden")
+        .transition(counterTransition)
+        .transition()
+        .duration(500)
+        .delay(1000)
+        .style("opacity", 1)
+        .style("visibility", "visible")
+        .on("end", () => {
+          const transition = d3.transition().duration(750).delay(500);
 
-          if (k >= 5) {
-            if (groupVillages.select("text").attr("opacity") === "0") {
-              groupVillages.selectAll("text").transition().attr("opacity", "1");
-            }
-          } else {
-            if (groupVillages.select("text").attr("opacity") === "1") {
-              groupVillages.selectAll("text").transition().attr("opacity", "0");
-            }
-          }
+          groupInteraction
+            .select("path")
+            .attr("d", `M ${hX} ${hY} v -12 L ${x} ${y}`)
+            .attr("pathLength", 1)
+            .attr("stroke-dasharray", 1)
+            .attr("stroke-dashoffset", 1)
+            .transition(transition)
+            .attr("stroke-dashoffset", 0);
+
+          groupInteraction
+            .select("circle")
+            .attr("transform", `translate(${x} ${y})`)
+            .attr("r", "0")
+            .transition(transition)
+            .transition()
+            .attr("r", "7");
         });
-
-      groupZoom
-        .append("rect")
-        .attr("width", size)
-        .attr("height", size)
-        .attr("opacity", "0")
-        .call(zoom)
-        .call(zoom.transform, d3.zoomIdentity.translate(initialX, initialY));
     });
 })();
