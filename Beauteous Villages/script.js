@@ -130,15 +130,15 @@ svg
 
       const textInteraction = groupHighlight
         .append("text")
-        .attr("dominant-baseline", "middle")
         .attr("font-size", "18")
-        .attr("x", "10");
+        .attr("x", "10")
+        .attr("y", "5");
 
       textInteraction.append("tspan").text("Villages such as ");
 
       textInteraction
         .append("tspan")
-        .attr("dx", "1")
+        .attr("dx", "2")
         .attr("font-size", "24")
         .attr("font-weight", "bold")
         .text(locality);
@@ -151,6 +151,7 @@ svg
 
       const voronoi = delaunay.voronoi([0, 0, size, size]);
 
+      // helper visuals
       // groupInteraction
       //   .append("path")
       //   .attr("d", voronoi.render())
@@ -165,7 +166,7 @@ svg
       //   .attr("stroke", "hsl(0, 0%, 27%)")
       //   .attr("stroke-width", 1);
 
-      groupInteraction
+      const cellsInteraction = groupInteraction
         .append("g")
         .selectAll("path")
         .data(villages)
@@ -174,8 +175,6 @@ svg
         .attr("opacity", 0)
         .attr("d", (d, i) => voronoi.renderCell(i));
 
-      return;
-      // transition
       const transitionData = d3.transition().duration(500).ease(d3.easeQuadIn);
       const durationTransitionVillages = 2500;
 
@@ -238,6 +237,26 @@ svg
             .transition(transition)
             .transition()
             .attr("r", 6);
+
+          cellsInteraction.on("pointerenter", function (e, d) {
+            const i = cellsInteraction.nodes().indexOf(this);
+
+            const { locality, longitude, latitude } = villages[i];
+            const [x, y] = projection([
+              parseFloat(longitude),
+              parseFloat(latitude),
+            ]);
+
+            groupInteraction
+              .select("path")
+              .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
+
+            groupInteraction
+              .select("circle")
+              .attr("transform", `translate(${x} ${y})`);
+
+            textInteraction.select("tspan:last-of-type").text(locality);
+          });
         });
     });
 })();
