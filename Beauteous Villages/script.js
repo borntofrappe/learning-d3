@@ -26,13 +26,13 @@ svg
 
 // REQUIRE A SERVER TO BYPASS CORS
 (async () => {
-  const dataGeo = await d3.json("geo.json");
+  const geoJSON = await d3.json("france.json");
   const { values: villages } = await d3.json("villages.json");
 
   const projection = d3
     .geoIdentity()
     .reflectY(true)
-    .fitSize([size, size], dataGeo);
+    .fitSize([size, size], geoJSON);
 
   const path = d3.geoPath().projection(projection);
 
@@ -49,38 +49,23 @@ svg
       const groupData = svg.append("g");
 
       const groupIntro = groupData.append("g");
-      const groupGeo = groupData.append("g");
+      const groupGeoJSON = groupData.append("g");
       const groupVillages = groupData.append("g");
       const groupInteraction = groupData.append("g");
-
-      const enterTransition = d3.transition().duration(500).ease(d3.easeQuadIn);
-      const counterDuration = 2500;
-      const counterTransition = d3
-        .transition(enterTransition)
-        .transition()
-        .duration(counterDuration);
-
-      groupData
-        .attr("opacity", "0")
-        .transition(enterTransition)
-        .attr("opacity", "1");
 
       const textIntro = groupIntro
         .append("text")
         .attr("font-size", "18")
         .attr("transform", "translate(0 24)");
+
       textIntro.append("tspan").text("As of October 2022 there are");
 
-      const counter = textIntro
+      const numberIntro = textIntro
         .append("tspan")
         .attr("dx", "5")
         .attr("font-size", "24")
-        .attr("font-weight", "bold");
-
-      counter
-        .text(0)
-        .transition(counterTransition)
-        .textTween(() => (t) => Math.floor(t * villages.length));
+        .attr("font-weight", "bold")
+        .text(villages.length);
 
       textIntro
         .append("tspan")
@@ -89,9 +74,9 @@ svg
         .attr("y", "26")
         .text("beautiful villages");
 
-      groupGeo
+      groupGeoJSON
         .selectAll("path")
-        .data(dataGeo.features)
+        .data(geoJSON.features)
         .enter()
         .append("path")
         .attr("d", path)
@@ -99,11 +84,11 @@ svg
         .attr("stroke", "hsl(0, 0%, 27%)")
         .attr("stroke-width", "0.75");
 
-      const groupsVillages = groupVillages
-        .selectAll("g")
+      groupVillages
+        .selectAll("circle")
         .data(villages)
         .enter()
-        .append("g")
+        .append("circle")
         .attr(
           "transform",
           ({ longitude, latitude }) =>
@@ -111,33 +96,32 @@ svg
               parseFloat(longitude),
               parseFloat(latitude),
             ])})`
-        );
-
-      groupsVillages
-        .append("circle")
+        )
         .attr("fill", "hsl(0, 0%, 27%)")
-        .attr("r", "0")
-        .transition(enterTransition)
-        .transition()
-        .delay((_, i, { length }) => (counterDuration / length) * i)
-        .ease(d3.easeBounceOut)
         .attr("r", "3");
+
+      const hX = 5;
+      const hY = size - 24;
+
+      const { locality, longitude, latitude } =
+        villages[Math.floor(Math.random() * villages.length)];
+      const [x, y] = projection([parseFloat(longitude), parseFloat(latitude)]);
 
       groupInteraction
         .append("path")
         .attr("fill", "none")
         .attr("stroke", "hsl(0, 0%, 27%)")
-        .attr("stroke-width", "1");
+        .attr("stroke-width", "1")
+        .attr("d", `M ${hX} ${hY} v -12 L ${x} ${y}`);
 
       groupInteraction
         .append("circle")
         .attr("fill", "hsl(0, 0%, 27%)")
         .attr("stroke", "hsl(0, 0%, 97%)")
         .attr("stroke-width", "1")
-        .attr("r", "0");
+        .attr("r", "6")
+        .attr("transform", `translate(${x} ${y})`);
 
-      const hX = 5;
-      const hY = size - 24;
       const groupHighlight = groupInteraction
         .append("g")
         .attr("transform", `translate(${hX} ${hY})`);
@@ -150,11 +134,8 @@ svg
         .attr("font-size", "18")
         .attr("x", "10");
 
-      const { locality, longitude, latitude } =
-        villages[Math.floor(Math.random() * villages.length)];
-      const [x, y] = projection([parseFloat(longitude), parseFloat(latitude)]);
-
       textInteraction.append("tspan").text("Villages such as ");
+
       textInteraction
         .append("tspan")
         .attr("dx", "1")
@@ -162,10 +143,44 @@ svg
         .attr("font-weight", "bold")
         .text(locality);
 
-      groupInteraction
+      /*
+        
+        const transitionData = d3.transition().duration(500).ease(d3.easeQuadIn);
+
+      const durationTransitionVillages = 2500;
+
+      const transitionVillages = d3
+        .transition(transitionData)
+        .transition()
+        .duration(durationTransitionVillages);
+
+      const transitionInteraction = d3
+        .transition(transitionVillages)
+        .transition();
+
+      groupData
+        .attr("opacity", "0")
+        .transition(transitionData)
+        .attr("opacity", "1");
+
+      numberIntro
+      .text(0)
+      .transition(transitionVillages)
+      .textTween(() => (t) => Math.floor(t * villages.length));
+
+            groupsVillages
+        .select("circle")
+        .attr("r", "0")
+        .transition(transitionData)
+        .transition()
+        .delay((_, i, { length }) => (durationTransitionVillages / length) * i)
+        .ease(d3.easeBounceOut)
+        .attr("r", "3");
+
+        groupInteraction
         .style("opacity", 0)
         .style("visibility", "hidden")
-        .transition(counterTransition)
+        .transition(transitionVillages)
         .transition()
         .duration(500)
         .delay(1000)
@@ -191,5 +206,6 @@ svg
             .transition()
             .attr("r", "7");
         });
+      */
     });
 })();
