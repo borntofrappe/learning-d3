@@ -3,1034 +3,1034 @@
     "values": [
     {
       "name": "Aiguèze (Gard)",
-      "longitude": "4.5566",
-      "latitude": "44.3034",
+      "longitude": 4.5566,
+      "latitude": 44.3034,
       "locality": "Aiguèze"
     },
     {
       "name": "Ainhoa (Pyrénées-Atlantiques)",
-      "longitude": "-1.4977",
-      "latitude": "43.3071",
+      "longitude": -1.4977,
+      "latitude": 43.3071,
       "locality": "Ainhoa"
     },
     {
       "name": "Angles-sur-l'Anglin (Vienne)",
-      "longitude": "0.8855",
-      "latitude": "46.6956",
+      "longitude": 0.8855,
+      "latitude": 46.6956,
       "locality": "Angles-sur-l’Anglin"
     },
     {
       "name": "Ansouis (Vaucluse)",
-      "longitude": "5.4638",
-      "latitude": "43.7373",
+      "longitude": 5.4638,
+      "latitude": 43.7373,
       "locality": "Ansouis"
     },
     {
       "name": "Apremont-sur-Allier (Cher)",
-      "longitude": "3.0482",
-      "latitude": "46.9062",
+      "longitude": 3.0482,
+      "latitude": 46.9062,
       "locality": "Apremont-sur-Allier"
     },
     {
       "name": "Arlempdes (Haute-Loire)",
-      "longitude": "3.9239",
-      "latitude": "44.865",
+      "longitude": 3.9239,
+      "latitude": 44.865,
       "locality": "Arlempdes"
     },
     {
       "name": "Ars-en-Ré (Charente-Maritime)",
-      "longitude": "-1.5148",
-      "latitude": "46.2078",
+      "longitude": -1.5148,
+      "latitude": 46.2078,
       "locality": "Ars-en-Ré"
     },
     {
       "name": "Aubeterre-sur-Dronne (Charente)",
-      "longitude": "0.1709",
-      "latitude": "45.2718",
+      "longitude": 0.1709,
+      "latitude": 45.2718,
       "locality": "Aubeterre-sur-Dronne"
     },
     {
       "name": "Autoire (Lot)",
-      "longitude": "1.8224",
-      "latitude": "44.8542",
+      "longitude": 1.8224,
+      "latitude": 44.8542,
       "locality": "Autoire"
     },
     {
       "name": "Auvillar (Tarn-et-Garonne)",
-      "longitude": "0.9008",
-      "latitude": "44.0694",
+      "longitude": 0.9008,
+      "latitude": 44.0694,
       "locality": "Auvillar"
     },
     {
       "name": "Balazuc (Ardèche)",
-      "longitude": "4.373",
-      "latitude": "44.5086",
+      "longitude": 4.373,
+      "latitude": 44.5086,
       "locality": "Balazuc"
     },
     {
       "name": "Barfleur (Manche)",
-      "longitude": "-1.2637",
-      "latitude": "49.6701",
+      "longitude": -1.2637,
+      "latitude": 49.6701,
       "locality": "Barfleur"
     },
     {
       "name": "Bargème (Var)",
-      "longitude": "6.5735",
-      "latitude": "43.7301",
+      "longitude": 6.5735,
+      "latitude": 43.7301,
       "locality": "Bargème"
     },
     {
       "name": "Baume-les-Messieurs (Jura)",
-      "longitude": "5.6492",
-      "latitude": "46.7082",
+      "longitude": 5.6492,
+      "latitude": 46.7082,
       "locality": "Baume-les-Messieurs"
     },
     {
       "name": "Beaulieu-sur-Dordogne (Corrèze)",
-      "longitude": "1.838629167",
-      "latitude": "44.9784",
+      "longitude": 1.838629167,
+      "latitude": 44.9784,
       "locality": "Beaulieu-sur-Dordogne"
     },
     {
       "name": "Belcastel (Aveyron)",
-      "longitude": "2.3381",
-      "latitude": "44.3889",
+      "longitude": 2.3381,
+      "latitude": 44.3889,
       "locality": "Belcastel"
     },
     {
       "name": "Belvès (Dordogne)",
-      "longitude": "1.0079",
-      "latitude": "44.7759",
+      "longitude": 1.0079,
+      "latitude": 44.7759,
       "locality": "Pays de Belvès"
     },
     {
       "name": "Bergheim (Haut-Rhin)",
-      "longitude": "7.361929167",
-      "latitude": "48.2049",
+      "longitude": 7.361929167,
+      "latitude": 48.2049,
       "locality": "Bergheim"
     },
     {
       "name": "Beuvron-en-Auge (Calvados)",
-      "longitude": "-0.0451",
-      "latitude": "49.1886",
+      "longitude": -0.0451,
+      "latitude": 49.1886,
       "locality": "Beuvron-en-Auge"
     },
     {
       "name": "Beynac-et-Cazenac (Dordogne)",
-      "longitude": "1.1447",
-      "latitude": "44.8398",
+      "longitude": 1.1447,
+      "latitude": 44.8398,
       "locality": "Beynac-et-Cazenac"
     },
     {
       "name": "Blesle (Haute-Loire)",
-      "longitude": "3.1715",
-      "latitude": "45.3186",
+      "longitude": 3.1715,
+      "latitude": 45.3186,
       "locality": "Blesle"
     },
     {
       "name": "Bonneval-sur-Arc (Savoie)",
-      "longitude": "7.0469",
-      "latitude": "45.3717",
+      "longitude": 7.0469,
+      "latitude": 45.3717,
       "locality": "Bonneval-sur-Arc"
     },
     {
       "name": "Brouage (Charente-Maritime)",
-      "longitude": "-1.0705",
-      "latitude": "45.8663",
+      "longitude": -1.0705,
+      "latitude": 45.8663,
       "locality": "Hiers-Brouage"
     },
     {
       "name": "Brousse-le-Château (Aveyron)",
-      "longitude": "2.6261",
-      "latitude": "43.9974",
+      "longitude": 2.6261,
+      "latitude": 43.9974,
       "locality": "Brousse-le-Château"
     },
     {
       "name": "Bruniquel (Tarn-et-Garonne)",
-      "longitude": "1.6658",
-      "latitude": "44.0559",
+      "longitude": 1.6658,
+      "latitude": 44.0559,
       "locality": "Bruniquel"
     },
     {
       "name": "Camon (Ariège)",
-      "longitude": "1.9673",
-      "latitude": "43.0218",
+      "longitude": 1.9673,
+      "latitude": 43.0218,
       "locality": "Camon"
     },
     {
       "name": "Candes-Saint-Martin (Indre-et-Loire)",
-      "longitude": "0.0737",
-      "latitude": "47.2113",
+      "longitude": 0.0737,
+      "latitude": 47.2113,
       "locality": "Candes-Saint-Martin"
     },
     {
       "name": "Capdenac-le-Haut (Lot)",
-      "longitude": "2.0699",
-      "latitude": "44.5806",
+      "longitude": 2.0699,
+      "latitude": 44.5806,
       "locality": "Capdenac"
     },
     {
       "name": "Cardaillac (Lot)",
-      "longitude": "1.9979",
-      "latitude": "44.6796",
+      "longitude": 1.9979,
+      "latitude": 44.6796,
       "locality": "Cardaillac"
     },
     {
       "name": "Carennac (Lot)",
-      "longitude": "1.7324",
-      "latitude": "44.919",
+      "longitude": 1.7324,
+      "latitude": 44.919,
       "locality": "Carennac"
     },
     {
       "name": "Castelnau-de-Montmiral (Tarn)",
-      "longitude": "1.8215",
-      "latitude": "43.9659",
+      "longitude": 1.8215,
+      "latitude": 43.9659,
       "locality": "Castelnau-de-Montmiral"
     },
     {
       "name": "Castelnaud-la-Chapelle (Dordogne)",
-      "longitude": "1.1492",
-      "latitude": "44.8155",
+      "longitude": 1.1492,
+      "latitude": 44.8155,
       "locality": "Castelnaud-la-Chapelle"
     },
     {
       "name": "Castelnou (Pyrénées-Orientales)",
-      "longitude": "2.7035",
-      "latitude": "42.6195",
+      "longitude": 2.7035,
+      "latitude": 42.6195,
       "locality": "Castelnou"
     },
     {
       "name": "Charroux (Allier)",
-      "longitude": "3.1616",
-      "latitude": "46.1853",
+      "longitude": 3.1616,
+      "latitude": 46.1853,
       "locality": "Charroux"
     },
     {
       "name": "Château-Chalon (Jura)",
-      "longitude": "5.6267",
-      "latitude": "46.755",
+      "longitude": 5.6267,
+      "latitude": 46.755,
       "locality": "Château-Chalon"
     },
     {
       "name": "Châteauneuf (Côte-d'Or)",
-      "longitude": "4.6408",
-      "latitude": "47.2183",
+      "longitude": 4.6408,
+      "latitude": 47.2183,
       "locality": "Châteauneuf"
     },
     {
       "name": "Châtillon-en-Diois (Drôme)",
-      "longitude": "5.484529167",
-      "latitude": "44.6949",
+      "longitude": 5.484529167,
+      "latitude": 44.6949,
       "locality": "Châtillon-en-Diois"
     },
     {
       "name": "Coaraze (Alpes-Maritimes)",
-      "longitude": "7.2953",
-      "latitude": "43.8642",
+      "longitude": 7.2953,
+      "latitude": 43.8642,
       "locality": "Coaraze"
     },
     {
       "name": "Collonges-la-Rouge (Corrèze)",
-      "longitude": "1.6559",
-      "latitude": "45.0612",
+      "longitude": 1.6559,
+      "latitude": 45.0612,
       "locality": "Collonges-la-Rouge"
     },
     {
       "name": "Conques (Aveyron)",
-      "longitude": "2.3975",
-      "latitude": "44.5995",
+      "longitude": 2.3975,
+      "latitude": 44.5995,
       "locality": "Conques"
     },
     {
       "name": "Cordes-sur-Ciel (Tarn)",
-      "longitude": "1.953829167",
-      "latitude": "44.0631",
+      "longitude": 1.953829167,
+      "latitude": 44.0631,
       "locality": "Cordes-sur-Ciel"
     },
     {
       "name": "Cotignac (Var)",
-      "longitude": "6.149629167",
-      "latitude": "43.5285",
+      "longitude": 6.149629167,
+      "latitude": 43.5285,
       "locality": "Cotignac"
     },
     {
       "name": "Crissay-sur-Manse (Indre-et-Loire)",
-      "longitude": "0.4886",
-      "latitude": "47.1501",
+      "longitude": 0.4886,
+      "latitude": 47.1501,
       "locality": "Crissay-sur-Manse"
     },
     {
       "name": "Curemonte (Corrèze)",
-      "longitude": "1.7432",
-      "latitude": "45.0009",
+      "longitude": 1.7432,
+      "latitude": 45.0009,
       "locality": "Curemonte"
     },
     {
       "name": "Domme (Dordogne)",
-      "longitude": "1.2149",
-      "latitude": "44.802",
+      "longitude": 1.2149,
+      "latitude": 44.802,
       "locality": "Domme"
     },
     {
       "name": "Eguisheim (Haut-Rhin)",
-      "longitude": "7.3061",
-      "latitude": "48.0429",
+      "longitude": 7.3061,
+      "latitude": 48.0429,
       "locality": "Eguisheim"
     },
     {
       "name": "Estaing (Aveyron)",
-      "longitude": "2.672",
-      "latitude": "44.5554",
+      "longitude": 2.672,
+      "latitude": 44.5554,
       "locality": "Estaing"
     },
     {
       "name": "Eus (Pyrénées-Orientales)",
-      "longitude": "2.4578",
-      "latitude": "42.6438",
+      "longitude": 2.4578,
+      "latitude": 42.6438,
       "locality": "Eus"
     },
     {
       "name": "Evol (Pyrénées-Orientales)",
-      "longitude": "2.2547",
-      "latitude": "42.5689",
+      "longitude": 2.2547,
+      "latitude": 42.5689,
       "locality": "Olette"
     },
     {
       "name": "Flavigny-sur-Ozerain (Côte-d'Or)",
-      "longitude": "4.5314",
-      "latitude": "47.5119",
+      "longitude": 4.5314,
+      "latitude": 47.5119,
       "locality": "Flavigny-sur-Ozerain"
     },
     {
       "name": "Fourcès (Gers)",
-      "longitude": "0.2312",
-      "latitude": "43.9929",
+      "longitude": 0.2312,
+      "latitude": 43.9929,
       "locality": "Fourcès"
     },
     {
       "name": "Gargilesse-Dampierre (Indre)",
-      "longitude": "1.5974",
-      "latitude": "46.5138",
+      "longitude": 1.5974,
+      "latitude": 46.5138,
       "locality": "Gargilesse-Dampierre"
     },
     {
       "name": "Gassin (Var)",
-      "longitude": "6.5861",
-      "latitude": "43.2288",
+      "longitude": 6.5861,
+      "latitude": 43.2288,
       "locality": "Gassin"
     },
     {
       "name": "Gerberoy (Oise)",
-      "longitude": "1.8503",
-      "latitude": "49.5342",
+      "longitude": 1.8503,
+      "latitude": 49.5342,
       "locality": "Gerberoy"
     },
     {
       "name": "Gordes (Vaucluse)",
-      "longitude": "5.201",
-      "latitude": "43.911",
+      "longitude": 5.201,
+      "latitude": 43.911,
       "locality": "Gordes"
     },
     {
       "name": "Gourdon (Alpes-Maritimes)",
-      "longitude": "6.9785",
-      "latitude": "43.7202",
+      "longitude": 6.9785,
+      "latitude": 43.7202,
       "locality": "Gourdon"
     },
     {
       "name": "Grignan (Drôme)",
-      "longitude": "4.908529167",
-      "latitude": "44.4195",
+      "longitude": 4.908529167,
+      "latitude": 44.4195,
       "locality": "Grignan"
     },
     {
       "name": "Hell-Bourg (Réunion)",
-      "longitude": "55.5190962097",
-      "latitude": "-21.0656790581",
+      "longitude": 55.5190962097,
+      "latitude": -21.0656790581,
       "locality": "Salazie"
     },
     {
       "name": "Hunawihr (Haut-Rhin)",
-      "longitude": "7.3115",
-      "latitude": "48.1806",
+      "longitude": 7.3115,
+      "latitude": 48.1806,
       "locality": "Hunawihr"
     },
     {
       "name": "Hunspach (Bas-Rhin)",
-      "longitude": "7.9424",
-      "latitude": "48.9537",
+      "longitude": 7.9424,
+      "latitude": 48.9537,
       "locality": "Hunspach"
     },
     {
       "name": "La Bastide-Clairence (Pyrénées-Atlantiques)",
-      "longitude": "-1.2556",
-      "latitude": "43.4304",
+      "longitude": -1.2556,
+      "latitude": 43.4304,
       "locality": "La Bastide-Clairence"
     },
     {
       "name": "La Couvertoirade (Aveyron)",
-      "longitude": "3.3173",
-      "latitude": "43.9128",
+      "longitude": 3.3173,
+      "latitude": 43.9128,
       "locality": "La Couvertoirade"
     },
     {
       "name": "La Flotte (Charente-Maritime)",
-      "longitude": "-1.3249",
-      "latitude": "46.1871",
+      "longitude": -1.3249,
+      "latitude": 46.1871,
       "locality": "La Flotte"
     },
     {
       "name": "La Garde-Adhémar (Drôme)",
-      "longitude": "4.7546",
-      "latitude": "44.3925",
+      "longitude": 4.7546,
+      "latitude": 44.3925,
       "locality": "La Garde-Adhémar"
     },
     {
       "name": "La Garde-Guérin (Lozère)",
-      "longitude": "3.9349",
-      "latitude": "44.4775",
+      "longitude": 3.9349,
+      "latitude": 44.4775,
       "locality": "Prévenchères"
     },
     {
       "name": "Lagrasse (Aude)",
-      "longitude": "2.6216",
-      "latitude": "43.0911",
+      "longitude": 2.6216,
+      "latitude": 43.0911,
       "locality": "Lagrasse"
     },
     {
       "name": "La Grave (Hautes-Alpes)",
-      "longitude": "6.3062",
-      "latitude": "45.0459",
+      "longitude": 6.3062,
+      "latitude": 45.0459,
       "locality": "La Grave"
     },
     {
       "name": "La Roche-Guyon (Val-d'Oise)",
-      "longitude": "1.6298",
-      "latitude": "49.0815",
+      "longitude": 1.6298,
+      "latitude": 49.0815,
       "locality": "La Roche-Guyon"
     },
     {
       "name": "La Romieu (Gers)",
-      "longitude": "0.498529167",
-      "latitude": "43.9821",
+      "longitude": 0.498529167,
+      "latitude": 43.9821,
       "locality": "La Romieu"
     },
     {
       "name": "La Roque-Gageac (Dordogne)",
-      "longitude": "1.1834",
-      "latitude": "44.8263",
+      "longitude": 1.1834,
+      "latitude": 44.8263,
       "locality": "La Roque-Gageac"
     },
     {
       "name": "La Roque-sur-Cèze (Gard)",
-      "longitude": "4.5197",
-      "latitude": "44.1936",
+      "longitude": 4.5197,
+      "latitude": 44.1936,
       "locality": "La Roque-sur-Cèze"
     },
     {
       "name": "Larressingle (Gers)",
-      "longitude": "0.3113",
-      "latitude": "43.9452",
+      "longitude": 0.3113,
+      "latitude": 43.9452,
       "locality": "Larressingle"
     },
     {
       "name": "Lautrec (Tarn)",
-      "longitude": "2.1392",
-      "latitude": "43.7058",
+      "longitude": 2.1392,
+      "latitude": 43.7058,
       "locality": "Lautrec"
     },
     {
       "name": "Lauzerte (Tarn-et-Garonne)",
-      "longitude": "1.1384",
-      "latitude": "44.2557",
+      "longitude": 1.1384,
+      "latitude": 44.2557,
       "locality": "Lauzerte"
     },
     {
       "name": "Lavardens (Gers)",
-      "longitude": "0.5147",
-      "latitude": "43.7607",
+      "longitude": 0.5147,
+      "latitude": 43.7607,
       "locality": "Lavardens"
     },
     {
       "name": "Lavardin (Loir-et-Cher)",
-      "longitude": "0.8864",
-      "latitude": "47.7423",
+      "longitude": 0.8864,
+      "latitude": 47.7423,
       "locality": "Lavardin"
     },
     {
       "name": "Lavaudieu (Haute-Loire)",
-      "longitude": "3.4541",
-      "latitude": "45.2628",
+      "longitude": 3.4541,
+      "latitude": 45.2628,
       "locality": "Lavaudieu"
     },
     {
       "name": "Lavoûte-Chilhac (Haute-Loire)",
-      "longitude": "3.403729167",
-      "latitude": "45.1485",
+      "longitude": 3.403729167,
+      "latitude": 45.1485,
       "locality": "Lavoûte-Chilhac"
     },
     {
       "name": "Le Bec-Hellouin (Eure)",
-      "longitude": "0.7217",
-      "latitude": "49.2318",
+      "longitude": 0.7217,
+      "latitude": 49.2318,
       "locality": "Le Bec-Hellouin"
     },
     {
       "name": "Le Castellet (Var)",
-      "longitude": "5.777029167",
-      "latitude": "43.2027",
+      "longitude": 5.777029167,
+      "latitude": 43.2027,
       "locality": "Le Castellet"
     },
     {
       "name": "Le Malzieu-Ville (Lozère)",
-      "longitude": "3.331729167",
-      "latitude": "44.856",
+      "longitude": 3.331729167,
+      "latitude": 44.856,
       "locality": "Le Malzieu-Ville"
     },
     {
       "name": "Le Poët-Laval (Drôme)",
-      "longitude": "5.01399923019",
-      "latitude": "44.5369454826",
+      "longitude": 5.01399923019,
+      "latitude": 44.5369454826,
       "locality": "Le Poët-Laval"
     },
     {
       "name": "Les Baux-de-Provence (Bouches-du-Rhône)",
-      "longitude": "4.796",
-      "latitude": "43.7436",
+      "longitude": 4.796,
+      "latitude": 43.7436,
       "locality": "Les Baux-de-Provence"
     },
     {
       "name": "Limeuil (Dordogne)",
-      "longitude": "0.89",
-      "latitude": "44.8857",
+      "longitude": 0.89,
+      "latitude": 44.8857,
       "locality": "Limeuil"
     },
     {
       "name": "Locronan (Finistère)",
-      "longitude": "-4.2076",
-      "latitude": "48.0996",
+      "longitude": -4.2076,
+      "latitude": 48.0996,
       "locality": "Locronan"
     },
     {
       "name": "Lods (Doubs)",
-      "longitude": "6.2486",
-      "latitude": "47.0448",
+      "longitude": 6.2486,
+      "latitude": 47.0448,
       "locality": "Lods"
     },
     {
       "name": "Loubressac (Lot)",
-      "longitude": "1.8035",
-      "latitude": "44.8713",
+      "longitude": 1.8035,
+      "latitude": 44.8713,
       "locality": "Loubressac"
     },
     {
       "name": "Lourmarin (Vaucluse)",
-      "longitude": "5.363",
-      "latitude": "43.7634",
+      "longitude": 5.363,
+      "latitude": 43.7634,
       "locality": "Lourmarin"
     },
     {
       "name": "Lussan (Gard)",
-      "longitude": "4.366729167",
-      "latitude": "44.1531",
+      "longitude": 4.366729167,
+      "latitude": 44.1531,
       "locality": "Lussan"
     },
     {
       "name": "Lyons-la-Forêt (Eure)",
-      "longitude": "1.4768",
-      "latitude": "49.3992",
+      "longitude": 1.4768,
+      "latitude": 49.3992,
       "locality": "Lyons-la-Forêt"
     },
     {
       "name": "Martel (Lot)",
-      "longitude": "1.610029167",
-      "latitude": "44.937",
+      "longitude": 1.610029167,
+      "latitude": 44.937,
       "locality": "Martel"
     },
     {
       "name": "Ménerbes (Vaucluse)",
-      "longitude": "5.2073",
-      "latitude": "43.8327",
+      "longitude": 5.2073,
+      "latitude": 43.8327,
       "locality": "Ménerbes"
     },
     {
       "name": "Minerve (Hérault)",
-      "longitude": "2.7467",
-      "latitude": "43.3539",
+      "longitude": 2.7467,
+      "latitude": 43.3539,
       "locality": "Minerve"
     },
     {
       "name": "Mirmande (Drôme)",
-      "longitude": "4.8356",
-      "latitude": "44.6985",
+      "longitude": 4.8356,
+      "latitude": 44.6985,
       "locality": "Mirmande"
     },
     {
       "name": "Mittelbergheim (Bas-Rhin)",
-      "longitude": "7.442",
-      "latitude": "48.3957",
+      "longitude": 7.442,
+      "latitude": 48.3957,
       "locality": "Mittelbergheim"
     },
     {
       "name": "Moncontour (Côtes-d'Armor)",
-      "longitude": "-2.6326",
-      "latitude": "48.3597",
+      "longitude": -2.6326,
+      "latitude": 48.3597,
       "locality": "Moncontour"
     },
     {
       "name": "Monestiés (Tarn)",
-      "longitude": "2.097829167",
-      "latitude": "44.0712",
+      "longitude": 2.097829167,
+      "latitude": 44.0712,
       "locality": "Monestiés"
     },
     {
       "name": "Monflanquin (Lot-et-Garonne)",
-      "longitude": "0.7685",
-      "latitude": "44.532",
+      "longitude": 0.7685,
+      "latitude": 44.532,
       "locality": "Monflanquin"
     },
     {
       "name": "Monpazier (Dordogne)",
-      "longitude": "0.8945",
-      "latitude": "44.6805",
+      "longitude": 0.8945,
+      "latitude": 44.6805,
       "locality": "Monpazier"
     },
     {
       "name": "Montbrun-les-Bains (Drôme)",
-      "longitude": "5.4431",
-      "latitude": "44.1756",
+      "longitude": 5.4431,
+      "latitude": 44.1756,
       "locality": "Montbrun-les-Bains"
     },
     {
       "name": "Montclus (Gard)",
-      "longitude": "4.420729167",
-      "latitude": "44.2602",
+      "longitude": 4.420729167,
+      "latitude": 44.2602,
       "locality": "Montclus"
     },
     {
       "name": "Montpeyroux (Puy-de-Dôme)",
-      "longitude": "3.2048",
-      "latitude": "45.6228",
+      "longitude": 3.2048,
+      "latitude": 45.6228,
       "locality": "Montpeyroux"
     },
     {
       "name": "Montréal (Gers)",
-      "longitude": "0.2033",
-      "latitude": "43.9497",
+      "longitude": 0.2033,
+      "latitude": 43.9497,
       "locality": "Montréal"
     },
     {
       "name": "Montrésor (Indre-et-Loire)",
-      "longitude": "1.2014",
-      "latitude": "47.1555",
+      "longitude": 1.2014,
+      "latitude": 47.1555,
       "locality": "Montrésor"
     },
     {
       "name": "Montsoreau (Maine-et-Loire)",
-      "longitude": "0.0575",
-      "latitude": "47.2167",
+      "longitude": 0.0575,
+      "latitude": 47.2167,
       "locality": "Montsoreau"
     },
     {
       "name": "Mornac-sur-Seudre (Charente-Maritime)",
-      "longitude": "-1.0279",
-      "latitude": "45.7101",
+      "longitude": -1.0279,
+      "latitude": 45.7101,
       "locality": "Mornac-sur-Seudre"
     },
     {
       "name": "Mortemart (Haute-Vienne)",
-      "longitude": "0.9575",
-      "latitude": "46.0422",
+      "longitude": 0.9575,
+      "latitude": 46.0422,
       "locality": "Mortemart"
     },
     {
       "name": "Moustiers-Sainte-Marie (Alpes-de-Haute-Provence)",
-      "longitude": "6.2216",
-      "latitude": "43.8471",
+      "longitude": 6.2216,
+      "latitude": 43.8471,
       "locality": "Moustiers-Sainte-Marie"
     },
     {
       "name": "Najac (Aveyron)",
-      "longitude": "1.9799",
-      "latitude": "44.2197",
+      "longitude": 1.9799,
+      "latitude": 44.2197,
       "locality": "Najac"
     },
     {
       "name": "Navarrenx (Pyrénées-Atlantiques)",
-      "longitude": "-0.758770833",
-      "latitude": "43.3215",
+      "longitude": -0.758770833,
+      "latitude": 43.3215,
       "locality": "Navarrenx"
     },
     {
       "name": "Noyers (Yonne)",
-      "longitude": "3.995",
-      "latitude": "47.6973",
+      "longitude": 3.995,
+      "latitude": 47.6973,
       "locality": "Noyers"
     },
     {
       "name": "Oingt (Rhône)",
-      "longitude": "4.5827",
-      "latitude": "45.9477",
+      "longitude": 4.5827,
+      "latitude": 45.9477,
       "locality": "Oingt"
     },
     {
       "name": "Olargues (Hérault)",
-      "longitude": "2.915",
-      "latitude": "43.5564",
+      "longitude": 2.915,
+      "latitude": 43.5564,
       "locality": "Olargues"
     },
     {
       "name": "Parfondeval (Aisne)",
-      "longitude": "4.1606",
-      "latitude": "49.7412",
+      "longitude": 4.1606,
+      "latitude": 49.7412,
       "locality": "Parfondeval"
     },
     {
       "name": "Pérouges (Ain)",
-      "longitude": "5.1803",
-      "latitude": "45.9036",
+      "longitude": 5.1803,
+      "latitude": 45.9036,
       "locality": "Pérouges"
     },
     {
       "name": "Pesmes (Haute-Saône)",
-      "longitude": "5.5655",
-      "latitude": "47.2797",
+      "longitude": 5.5655,
+      "latitude": 47.2797,
       "locality": "Pesmes"
     },
     {
       "name": "Peyre (Aveyron)",
-      "longitude": "2.9987",
-      "latitude": "44.0914",
+      "longitude": 2.9987,
+      "latitude": 44.0914,
       "locality": "Comprégnac"
     },
     {
       "name": "Piana (Corse-du-Sud)",
-      "longitude": "8.6363",
-      "latitude": "42.2388",
+      "longitude": 8.6363,
+      "latitude": 42.2388,
       "locality": "Piana"
     },
     {
       "name": "Polignac (Haute-Loire)",
-      "longitude": "3.860029167",
-      "latitude": "45.0693",
+      "longitude": 3.860029167,
+      "latitude": 45.0693,
       "locality": "Polignac"
     },
     {
       "name": "Pradelles (Haute-Loire)",
-      "longitude": "3.8825",
-      "latitude": "44.7696",
+      "longitude": 3.8825,
+      "latitude": 44.7696,
       "locality": "Pradelles"
     },
     {
       "name": "Pujols-le-Haut (Lot-et-Garonne)",
-      "longitude": "0.6878",
-      "latitude": "44.3856",
+      "longitude": 0.6878,
+      "latitude": 44.3856,
       "locality": "Pujols"
     },
     {
       "name": "Puycelsi (Tarn)",
-      "longitude": "1.7108",
-      "latitude": "43.9929",
+      "longitude": 1.7108,
+      "latitude": 43.9929,
       "locality": "Puycelsi"
     },
     {
       "name": "Riquewihr (Haut-Rhin)",
-      "longitude": "7.298",
-      "latitude": "48.1662",
+      "longitude": 7.298,
+      "latitude": 48.1662,
       "locality": "Riquewihr"
     },
     {
       "name": "Rocamadour (Lot)",
-      "longitude": "1.618129167",
-      "latitude": "44.7993",
+      "longitude": 1.618129167,
+      "latitude": 44.7993,
       "locality": "Rocamadour"
     },
     {
       "name": "Rochefort-en-Terre (Morbihan)",
-      "longitude": "-2.3356",
-      "latitude": "47.7",
+      "longitude": -2.3356,
+      "latitude": 47.7,
       "locality": "Rochefort-en-Terre"
     },
     {
       "name": "Rodemack (Moselle)",
-      "longitude": "6.2369",
-      "latitude": "49.4694",
+      "longitude": 6.2369,
+      "latitude": 49.4694,
       "locality": "Rodemack"
     },
     {
       "name": "Roussillon (Vaucluse)",
-      "longitude": "5.2937",
-      "latitude": "43.902",
+      "longitude": 5.2937,
+      "latitude": 43.902,
       "locality": "Roussillon"
     },
     {
       "name": "Saint-Amand-de-Coly (Dordogne)",
-      "longitude": "1.2482",
-      "latitude": "45.0639",
+      "longitude": 1.2482,
+      "latitude": 45.0639,
       "locality": "Saint-Amand-de-Coly"
     },
     {
       "name": "Saint-Antoine-l'Abbaye (Isère)",
-      "longitude": "5.2172",
-      "latitude": "45.1746",
+      "longitude": 5.2172,
+      "latitude": 45.1746,
       "locality": "Saint-Antoine-l'Abbaye"
     },
     {
       "name": "Saint-Benoît-du-Sault (Indre)",
-      "longitude": "1.3913",
-      "latitude": "46.4409",
+      "longitude": 1.3913,
+      "latitude": 46.4409,
       "locality": "Saint-Benoît-du-Sault"
     },
     {
       "name": "Saint-Bertrand-de-Comminges (Haute-Garonne)",
-      "longitude": "0.571429167",
-      "latitude": "43.0272",
+      "longitude": 0.571429167,
+      "latitude": 43.0272,
       "locality": "Saint-Bertrand-de-Comminges"
     },
     {
       "name": "Saint-Céneri-le-Gérei (Orne)",
-      "longitude": "-0.0523",
-      "latitude": "48.3804",
+      "longitude": -0.0523,
+      "latitude": 48.3804,
       "locality": "Saint-Céneri-le-Gérei"
     },
     {
       "name": "Saint-Cirq-Lapopie (Lot)",
-      "longitude": "1.6703",
-      "latitude": "44.4645",
+      "longitude": 1.6703,
+      "latitude": 44.4645,
       "locality": "Saint-Cirq-Lapopie"
     },
     {
       "name": "Saint-Côme-d'Olt (Aveyron)",
-      "longitude": "2.8151",
-      "latitude": "44.5158",
+      "longitude": 2.8151,
+      "latitude": 44.5158,
       "locality": "Saint-Côme-d’Olt"
     },
     {
       "name": "Sainte-Agnès (Alpes-Maritimes)",
-      "longitude": "7.4618",
-      "latitude": "43.8003",
+      "longitude": 7.4618,
+      "latitude": 43.8003,
       "locality": "Sainte-Agnès"
     },
     {
       "name": "Sainte-Croix-en-Jarez (Loire)",
-      "longitude": "4.6475",
-      "latitude": "45.4797",
+      "longitude": 4.6475,
+      "latitude": 45.4797,
       "locality": "Sainte-Croix-en-Jarez"
     },
     {
       "name": "Sainte-Enimie (Lozère)",
-      "longitude": "3.4118",
-      "latitude": "44.3664",
+      "longitude": 3.4118,
+      "latitude": 44.3664,
       "locality": "Gorges du Tarn Causses"
     },
     {
       "name": "Sainte-Eulalie-d'Olt (Aveyron)",
-      "longitude": "2.9465",
-      "latitude": "44.4645",
+      "longitude": 2.9465,
+      "latitude": 44.4645,
       "locality": "Sainte-Eulalie-d’Olt"
     },
     {
       "name": "Sainte-Suzanne (Mayenne)",
-      "longitude": "-0.352",
-      "latitude": "48.0978",
+      "longitude": -0.352,
+      "latitude": 48.0978,
       "locality": "Sainte-Suzanne"
     },
     {
       "name": "Saint-Guilhem-le-Désert (Hérault)",
-      "longitude": "3.5504",
-      "latitude": "43.7337",
+      "longitude": 3.5504,
+      "latitude": 43.7337,
       "locality": "Saint-Guilhem-le-Désert"
     },
     {
       "name": "Saint-Jean-de-Côle (Dordogne)",
-      "longitude": "0.8387",
-      "latitude": "45.4212",
+      "longitude": 0.8387,
+      "latitude": 45.4212,
       "locality": "Saint-Jean-de-Côle"
     },
     {
       "name": "Saint-Jean-Pied-de-Port (Pyrénées-Atlantiques)",
-      "longitude": "-1.235770833",
-      "latitude": "43.164",
+      "longitude": -1.235770833,
+      "latitude": 43.164,
       "locality": "Saint-Jean-Pied-de-Port"
     },
     {
       "name": "Saint-Léon-sur-Vézère (Dordogne)",
-      "longitude": "1.0898",
-      "latitude": "45.0108",
+      "longitude": 1.0898,
+      "latitude": 45.0108,
       "locality": "Saint-Léon-sur-Vézère"
     },
     {
       "name": "Saint-Quirin (Moselle)",
-      "longitude": "7.0649",
-      "latitude": "48.6099",
+      "longitude": 7.0649,
+      "latitude": 48.6099,
       "locality": "Saint-Quirin"
     },
     {
       "name": "Saint-Robert (Corrèze)",
-      "longitude": "1.2941",
-      "latitude": "45.2556",
+      "longitude": 1.2941,
+      "latitude": 45.2556,
       "locality": "Saint-Robert"
     },
     {
       "name": "Saint-Suliac (Ille-et-Vilaine)",
-      "longitude": "-1.972",
-      "latitude": "48.5703",
+      "longitude": -1.972,
+      "latitude": 48.5703,
       "locality": "Saint-Suliac"
     },
     {
       "name": "Saint-Véran (Hautes-Alpes)",
-      "longitude": "6.8687",
-      "latitude": "44.7003",
+      "longitude": 6.8687,
+      "latitude": 44.7003,
       "locality": "Saint-Véran"
     },
     {
       "name": "Salers (Cantal)",
-      "longitude": "2.4947",
-      "latitude": "45.1386",
+      "longitude": 2.4947,
+      "latitude": 45.1386,
       "locality": "Salers"
     },
     {
       "name": "Sancerre (Cher)",
-      "longitude": "2.839429167",
-      "latitude": "47.331",
+      "longitude": 2.839429167,
+      "latitude": 47.331,
       "locality": "Sancerre"
     },
     {
       "name": "Sant'Antonino (Haute-Corse)",
-      "longitude": "8.9054",
-      "latitude": "42.5889",
+      "longitude": 8.9054,
+      "latitude": 42.5889,
       "locality": "Sant’Antonino"
     },
     {
       "name": "Sare (Pyrénées-Atlantiques)",
-      "longitude": "-1.5796",
-      "latitude": "43.3125",
+      "longitude": -1.5796,
+      "latitude": 43.3125,
       "locality": "Sare"
     },
     {
       "name": "Sarrant (Gers)",
-      "longitude": "0.9296",
-      "latitude": "43.7742",
+      "longitude": 0.9296,
+      "latitude": 43.7742,
       "locality": "Sarrant"
     },
     {
       "name": "Sauveterre-de-Rouergue (Aveyron)",
-      "longitude": "2.3183",
-      "latitude": "44.2206",
+      "longitude": 2.3183,
+      "latitude": 44.2206,
       "locality": "Sauveterre-de-Rouergue"
     },
     {
       "name": "Séguret (Vaucluse)",
-      "longitude": "5.0237",
-      "latitude": "44.2062",
+      "longitude": 5.0237,
+      "latitude": 44.2062,
       "locality": "Séguret"
     },
     {
       "name": "Ségur-le-Château (Corrèze)",
-      "longitude": "1.3058",
-      "latitude": "45.4293",
+      "longitude": 1.3058,
+      "latitude": 45.4293,
       "locality": "Ségur-le-Château"
     },
     {
       "name": "Seillans (Var)",
-      "longitude": "6.6437",
-      "latitude": "43.6365",
+      "longitude": 6.6437,
+      "latitude": 43.6365,
       "locality": "Seillans"
     },
     {
       "name": "Semur-en-Brionnais (Saône-et-Loire)",
-      "longitude": "4.0913",
-      "latitude": "46.2627",
+      "longitude": 4.0913,
+      "latitude": 46.2627,
       "locality": "Semur-en-Brionnais"
     },
     {
       "name": "Talmont-sur-Gironde (Charente-Maritime)",
-      "longitude": "-0.9073",
-      "latitude": "45.5355",
+      "longitude": -0.9073,
+      "latitude": 45.5355,
       "locality": "Talmont-sur-Gironde"
     },
     {
       "name": "Tournemire (Cantal)",
-      "longitude": "2.483",
-      "latitude": "45.054",
+      "longitude": 2.483,
+      "latitude": 45.054,
       "locality": "Tournemire"
     },
     {
       "name": "Tournon-d'Agenais (Lot-et-Garonne)",
-      "longitude": "0.996229167",
-      "latitude": "44.3997",
+      "longitude": 0.996229167,
+      "latitude": 44.3997,
       "locality": "Tournon-d’Agenais"
     },
     {
       "name": "Tourtour (Var)",
-      "longitude": "6.3026",
-      "latitude": "43.5897",
+      "longitude": 6.3026,
+      "latitude": 43.5897,
       "locality": "Tourtour"
     },
     {
       "name": "Turenne (Corrèze)",
-      "longitude": "1.583",
-      "latitude": "45.054",
+      "longitude": 1.583,
+      "latitude": 45.054,
       "locality": "Turenne"
     },
     {
       "name": "Usson (Puy-de-Dôme)",
-      "longitude": "3.3398",
-      "latitude": "45.5274",
+      "longitude": 3.3398,
+      "latitude": 45.5274,
       "locality": "Usson"
     },
     {
       "name": "Venasque (Vaucluse)",
-      "longitude": "5.147",
-      "latitude": "43.9956",
+      "longitude": 5.147,
+      "latitude": 43.9956,
       "locality": "Venasque"
     },
     {
       "name": "Veules-les-Roses (Seine-Maritime)",
-      "longitude": "0.8",
-      "latitude": "49.8735",
+      "longitude": 0.8,
+      "latitude": 49.8735,
       "locality": "Veules-les-Roses"
     },
     {
       "name": "Vézelay (Yonne)",
-      "longitude": "3.74759778175",
-      "latitude": "47.4662756129",
+      "longitude": 3.74759778175,
+      "latitude": 47.4662756129,
       "locality": "Vézelay"
     },
     {
       "name": "Villefranche-de-Conflent (Pyrénées-Orientales)",
-      "longitude": "2.3687",
-      "latitude": "42.5871",
+      "longitude": 2.3687,
+      "latitude": 42.5871,
       "locality": "Villefranche-de-Conflent"
     },
     {
       "name": "Villeréal (Lot-et-Garonne)",
-      "longitude": "0.744229167",
-      "latitude": "44.6364",
+      "longitude": 0.744229167,
+      "latitude": 44.6364,
       "locality": "Villeréal"
     },
     {
       "name": "Vogüé (Ardèche)",
-      "longitude": "4.4153",
-      "latitude": "44.5509",
+      "longitude": 4.4153,
+      "latitude": 44.5509,
       "locality": "Vogüé"
     },
     {
       "name": "Vouvant (Vendée)",
-      "longitude": "-0.7687",
-      "latitude": "46.5723",
+      "longitude": -0.7687,
+      "latitude": 46.5723,
       "locality": "Vouvant"
     },
     {
       "name": "Yèvre-le-Châtel (Loiret)",
-      "longitude": "2.3337",
-      "latitude": "48.16",
+      "longitude": 2.3337,
+      "latitude": 48.16,
       "locality": "Yèvre-la-Ville"
     },
     {
       "name": "Yvoire (Haute-Savoie)",
-      "longitude": "6.3269",
-      "latitude": "46.3698",
+      "longitude": 6.3269,
+      "latitude": 46.3698,
       "locality": "Yvoire"
     }
   ]

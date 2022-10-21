@@ -5,12 +5,8 @@ header.append("h1").text("Beauteous Villages");
 header
   .append("p")
   .html(
-    '<a href="https://www.les-plus-beaux-villages-de-france.org">Les Plus Beaux Village de France</a> celebrates the most beautiful villages of France. In these communities of less than 2000 inhabitants the association promotes sites of historical importance as well as peculiar landscapes and local traditions.'
+    '<a href="https://www.les-plus-beaux-villages-de-france.org">Les Plus Beaux Village de France</a> celebrates the most beautiful villages of France. <br/>In these communities the association promotes sites of historical importance, peculiar landscapes and local traditions.'
   );
-
-header
-  .append("p")
-  .text("Let's try to highlight the certification through continental France.");
 
 const size = 600;
 
@@ -22,7 +18,7 @@ svg
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
   .append("text")
-  .text("Loading Geographical Data");
+  .text("Loading data");
 
 // REQUIRE A SERVER TO BYPASS CORS
 (async () => {
@@ -75,14 +71,14 @@ svg
         .text("beautiful villages");
 
       groupGeoJSON
+        .attr("fill", "rgb(249, 161, 91)")
+        .attr("stroke", "rgba(255, 255, 255, 0.8)")
+        .attr("stroke-width", "1")
         .selectAll("path")
         .data(geoJSON.features)
         .enter()
         .append("path")
-        .attr("d", path)
-        .attr("fill", "hsl(0, 0%, 92%)")
-        .attr("stroke", "hsl(0, 0%, 27%)")
-        .attr("stroke-width", "0.75");
+        .attr("d", path);
 
       groupVillages
         .selectAll("circle")
@@ -92,10 +88,7 @@ svg
         .attr(
           "transform",
           ({ longitude, latitude }) =>
-            `translate(${projection([
-              parseFloat(longitude),
-              parseFloat(latitude),
-            ])})`
+            `translate(${projection([longitude, latitude])})`
         )
         .attr("fill", "hsl(0, 0%, 27%)")
         .attr("r", "3");
@@ -105,7 +98,7 @@ svg
 
       const { locality, longitude, latitude } =
         villages[Math.floor(Math.random() * villages.length)];
-      const [x, y] = projection([parseFloat(longitude), parseFloat(latitude)]);
+      const [x, y] = projection([longitude, latitude]);
 
       groupInteraction
         .append("path")
@@ -145,26 +138,11 @@ svg
 
       const delaunay = d3.Delaunay.from(
         villages.map(({ longitude, latitude }) =>
-          projection([parseFloat(longitude), parseFloat(latitude)])
+          projection([longitude, latitude])
         )
       );
 
       const voronoi = delaunay.voronoi([0, 0, size, size]);
-
-      // helper visuals
-      // groupInteraction
-      //   .append("path")
-      //   .attr("d", voronoi.render())
-      //   .attr("fill", "none")
-      //   .attr("stroke", "hsl(0, 0%, 27%)")
-      //   .attr("stroke-width", 1);
-
-      // groupInteraction
-      //   .append("path")
-      //   .attr("d", voronoi.renderBounds())
-      //   .attr("fill", "none")
-      //   .attr("stroke", "hsl(0, 0%, 27%)")
-      //   .attr("stroke-width", 1);
 
       const cellsInteraction = groupInteraction
         .append("g")
@@ -183,7 +161,7 @@ svg
         .transition()
         .duration(durationTransitionVillages);
 
-      const transitionInteraction = d3
+      const transitionHighlight = d3
         .transition(transitionVillages)
         .transition()
         .duration(500)
@@ -219,7 +197,7 @@ svg
       groupInteraction
         .style("opacity", 0)
         .style("visibility", "hidden")
-        .transition(transitionInteraction)
+        .transition(transitionHighlight)
         .style("opacity", 1)
         .style("visibility", "visible")
         .on("end", () => {
@@ -242,10 +220,7 @@ svg
             const i = cellsInteraction.nodes().indexOf(this);
 
             const { locality, longitude, latitude } = villages[i];
-            const [x, y] = projection([
-              parseFloat(longitude),
-              parseFloat(latitude),
-            ]);
+            const [x, y] = projection([longitude, latitude]);
 
             groupInteraction
               .select("path")
