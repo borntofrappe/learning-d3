@@ -148,3 +148,75 @@ const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
 
     return [...acc, decimal];
   }, []);
+
+const div = d3.select("body").append("div");
+
+const size = 600;
+
+const svg = div
+  .append("svg")
+  .attr("viewBox", `0 0 ${size} ${size}`)
+  .attr("width", size)
+  .attr("height", size);
+
+const defs = svg.append("defs");
+
+const radialGradient = defs
+  .append("radialGradient")
+  .attr("id", "g")
+  .attr("gradientUnits", "userSpaceOnUse")
+  .attr("cx", (size * 3) / 4)
+  .attr("cy", size / 4);
+
+radialGradient
+  .append("stop")
+  .attr("offset", 0)
+  .attr("stop-color", "hsl(0, 0%, 100%)");
+
+radialGradient
+  .append("stop")
+  .attr("offset", 1)
+  .attr("stop-color", "hsl(0, 0%, 50%)");
+
+svg
+  .append("g")
+  .attr("transform", `translate(${size / 2} ${size / 2})`)
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .append("text")
+  .text("Loading data");
+
+(async () => {
+  const json = await d3.json(
+    "https://unpkg.com/world-atlas@2.0.2/land-50m.json"
+  );
+  svg.select("g").remove();
+
+  const sphere = { type: "Sphere" };
+
+  const projection = d3.geoOrthographic().fitSize([size, size], sphere);
+  const path = d3.geoPath().projection(projection);
+
+  const groupGeo = svg.append("g");
+  const groupData = svg.append("g");
+
+  groupGeo
+    .append("path")
+    .attr("d", path(sphere))
+    .attr("fill", "hsl(0, 0%, 97%)");
+  groupGeo
+    .append("path")
+    .attr("d", path(sphere))
+    .attr("fill", "url(#g)")
+    .attr("opacity", 0.5);
+
+  groupGeo
+    .append("path")
+    .attr("d", path(topojson.feature(json, json.objects.land)))
+    .attr("fill", "hsl(0, 0%, 78%)");
+  groupGeo
+    .append("path")
+    .attr("d", path(topojson.feature(json, json.objects.land)))
+    .attr("fill", "url(#g)")
+    .attr("opacity", 0.5);
+})();
