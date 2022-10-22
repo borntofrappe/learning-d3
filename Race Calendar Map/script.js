@@ -133,13 +133,18 @@ const data = [
   },
 ];
 
-const main = d3.select("body").append("main");
-main.append("h1").text("F1 Calendar Map");
+const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
+  coordinates.split(/[ -]/).reduce((acc, curr) => {
+    let [, degrees, minutes, seconds, direction] = curr.match(
+      /([\d\.]+)°([\d\.]+)′([\d\.]+)″([NSWE])/
+    );
 
-const draw = async () => {
-  const data = await d3.csv("data.csv");
+    [degrees, minutes, seconds] = [degrees, minutes, seconds].map((d) =>
+      parseFloat(d)
+    );
+    let decimal = degrees + minutes / 60 + seconds / 3600;
 
-  console.log(data);
-};
+    if (direction === "S" || direction === "W") decimal *= -1;
 
-draw();
+    return [...acc, decimal];
+  }, []);
