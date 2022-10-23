@@ -225,4 +225,29 @@ svg
     .attr("clip-path", "url(#clip-path-overlay)")
     .attr("fill", "url(#gradient-overlay)")
     .attr("opacity", 0.5);
+
+  const groupsData = groupData
+    .selectAll("g")
+    .data(data)
+    .enter()
+    .append("g")
+    .attr(
+      "transform",
+      ({ Coordinates }) => `translate(${projection(getLongLat(Coordinates))})`
+    );
+
+  groupsData.append("circle").attr("r", "5");
+
+  groupsData
+    .append("text")
+    .text((d) => d.Venue)
+    .attr("y", "-8")
+    .attr("text-anchor", "middle");
+
+  groupsData
+    .filter(
+      ({ Coordinates }) =>
+        path({ type: "Point", coordinates: getLongLat(Coordinates) }) === null
+    )
+    .attr("opacity", "0");
 })();

@@ -10,7 +10,7 @@ Highlight the destinations geographically taking inspiration from [a bl.ock intr
 
 The data is taken directly from the cited F1 website. On top of the three keys describing the date, grand prix and venue I've manually added the geographic coordinates from Wikipedia.
 
-For each track the coordinates describe the location with degrees, minutes and seconds. `getLatLong` receives such a coordinate and returns the values for the longitude and latitude used in a D3 projection.
+For each track the coordinates describe the location with degrees, minutes and seconds. `getLongLat` receives such a coordinate and returns the values for the longitude and latitude used in a D3 projection.
 
 ## World map
 
@@ -66,3 +66,60 @@ groupOverlay
   .attr("height", size)
   .attr("clip-path", "url(#clip-path-overlay)");
 ```
+
+## Points
+
+For the input data use the projection function to position group elements.
+
+```js
+const groupsData = groupData
+  .selectAll("g")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    ({ Coordinates }) => `translate(${projection(getLongLat(Coordinates))})`
+  );
+```
+
+In each group add a circle and a text with a label.
+
+```js
+groupsData.append("circle").attr("r", "5");
+
+groupsData.append("text").text((d) => d.Venue);
+```
+
+This has the unfortunate effect of drawing _all_ points, even those behind the projection. One way to fix this is through an object of type `Point` with specific coordinates.
+
+```js
+{ type: "Point", coordinates: [long, lat] }
+```
+
+Passed to the `geoPath` function the result is either the syntax for the `d` attribute of path elements or `null`, if the point is not visible.
+
+```js
+path({ type: "Point", coordinates: [long, lat] });
+```
+
+Filter the groups according to this value to hide the corresponding elements.
+
+```js
+groupsData
+  .filter(
+    ({ Coordinates }) =>
+      path({ type: "Point", coordinates: getLongLat(Coordinates) }) === null
+  )
+  .attr("opacity", "0");
+```
+
+<!--
+const header = div.append("header");
+header.append("h1").text("F1 Calendar Map");
+header
+  .append("p")
+  .html(
+    '<a href="https://www.formula1.com/en/latest/article.formula-1-announces-23-race-calendar-for-2022.2HcIP34fK3Zznx7YZfWL6P.html">The 2022 season</a> was announced to include races from all over the globe.'
+  );
+-->
