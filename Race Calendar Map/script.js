@@ -134,20 +134,23 @@ const data = [
 ];
 
 const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
-  coordinates.split(/[ -]/).reduce((acc, curr) => {
-    let [, degrees, minutes, seconds, direction] = curr.match(
-      /([\d\.]+)°([\d\.]+)′([\d\.]+)″([NSWE])/
-    );
+  coordinates
+    .split(/[ -]/)
+    .reduce((acc, curr) => {
+      let [, degrees, minutes, seconds, direction] = curr.match(
+        /([\d\.]+)°([\d\.]+)′([\d\.]+)″([NSWE])/
+      );
 
-    [degrees, minutes, seconds] = [degrees, minutes, seconds].map((d) =>
-      parseFloat(d)
-    );
-    let decimal = degrees + minutes / 60 + seconds / 3600;
+      [degrees, minutes, seconds] = [degrees, minutes, seconds].map((d) =>
+        parseFloat(d)
+      );
+      let decimal = degrees + minutes / 60 + seconds / 3600;
 
-    if (direction === "S" || direction === "W") decimal *= -1;
+      if (direction === "S" || direction === "W") decimal *= -1;
 
-    return [...acc, decimal];
-  }, []);
+      return [...acc, decimal];
+    }, [])
+    .reverse();
 
 const div = d3.select("body").append("div");
 
@@ -163,7 +166,7 @@ const defs = svg.append("defs");
 
 const radialGradient = defs
   .append("radialGradient")
-  .attr("id", "g")
+  .attr("id", "gradient-overlay")
   .attr("gradientUnits", "userSpaceOnUse")
   .attr("cx", (size * 3) / 4)
   .attr("cy", size / 4);
@@ -199,24 +202,27 @@ svg
 
   const groupGeo = svg.append("g");
   const groupData = svg.append("g");
+  const groupOverlay = svg.append("g");
+
+  const clipPath = defs.append("clipPath").attr("id", "clip-path-overlay");
+
+  clipPath.append("path").attr("d", path(sphere));
 
   groupGeo
     .append("path")
     .attr("d", path(sphere))
     .attr("fill", "hsl(0, 0%, 97%)");
-  groupGeo
-    .append("path")
-    .attr("d", path(sphere))
-    .attr("fill", "url(#g)")
-    .attr("opacity", 0.5);
 
   groupGeo
     .append("path")
     .attr("d", path(topojson.feature(json, json.objects.land)))
     .attr("fill", "hsl(0, 0%, 78%)");
-  groupGeo
-    .append("path")
-    .attr("d", path(topojson.feature(json, json.objects.land)))
-    .attr("fill", "url(#g)")
+
+  groupOverlay
+    .append("rect")
+    .attr("width", size)
+    .attr("height", size)
+    .attr("clip-path", "url(#clip-path-overlay)")
+    .attr("fill", "url(#gradient-overlay)")
     .attr("opacity", 0.5);
 })();
