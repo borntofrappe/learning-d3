@@ -152,6 +152,11 @@ const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
     }, [])
     .reverse();
 
+data.forEach((datum) => {
+  const { Coordinates } = datum;
+  datum.coordinates = getLongLat(Coordinates);
+});
+
 const div = d3.select("body").append("div");
 
 const size = 600;
@@ -201,6 +206,7 @@ svg
   const path = d3.geoPath().projection(projection);
 
   const groupGeo = svg.append("g");
+  const groupArcs = svg.append("g");
   const groupData = svg.append("g");
   const groupOverlay = svg.append("g");
 
@@ -233,7 +239,7 @@ svg
     .append("g")
     .attr(
       "transform",
-      ({ Coordinates }) => `translate(${projection(getLongLat(Coordinates))})`
+      ({ coordinates }) => `translate(${projection(coordinates)})`
     );
 
   groupsData.append("circle").attr("r", "5");
@@ -245,9 +251,21 @@ svg
     .attr("text-anchor", "middle");
 
   groupsData
-    .filter(
-      ({ Coordinates }) =>
-        path({ type: "Point", coordinates: getLongLat(Coordinates) }) === null
-    )
+    .filter(({ coordinates }) => path({ type: "Point", coordinates }) === null)
     .attr("opacity", "0");
+
+  groupArcs
+    .selectAll("g")
+    .data(data.slice(0, -1))
+    .enter()
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "1")
+    .attr("d", ({ coordinates }, i) =>
+      path({
+        type: "LineString",
+        coordinates: [coordinates, data[i + 1].coordinates],
+      })
+    );
 })();

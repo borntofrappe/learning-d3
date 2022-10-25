@@ -114,6 +114,31 @@ groupsData
   .attr("opacity", "0");
 ```
 
+## Arcs
+
+Looking at the source code for [Faux-3D Arcs](http://bl.ocks.org/dwtkns/4973620) it seems the solution to draw 3D arcs is with another object type.
+
+```js
+path({
+  type: "Feature",
+  geometry: {
+    type: "LineString",
+    coordinates: [data[0].coordinates, data[5].coordinates],
+  },
+});
+```
+
+It is actually possible to simplify the object further considering only the `type` of `LineString` and `coordinates` nested array for the source and target.
+
+```js
+path({
+  type: "LineString",
+  coordinates: [data[0].coordinates, data[5].coordinates],
+});
+```
+
+The projetion already accounts for the line behind the sphere.
+
 <!--
 const header = div.append("header");
 header.append("h1").text("F1 Calendar Map");
