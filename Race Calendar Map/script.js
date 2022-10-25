@@ -159,6 +159,13 @@ data.forEach((datum) => {
 
 const div = d3.select("body").append("div");
 
+const input = div
+  .append("input")
+  .attr("type", "range")
+  .attr("min", "0")
+  .attr("max", "360")
+  .attr("value", "0");
+
 const size = 600;
 
 const svg = div
@@ -203,6 +210,7 @@ svg
   const sphere = { type: "Sphere" };
 
   const projection = d3.geoOrthographic().fitSize([size, size], sphere);
+
   const path = d3.geoPath().projection(projection);
 
   const groupGeo = svg.append("g");
@@ -255,7 +263,7 @@ svg
     .attr("opacity", "0");
 
   groupArcs
-    .selectAll("g")
+    .selectAll("path")
     .data(data.slice(0, -1))
     .enter()
     .append("path")
@@ -268,4 +276,35 @@ svg
         coordinates: [coordinates, data[i + 1].coordinates],
       })
     );
+
+  input.on("input", (e) => {
+    const degrees = parseFloat(e.target.value);
+
+    projection.rotate([degrees, 0]);
+
+    groupGeo
+      .select("path:nth-of-type(2)")
+      .attr("d", path(topojson.feature(json, json.objects.land)));
+
+    groupData
+      .selectAll("g")
+      .attr(
+        "transform",
+        ({ coordinates }) => `translate(${projection(coordinates)})`
+      );
+
+    groupsData
+      .attr("opacity", "1")
+      .filter(
+        ({ coordinates }) => path({ type: "Point", coordinates }) === null
+      )
+      .attr("opacity", "0");
+
+    groupArcs.selectAll("path").attr("d", ({ coordinates }, i) =>
+      path({
+        type: "LineString",
+        coordinates: [coordinates, data[i + 1].coordinates],
+      })
+    );
+  });
 })();

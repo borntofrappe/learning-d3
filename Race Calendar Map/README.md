@@ -140,6 +140,42 @@ path({
 The projetion already accounts for the line behind the sphere.
 
 <!--
+
+### Details
+
+To further the illusion of depth the idea is to create different arcs.
+
+
+
+  const line = d3
+    .line()
+    .x(([x]) => x)
+    .y(([, y]) => y)
+    .curve(d3.curveCatmullRom);
+
+  const projectionArcs = d3
+    .geoOrthographic()
+    .fitSize([size, size], sphere)
+    .scale(projection.scale() * 1.1);
+
+  const pathArcs = d3.geoPath().projection(projectionArcs);
+
+  groupArcs
+    .append("g")
+    .selectAll("path")
+    .data(data.slice(0, -1))
+    .enter()
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", "1")
+    .attr("d", ({ coordinates }, i) =>
+      path({
+        type: "LineString",
+        coordinates: [coordinates, data[i + 1].coordinates],
+      })
+    );
+
 const header = div.append("header");
 header.append("h1").text("F1 Calendar Map");
 header
