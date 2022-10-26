@@ -147,6 +147,25 @@ const svg = div
   .attr("width", size)
   .attr("height", size);
 
+const defs = svg.append("defs");
+
+const radialGradient = defs
+  .append("radialGradient")
+  .attr("id", "gradient-overlay")
+  .attr("gradientUnits", "userSpaceOnUse")
+  .attr("cx", (size * 3) / 4)
+  .attr("cy", size / 4);
+
+radialGradient
+  .append("stop")
+  .attr("offset", 0)
+  .attr("stop-color", "hsl(0, 0%, 100%)");
+
+radialGradient
+  .append("stop")
+  .attr("offset", 1)
+  .attr("stop-color", "hsl(0, 0%, 50%)");
+
 svg
   .append("g")
   .attr("transform", `translate(${size / 2} ${size / 2})`)
@@ -170,6 +189,7 @@ svg
   intro.on("end", () => {
     const groupMap = svg.append("g");
     const groupGeo = groupMap.append("g");
+    const groupOverlay = groupMap.append("g");
 
     groupMap.attr("opacity", "0").transition().attr("opacity", "1");
 
@@ -178,14 +198,28 @@ svg
 
     const path = d3.geoPath().projection(projection);
 
+    defs
+      .append("clipPath")
+      .attr("id", "clip-path-overlay")
+      .append("path")
+      .attr("d", path(sphere));
+
     groupGeo
       .append("path")
       .attr("d", path(sphere))
-      .attr("fill", "hsl(0, 0%, 95%)");
+      .attr("fill", "hsl(0, 0%, 97%)");
 
     groupGeo
       .append("path")
       .attr("d", path(topojson.feature(json, json.objects.land)))
       .attr("fill", "hsl(0, 0%, 78%)");
+
+    groupOverlay
+      .append("rect")
+      .attr("width", size)
+      .attr("height", size)
+      .attr("fill", "url(#gradient-overlay)")
+      .attr("opacity", 0.5)
+      .attr("clip-path", "url(#clip-path-overlay)");
   });
 })();

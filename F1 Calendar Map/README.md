@@ -104,3 +104,46 @@ groupGeo
 ```
 
 Use `topojson.feature` for the desired geometries.
+
+### Depth
+
+The orthographic projection already creates the illusion of depth. To further this illusion, following the faux-3d arcs cited example, add a radial gradient on the Earth's surface.
+
+Define the gradient relative to the SVG.
+
+```js
+const defs = svg.append("defs");
+
+const radialGradient = defs
+  .append("radialGradient")
+  .attr("id", "gradient-overlay")
+  .attr("gradientUnits", "userSpaceOnUse")
+  .attr("cx", (size * 3) / 4)
+  .attr("cy", size / 4);
+```
+
+For the colors of the gradient I chose two arbitrary shades of white.
+
+Overlay a semitransparent rectangle with the gradient.
+
+```js
+groupOverlay
+  .append("rect")
+  .attr("width", size)
+  .attr("height", size)
+  .attr("fill", "url(#gradient-overlay)")
+  .attr("opacity", 0.5);
+```
+
+Clip the rectangle with the same path element used for the sphere.
+
+```js
+defs
+  .append("clipPath")
+  .attr("id", "clip-path-overlay")
+  .append("path")
+  .attr("d", path(sphere));
+
+// rect
+.attr("clip-path", "url(#clip-path-overlay)");
+```
