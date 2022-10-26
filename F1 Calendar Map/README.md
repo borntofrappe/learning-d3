@@ -147,3 +147,55 @@ defs
 // rect
 .attr("clip-path", "url(#clip-path-overlay)");
 ```
+
+## Points
+
+Define getLongLat to return the values for a D3 projection, longitude and latitude, from an input coordinate. Given a certain direction the coversion follows the formula:
+
+```pseudo
+decimal = degrees + minutes / 60 + seconds / 3600
+```
+
+If the direction is South or West the value should be negative.
+
+You could call the function whenever you use a projection, but out of convenience loop through the input dataset to create the values for all destinations.
+
+```js
+const data = dataset.map((datum) => {
+  const { Coordinates } = datum;
+  const coordinates = getLongLat(Coordinates);
+
+  return { ...datum, coordinates };
+});
+```
+
+To draw single points use the projection with a specific geometry (similar to how you use an object for the sphere).
+
+```js
+const point = { type: "Point", coordinates: [long, lat] };
+```
+
+Pass the object with the longitude and latitude to the instance of the `geoPath` function.
+
+```js
+groupData.append("path").attr("d", path(point)).attr("fill", "hsl(0, 0%, 32%)");
+```
+
+The function is based on the projection and returns the d attribute for a path element. The syntax essentially draws a dot. Based on the projection it returns the attribute _or_ `null`, meaning the point is not displayed. This happens when the point is behind the 3D projection.
+
+Repeat the operation for all data points to describe all tracks.
+
+Change the size of the point on the same path function.
+
+```js
+const path = d3.geoPath().projection(projection).pointRadius(7);
+```
+
+To test the visibility of the points rotate the projection.
+
+```js
+const projection = d3
+  .geoOrthographic()
+  .fitSize([size, size], sphere)
+  .rotate([180, 0]);
+```

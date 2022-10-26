@@ -133,6 +133,25 @@ const dataset = [
   },
 ];
 
+const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
+  coordinates
+    .split(/[ -]/)
+    .reduce((acc, curr) => {
+      let [, degrees, minutes, seconds, direction] = curr.match(
+        /([\d\.]+)°([\d\.]+)′([\d\.]+)″([NSWE])/
+      );
+
+      [degrees, minutes, seconds] = [degrees, minutes, seconds].map((d) =>
+        parseFloat(d)
+      );
+      let decimal = degrees + minutes / 60 + seconds / 3600;
+
+      if (direction === "S" || direction === "W") decimal *= -1;
+
+      return [...acc, decimal];
+    }, [])
+    .reverse();
+
 const div = d3
   .select("body")
   .append("div")
@@ -179,6 +198,13 @@ svg
     "https://unpkg.com/world-atlas@2.0.2/land-50m.json"
   );
 
+  const data = dataset.map((datum) => {
+    const { Coordinates } = datum;
+    const coordinates = getLongLat(Coordinates);
+
+    return { ...datum, coordinates };
+  });
+
   const intro = svg
     .select("g")
     .attr("opacity", "1")
@@ -190,13 +216,15 @@ svg
     const groupMap = svg.append("g");
     const groupGeo = groupMap.append("g");
     const groupOverlay = groupMap.append("g");
+    const groupData = groupMap.append("g");
 
     groupMap.attr("opacity", "0").transition().attr("opacity", "1");
 
     const sphere = { type: "Sphere" };
+
     const projection = d3.geoOrthographic().fitSize([size, size], sphere);
 
-    const path = d3.geoPath().projection(projection);
+    const path = d3.geoPath().projection(projection).pointRadius(5);
 
     defs
       .append("clipPath")
@@ -221,5 +249,14 @@ svg
       .attr("fill", "url(#gradient-overlay)")
       .attr("opacity", 0.5)
       .attr("clip-path", "url(#clip-path-overlay)");
+
+    const groupPoints = groupData.append("g");
+    groupPoints
+      .selectAll("path")
+      .data(data)
+      .enter()
+      .append("path")
+      .attr("d", ({ coordinates }) => path({ type: "Point", coordinates }))
+      .attr("fill", "hsl(0, 0%, 32%)");
   });
 })();
