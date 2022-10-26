@@ -199,3 +199,11 @@ const projection = d3
   .fitSize([size, size], sphere)
   .rotate([180, 0]);
 ```
+
+### Focus
+
+Draw countries instead of land (messy rotation).
+
+Bind data to the countries' paths and the data' points.
+
+Update projection to focus on the longitude of a start value.

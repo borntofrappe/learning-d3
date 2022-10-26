@@ -156,6 +156,7 @@ const div = d3
   .select("body")
   .append("div")
   .style("background", "hsl(0, 0%, 99%)");
+
 div.append("h1").text("F1 Calendar Map");
 
 const size = 600;
@@ -195,7 +196,7 @@ svg
 
 (async () => {
   const json = await d3.json(
-    "https://unpkg.com/world-atlas@2.0.2/land-50m.json"
+    "https://unpkg.com/world-atlas@2.0.2/countries-110m.json"
   );
 
   const data = dataset.map((datum) => {
@@ -205,20 +206,23 @@ svg
     return { ...datum, coordinates };
   });
 
-  const intro = svg
+  const outro = svg
     .select("g")
     .attr("opacity", "1")
     .transition()
     .attr("opacity", "0")
     .remove();
 
-  intro.on("end", () => {
+  outro.on("end", () => {
     const groupMap = svg.append("g");
     const groupGeo = groupMap.append("g");
     const groupOverlay = groupMap.append("g");
     const groupData = groupMap.append("g");
 
-    groupMap.attr("opacity", "0").transition().attr("opacity", "1");
+    const intro = groupMap
+      .attr("opacity", "0")
+      .transition()
+      .attr("opacity", "1");
 
     const sphere = { type: "Sphere" };
 
@@ -237,9 +241,14 @@ svg
       .attr("d", path(sphere))
       .attr("fill", "hsl(0, 0%, 97%)");
 
-    groupGeo
+    const groupCountries = groupGeo.append("g");
+
+    groupCountries
+      .selectAll("path")
+      .data(topojson.feature(json, json.objects.countries).features)
+      .enter()
       .append("path")
-      .attr("d", path(topojson.feature(json, json.objects.land)))
+      .attr("d", path)
       .attr("fill", "hsl(0, 0%, 78%)");
 
     groupOverlay
@@ -253,10 +262,39 @@ svg
     const groupPoints = groupData.append("g");
     groupPoints
       .selectAll("path")
-      .data(data)
+      .data(data.map(({ coordinates }) => ({ type: "Point", coordinates })))
       .enter()
       .append("path")
-      .attr("d", ({ coordinates }) => path({ type: "Point", coordinates }))
+      .attr("d", path)
       .attr("fill", "hsl(0, 0%, 32%)");
+
+    intro.on("end", (d) => {
+      const [datum] = data;
+      const { Venue, coordinates } = datum;
+      const [long, lat] = coordinates;
+
+      const [startAngle] = projection.rotate();
+      const endAngle = long * -1 + 30;
+      const duration = 1000;
+      const timer = d3.timer((elapsed) => {
+        const angle =
+          startAngle + (endAngle - startAngle) * (elapsed / duration);
+        projection.rotate([angle, 0, 0]);
+
+        groupCountries.selectAll("path").attr("d", path);
+
+        groupPoints.selectAll("path").attr("d", path);
+
+        if (elapsed > duration) {
+          timer.stop();
+
+          projection.rotate([endAngle, 0, 0]);
+
+          groupCountries.selectAll("path").attr("d", path);
+
+          groupPoints.selectAll("path").attr("d", path);
+        }
+      }, 150);
+    });
   });
 })();
