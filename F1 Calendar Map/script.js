@@ -133,5 +133,59 @@ const dataset = [
   },
 ];
 
-const div = d3.select("body").append("div");
+const div = d3
+  .select("body")
+  .append("div")
+  .style("background", "hsl(0, 0%, 99%)");
 div.append("h1").text("F1 Calendar Map");
+
+const size = 600;
+
+const svg = div
+  .append("svg")
+  .attr("viewBox", `0 0 ${size} ${size}`)
+  .attr("width", size)
+  .attr("height", size);
+
+svg
+  .append("g")
+  .attr("transform", `translate(${size / 2} ${size / 2})`)
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .append("text")
+  .text("Loading data");
+
+(async () => {
+  const json = await d3.json(
+    "https://unpkg.com/world-atlas@2.0.2/land-50m.json"
+  );
+
+  const intro = svg
+    .select("g")
+    .attr("opacity", "1")
+    .transition()
+    .attr("opacity", "0")
+    .remove();
+
+  intro.on("end", () => {
+    const groupMap = svg.append("g");
+    const groupGeo = groupMap.append("g");
+
+    groupMap.attr("opacity", "0").transition().attr("opacity", "1");
+
+    const sphere = { type: "Sphere" };
+    const projection = d3.geoOrthographic().fitSize([size, size], sphere);
+
+    const path = d3.geoPath().projection(projection);
+
+    groupGeo
+      .append("path")
+      .attr("d", path(sphere))
+      .attr("fill", "hsl(0, 0%, 95%)");
+
+    groupGeo
+      .append("path")
+      .attr("d", path(topojson.feature(json, json.objects.land)))
+      .attr("fill", "hsl(0, 0%, 78%)");
+  });
+})();

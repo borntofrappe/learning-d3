@@ -10,7 +10,9 @@ Display the circuits of the programmed 2022 F1 season with a geographical visual
 
 - [Faux-3D arc bl.ock](http://bl.ocks.org/dwtkns/4973620). The demo inspires the project by providing two challenges: 1. how to shade the orthographic projection to further the illusion of depth and 2. how to create arcs to connects the points on the map
 
-## Data
+## Notes
+
+### Data
 
 Data for the programmed 2022 F1 season is taken directly from the cited F1 website. On top of the three keys describing the date, grand prix and venue I've manually added the geographic coordinates from Wikipedia.
 
@@ -21,3 +23,84 @@ Data for the programmed 2022 F1 season is taken directly from the cited F1 websi
 | ...      | ...          | ...    | ...                  |
 
 For each track the coordinates describe the location with degrees, minutes and seconds, so you need to compute the longitude and latitude understood by D3's projection function.
+
+### Geo
+
+> _goal_: draw a map of the world's sphere and countries
+
+> _topics_: world-atlas, topojson, geojson
+
+[`world-atlas`](https://github.com/topojson/world-atlas) gives a JSON file with the TopoJSON necessary to draw the world and its countries
+
+D3 understands GeoJSON, so you need [`topojson`](https://github.com/topojson/topojson) to convert the topologies to the necessary geometries
+
+In `index.html` require `topojson` on top of `d3`:
+
+```html
+<script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+```
+
+In `script.js` set up an SVG in which to display the map.
+
+```js
+const svg = div
+  .append("svg")
+  .attr("viewBox", `0 0 ${size} ${size}`)
+  .attr("width", size)
+  .attr("height", size);
+```
+
+Add default content as you need an async function to retrieve the json data.
+
+This is one way to avoid a layout shift and in a more elaborate demo should provide a fallback visual in the moment the async call fails.
+
+Past this setup immediately execute an async function.
+
+```js
+(async () => {
+  //
+})();
+```
+
+In the body retrieve the topojson from the world atlas.
+
+```js
+const json = await d3.json("https://unpkg.com/world-atlas@2.0.2/land-50m.json");
+```
+
+With the data remove the defaul content and add the world.
+
+Describe the world with an object with a `type` of `"Sphere"`.
+
+```js
+const sphere = { type: "Sphere" };
+```
+
+Set up a projection to fit the map in the constraints of the SVG
+
+```js
+const projection = d3.geoOrthographic().fitSize([size, size], sphere);
+```
+
+Set up geoPath to use the projection.
+
+```js
+const path = d3.geoPath().projection(projection);
+```
+
+Draw the world.
+
+```js
+groupGeo.append("path").attr("d", path(sphere)).attr("fill", "hsl(0, 0%, 97%)");
+```
+
+Draw the world's countries.
+
+```js
+groupGeo
+  .append("path")
+  .attr("d", path(topojson.feature(json, json.objects.land)))
+  .attr("fill", "hsl(0, 0%, 78%)");
+```
+
+Use `topojson.feature` for the desired geometries.
