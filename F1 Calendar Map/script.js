@@ -159,6 +159,22 @@ const div = d3
 
 div.append("h1").text("F1 Calendar Map");
 
+const form = div
+  .append("form")
+  .style("opacity", "0")
+  .style("visibility", "hidden")
+  .on("submit", (e) => e.preventDefault());
+
+const select = form.append("select");
+
+select
+  .selectAll("option")
+  .data(dataset)
+  .enter()
+  .append("option")
+  .attr("value", ({ Venue }) => Venue)
+  .text(({ Venue }) => Venue);
+
 const size = 600;
 
 const svg = div
@@ -269,32 +285,69 @@ svg
       .attr("fill", "hsl(0, 0%, 32%)");
 
     intro.on("end", (d) => {
-      const [datum] = data;
+      const [, , datum] = data;
       const { Venue, coordinates } = datum;
       const [long, lat] = coordinates;
 
       const [startAngle] = projection.rotate();
       const endAngle = long * -1 + 30;
-      const duration = 1000;
-      const timer = d3.timer((elapsed) => {
-        const angle =
-          startAngle + (endAngle - startAngle) * (elapsed / duration);
-        projection.rotate([angle, 0, 0]);
 
-        groupCountries.selectAll("path").attr("d", path);
+      const transition = d3
+        .transition()
+        .duration(1000)
+        .delay(150)
+        .ease(d3.easeQuadInOut);
 
-        groupPoints.selectAll("path").attr("d", path);
+      transition
+        .tween("focus", () => {
+          const i = d3.interpolateArray([startAngle, 0, 0], [endAngle, 0, 0]);
 
-        if (elapsed > duration) {
-          timer.stop();
+          return (t) => {
+            projection.rotate(i(t));
 
-          projection.rotate([endAngle, 0, 0]);
+            groupCountries.selectAll("path").attr("d", path);
 
-          groupCountries.selectAll("path").attr("d", path);
+            groupPoints.selectAll("path").attr("d", path);
+          };
+        })
+        .on("end", () => {
+          select.property("value", Venue);
 
-          groupPoints.selectAll("path").attr("d", path);
-        }
-      }, 150);
+          form
+            .transition()
+            .style("opacity", "1")
+            .style("visibility", "visible");
+
+          select.on("input", (e) => {
+            const { value } = e.target;
+            const { coordinates } = data.find((datum) => datum.Venue === value);
+
+            const [long, lat] = coordinates;
+
+            const [startAngle] = projection.rotate();
+            const endAngle = long * -1 + 30;
+
+            const transition = d3
+              .transition()
+              .duration(1000)
+              .ease(d3.easeQuadInOut);
+
+            transition.tween("focus", () => {
+              const i = d3.interpolateArray(
+                [startAngle, 0, 0],
+                [endAngle, 0, 0]
+              );
+
+              return (t) => {
+                projection.rotate(i(t));
+
+                groupCountries.selectAll("path").attr("d", path);
+
+                groupPoints.selectAll("path").attr("d", path);
+              };
+            });
+          });
+        });
     });
   });
 })();

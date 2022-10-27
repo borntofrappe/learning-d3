@@ -26,10 +26,6 @@ For each track the coordinates describe the location with degrees, minutes and s
 
 ### Geo
 
-> _goal_: draw a map of the world's sphere and countries
-
-> _topics_: world-atlas, topojson, geojson
-
 [`world-atlas`](https://github.com/topojson/world-atlas) gives a JSON file with the TopoJSON necessary to draw the world and its countries
 
 D3 understands GeoJSON, so you need [`topojson`](https://github.com/topojson/topojson) to convert the topologies to the necessary geometries
@@ -202,8 +198,108 @@ const projection = d3
 
 ### Focus
 
-Draw countries instead of land (messy rotation).
+Ultimately you rotate the projection and update the elements which rely on the value, either directly through the projection or through the `geoPath` function which depends on the projection.
 
-Bind data to the countries' paths and the data' points.
+If you use the land object referenced in the geo section you don't see a rotation, but a morphing of the shape (it seems d3 animates the d attribute of the single path). To fix this reference the topojson with the data for all the countries.
 
-Update projection to focus on the longitude of a start value.
+```js
+const json = await d3.json(
+  "https://unpkg.com/world-atlas@2.0.2/countries-110m.json"
+);
+```
+
+Add multiple path elements, one for each country.
+
+```js
+const groupCountries = groupGeo.append("g");
+
+groupCountries
+  .selectAll("path")
+  .data(topojson.feature(json, json.objects.countries).features)
+  .enter()
+  .append("path")
+  .attr("d", path)
+  .attr("fill", "hsl(0, 0%, 78%)");
+```
+
+Bind the geometries to the path elements so that ultimately, with the updated projection, you just need to reference the `geoPath` function.
+
+```js
+groupCountries.selectAll("path").attr("d", path);
+```
+
+Repeat the process for the points. Bind data.
+
+```js
+const groupPoints = groupData.append("g");
+groupPoints
+  .selectAll("path")
+  .data(data.map(({ coordinates }) => ({ type: "Point", coordinates })))
+  .enter()
+  .append("path")
+  .attr("d", path)
+  .attr("fill", "hsl(0, 0%, 32%)");
+```
+
+Update.
+
+```js
+groupPoints.selectAll("path").attr("d", path);
+```
+
+To focus on a point the idea is to rotate the projection horizontally. Consider the longitude of a point.
+
+```js
+[50.510555555555555, 26.0325];
+```
+
+To center the point rotate the projection in the opposite direction.
+
+```js
+projection.rotate([-50.510555555555555, 0]);
+```
+
+To have an offset add, or remove, an arbitrary number of meridians.
+
+With the final value the goal is to animate the projection. One way is with `d3.timer`.
+
+```js
+const duration = 1000;
+const timer = d3.timer((elapsed) => {
+  const t = elapsed / duration;
+
+  if (t >= 1) {
+    timer.stop();
+  }
+}, 150);
+```
+
+`elapsed` describes the number of milliseconds, `t` a value from 0 to 1, so that the extra step is to map the value to the desired range.
+
+Another approach is with a custom transition and [`transition.tween`](https://github.com/d3/d3-transition/blob/main/README.md#transition_tween).
+
+```js
+const transition = d3.transition().duration(1000).delay(150);
+
+transition.tween("focus", () => {
+  //
+});
+```
+
+Since the projection's rotation works with an array use d3.interpolateArray.
+
+```js
+const i = d3.interpolateArray([startAngle, 0, 0], [endAngle, 0, 0]);
+```
+
+Update the projection and accompanying visuals.
+
+```js
+return (t) => {
+  projection.rotate(i(t));
+
+  groupCountries.selectAll("path").attr("d", path);
+
+  groupPoints.selectAll("path").attr("d", path);
+};
+```
