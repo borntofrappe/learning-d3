@@ -303,3 +303,25 @@ return (t) => {
   groupPoints.selectAll("path").attr("d", path);
 };
 ```
+
+### Highlight
+
+Instead of showing all points and rotate the projection to focus on the different ones the goal is to show only one dot a time, with additional information for the specific one.
+
+Remove the objects of type Point. Add instead a circle with no radius and text elements with no text. For the text I prefer to increase contrast by using a bright color and add a background in the form of a dark rectangle. Since the size of the text depends on content the size of the rectangle, and its position, are computed every time the text changes.
+
+Consider the _node_ which is the text.
+
+```js
+groupData.select("text").node();
+```
+
+Consider the width and height in terms of SVG unnit with getBBox()
+
+```js
+groupData.select("text").node().getBBox();
+```
+
+Use width and height for the attributes of the rectangle.
+
+In terms of flow, the logic is relevant 1. as the visualization first focuses on the initial track and 2. as you pick different track. -in both instances show the circle, then animate stroke of a line to connect the point to the text.

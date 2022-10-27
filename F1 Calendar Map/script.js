@@ -275,17 +275,40 @@ svg
       .attr("opacity", 0.5)
       .attr("clip-path", "url(#clip-path-overlay)");
 
-    const groupPoints = groupData.append("g");
-    groupPoints
-      .selectAll("path")
-      .data(data.map(({ coordinates }) => ({ type: "Point", coordinates })))
-      .enter()
+    groupData
       .append("path")
-      .attr("d", path)
-      .attr("fill", "hsl(0, 0%, 32%)");
+      .attr("fill", "none")
+      .attr("stroke", "hsl(0, 0%, 57%)")
+      .attr("stroke-width", "2");
+
+    groupData.append("circle").attr("fill", "hsl(0, 0%, 32%)");
+
+    const groupDetails = groupData.append("g");
+
+    const groupBackground = groupDetails.append("g");
+    groupBackground.append("rect").attr("fill", "hsl(0, 0%, 32%)");
+
+    const groupText = groupDetails.append("g").style("opacity", "0");
+
+    const text = groupText
+      .append("text")
+      .attr("fill", "hsl(0, 0%, 97%)")
+      .attr("font-family", "sans-serif");
+
+    text
+      .append("tspan")
+      .attr("font-size", "38")
+      .attr("y", "36")
+      .attr("font-weight", "700");
+
+    text
+      .append("tspan")
+      .attr("font-size", "18")
+      .attr("x", "0")
+      .attr("dy", "32");
 
     intro.on("end", (d) => {
-      const [, , datum] = data;
+      const [, , , datum] = data;
       const { Venue, coordinates } = datum;
       const [long, lat] = coordinates;
 
@@ -306,8 +329,6 @@ svg
             projection.rotate(i(t));
 
             groupCountries.selectAll("path").attr("d", path);
-
-            groupPoints.selectAll("path").attr("d", path);
           };
         })
         .on("end", () => {
@@ -318,14 +339,90 @@ svg
             .style("opacity", "1")
             .style("visibility", "visible");
 
+          groupData
+            .select("circle")
+            .attr("transform", `translate(${projection(coordinates)})`);
+
+          groupDetails.select("text tspan:nth-of-type(1)").text(datum.Venue);
+
+          groupDetails
+            .select("text tspan:nth-of-type(2)")
+            .text(`${datum.Date}, ${datum["Grand Prix"]}`);
+
+          const { width, height } = groupDetails
+            .select("text")
+            .node()
+            .getBBox();
+
+          const x = Math.max(0, size / 3 - width / 2);
+          const y = lat > 0 ? size / 2 - height : size / 2;
+
+          const [x1, y1] = projection(coordinates);
+          const x2 = x + width / 2;
+          const y2 = y + height / 2;
+
+          groupData.select("path").attr("d", `M ${x1} ${y1} ${x2} ${y2}`);
+
+          groupBackground
+            .attr("transform", `translate(${width / 2} ${height / 2})`)
+            .select("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .attr("x", (width / 2) * -1)
+            .attr("y", (height / 2) * -1);
+
+          groupDetails.attr("transform", `translate(${x} ${y})`);
+
+          const transitionPoint = d3
+            .transition()
+            .duration(350)
+            .ease(d3.easeQuadIn);
+          const transitionPath = d3
+            .transition(transitionPoint)
+            .transition()
+            .duration(700)
+            .ease(d3.easeQuadInOut);
+          const transitionBackground = d3
+            .transition(transitionPath)
+            .transition()
+            .duration(400);
+          const transitionText = d3
+            .transition(transitionBackground)
+            .transition()
+            .duration(400)
+            .ease(d3.easeQuadOut);
+
+          groupData
+            .select("circle")
+            .attr("r", "0")
+            .transition(transitionPoint)
+            .attr("r", "7");
+
+          groupData
+            .select("path")
+            .attr("pathLength", "1")
+            .attr("stroke-dasharray", "1")
+            .attr("stroke-dashoffset", "1")
+            .transition(transitionPath)
+            .attr("stroke-dashoffset", "0");
+
+          groupBackground
+            .select("rect")
+            .attr("transform", "scale(0)")
+            .transition(transitionBackground)
+            .attr("transform", "scale(1.2 1.5)");
+
+          groupText.transition(transitionText).style("opacity", "1");
+
           select.on("input", (e) => {
             const { value } = e.target;
-            const { coordinates } = data.find((datum) => datum.Venue === value);
+            const datum = data.find(({ Venue }) => Venue === value);
+            const { coordinates } = datum;
 
             const [long, lat] = coordinates;
 
             let [startAngle] = projection.rotate();
-            let endAngle = long * -1 + 30;
+            let endAngle = long * -1;
 
             const change = endAngle - startAngle;
             if (Math.abs(change) > 180) {
@@ -333,24 +430,154 @@ svg
               else startAngle += 360;
             }
 
-            const transition = d3
+            const transitionText = d3
               .transition()
-              .duration(1000)
+              .duration(400)
+              .ease(d3.easeQuadIn);
+
+            const transitionBackground = d3
+              .transition(transitionText)
+              .transition()
+              .duration(400)
               .ease(d3.easeQuadInOut);
 
-            transition.tween("focus", () => {
-              const i = d3.interpolateArray(
-                [startAngle, 0, 0],
-                [endAngle, 0, 0]
-              );
+            const transitionPath = d3
+              .transition(transitionBackground)
+              .transition()
+              .duration(700);
 
-              return (t) => {
-                projection.rotate(i(t));
+            const transitionPoint = d3
+              .transition(transitionPath)
+              .transition()
+              .duration(350)
+              .ease(d3.easeQuadOut);
 
-                groupCountries.selectAll("path").attr("d", path);
+            groupText
+              .transition(transitionText)
+              .style("opacity", "0")
+              .on("end", function () {
+                d3.select(this).select("text tspan:nth-of-type(1)").text("");
 
-                groupPoints.selectAll("path").attr("d", path);
-              };
+                d3.select(this).select("text tspan:nth-of-type(2)").text("");
+              });
+
+            groupBackground
+              .select("rect")
+              .transition(transitionBackground)
+              .attr("transform", "scale(0)");
+
+            groupData
+              .select("path")
+              .transition(transitionPath)
+              .attr("stroke-dashoffset", "1");
+
+            groupData
+              .select("circle")
+              .transition(transitionPoint)
+              .attr("r", "0");
+
+            transitionPoint.on("end", () => {
+              const transition = d3
+                .transition()
+                .duration(1000)
+                .ease(d3.easeQuadInOut);
+
+              transition
+                .tween("focus", () => {
+                  const i = d3.interpolateArray(
+                    [startAngle, 0, 0],
+                    [long > 0 ? endAngle + 30 : endAngle - 30, 0, 0]
+                  );
+
+                  return (t) => {
+                    projection.rotate(i(t));
+
+                    groupCountries.selectAll("path").attr("d", path);
+                  };
+                })
+                .on("end", () => {
+                  groupData
+                    .select("circle")
+                    .attr("transform", `translate(${projection(coordinates)})`);
+
+                  groupDetails
+                    .select("text tspan:nth-of-type(1)")
+                    .text(datum.Venue);
+
+                  groupDetails
+                    .select("text tspan:nth-of-type(2)")
+                    .text(`${datum.Date}, ${datum["Grand Prix"]}`);
+
+                  const { width, height } = groupDetails
+                    .select("text")
+                    .node()
+                    .getBBox();
+
+                  const x =
+                    long > 0
+                      ? Math.max(0, size / 3 - width / 2)
+                      : Math.min(size - width, (size * 2) / 3 - width / 2);
+                  const y = lat > 0 ? size / 2 - height : size / 2;
+
+                  const [x1, y1] = projection(coordinates);
+                  const x2 = x + width / 2;
+                  const y2 = y + height / 2;
+
+                  groupData
+                    .select("path")
+                    .attr("d", `M ${x1} ${y1} ${x2} ${y2}`);
+
+                  groupBackground
+                    .attr("transform", `translate(${width / 2} ${height / 2})`)
+                    .select("rect")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("x", (width / 2) * -1)
+                    .attr("y", (height / 2) * -1);
+
+                  groupDetails.attr("transform", `translate(${x} ${y})`);
+
+                  const transitionPoint = d3
+                    .transition()
+                    .duration(350)
+                    .ease(d3.easeQuadIn);
+                  const transitionPath = d3
+                    .transition(transitionPoint)
+                    .transition()
+                    .duration(700)
+                    .ease(d3.easeQuadInOut);
+                  const transitionBackground = d3
+                    .transition(transitionPath)
+                    .transition()
+                    .duration(400);
+                  const transitionText = d3
+                    .transition(transitionBackground)
+                    .transition()
+                    .duration(400)
+                    .ease(d3.easeQuadOut);
+
+                  groupData
+                    .select("circle")
+                    .attr("r", "0")
+                    .transition(transitionPoint)
+                    .attr("r", "7");
+
+                  groupData
+                    .select("path")
+                    .attr("pathLength", "1")
+                    .attr("stroke-dasharray", "1")
+                    .attr("stroke-dashoffset", "1")
+                    .transition(transitionPath)
+                    .attr("stroke-dashoffset", "0");
+
+                  groupBackground
+                    .select("rect")
+                    .attr("transform", "scale(0)")
+                    .transition(transitionBackground)
+                    .attr("transform", "scale(1.2 1.5)");
+
+                  groupText.transition(transitionText).style("opacity", "1");
+                });
             });
           });
         });
