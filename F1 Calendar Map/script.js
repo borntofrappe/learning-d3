@@ -324,8 +324,14 @@ svg
 
             const [long, lat] = coordinates;
 
-            const [startAngle] = projection.rotate();
-            const endAngle = long * -1 + 30;
+            let [startAngle] = projection.rotate();
+            let endAngle = long * -1 + 30;
+
+            const change = endAngle - startAngle;
+            if (Math.abs(change) > 180) {
+              if (change < 0) endAngle += 360;
+              else startAngle += 360;
+            }
 
             const transition = d3
               .transition()
