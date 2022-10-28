@@ -318,6 +318,17 @@ svg
       .attr("x", "0")
       .attr("dy", "30");
 
+    const line = d3
+      .line()
+      .x(([x]) => x)
+      .y(([, y]) => y)
+      .curve(d3.curveBasis);
+
+    const lineDistanceScale = d3
+      .scaleLinear()
+      .domain([0, size])
+      .range([0, 100]);
+
     const handleUpdate = (datum, from) => {
       const { coordinates } = datum;
 
@@ -375,11 +386,38 @@ svg
       transitionPoint.on("end", () => {
         const { coordinates: source } = from;
 
-        const [x1, y1] = projection(source);
-        const [x2, y2] = projection(coordinates);
+        const start = projection(source);
+        const end = projection(coordinates);
+
+        const [x1, y1] = start;
+        const [x2, y2] = end;
+
+        const cx = (x2 + x1) / 2;
+        const cy = (y2 + y1) / 2;
+
+        const px = x2 - x1;
+        const py = y2 - y1;
+
+        let nx = py * -1;
+        let ny = px;
+
+        const m = (nx ** 2 + ny ** 2) ** 0.5;
+
+        nx /= m;
+        ny /= m;
+
+        const d = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5;
+
+        const lineDistance = lineDistanceScale(d);
+
+        const x = cx + nx * lineDistance;
+        const y = cy + ny * lineDistance;
+
+        const points = [start, [x, y], end];
+
         groupData
           .select("path")
-          .attr("d", `M ${x1} ${y1} ${x2} ${y2}`)
+          .attr("d", line(points))
           .attr("pathLength", "1")
           .attr("stroke-dasharray", "1")
           .attr("stroke-dashoffset", "1");
@@ -403,12 +441,31 @@ svg
 
               groupCountries.selectAll("path").attr("d", path);
 
-              const [x1, y1] = projection(source);
-              const [x2, y2] = projection(coordinates);
+              const start = projection(source);
+              const end = projection(coordinates);
+
+              const cx = (end[0] + start[0]) / 2;
+              const cy = (end[1] + start[1]) / 2;
+
+              const px = end[0] - start[0];
+              const py = end[1] - start[1];
+
+              let nx = py * -1;
+              let ny = px;
+
+              const m = (nx ** 2 + ny ** 2) ** 0.5;
+
+              nx /= m;
+              ny /= m;
+
+              const x = cx + nx * lineDistance;
+              const y = cy + ny * lineDistance;
+
+              const points = [start, [x, y], end];
 
               groupData
                 .select("path")
-                .attr("d", `M ${x1} ${y1} ${x2} ${y2}`)
+                .attr("d", line(points))
                 .attr("pathLength", "1")
                 .attr("stroke-dasharray", "1")
                 .attr("stroke-dashoffset", o(t));
