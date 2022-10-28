@@ -216,10 +216,12 @@ svg
       {
         href: "arrow-left",
         x: 0,
+        index: -1,
       },
       {
         href: "arrow-right",
         x: size - controlSize,
+        index: 1,
       },
     ];
 
@@ -227,17 +229,25 @@ svg
       .attr("opacity", "0")
       .attr("transform", `translate(0 ${size - controlSize})`);
 
-    groupControls
-      .selectAll("use")
+    const groupsControls = groupControls
+      .selectAll("g")
       .data(controls)
       .enter()
+      .append("g")
+      .attr("transform", ({ x }) => `translate(${x} 0)`);
+
+    groupsControls
       .append("use")
       .attr("href", ({ href }) => `#${href}`)
-      .attr("x", ({ x }) => x)
       .attr("width", controlSize)
       .attr("height", controlSize)
-      .style("color", "#37373f")
-      .style("pointer-events", "none");
+      .style("color", "#37373f");
+
+    groupsControls
+      .append("rect")
+      .attr("width", controlSize)
+      .attr("height", controlSize)
+      .attr("opacity", "0");
 
     const intro = groupMap
       .attr("opacity", "0")
@@ -308,8 +318,188 @@ svg
       .attr("x", "0")
       .attr("dy", "30");
 
+    const handleUpdate = (datum) => {
+      const { coordinates } = datum;
+
+      const [long, lat] = coordinates;
+
+      let [startAngle] = projection.rotate();
+      let endAngle = long * -1;
+
+      const change = endAngle - startAngle;
+      if (Math.abs(change) > 180) {
+        if (change < 0) endAngle += 360;
+        else startAngle += 360;
+      }
+
+      const transitionText = d3.transition().duration(400).ease(d3.easeQuadIn);
+
+      const transitionBackground = d3
+        .transition(transitionText)
+        .transition()
+        .duration(400)
+        .ease(d3.easeQuadInOut);
+
+      const transitionPath = d3
+        .transition(transitionBackground)
+        .transition()
+        .duration(700);
+
+      const transitionPoint = d3
+        .transition(transitionPath)
+        .transition()
+        .duration(350)
+        .ease(d3.easeQuadOut);
+
+      groupText
+        .transition(transitionText)
+        .style("opacity", "0")
+        .on("end", function () {
+          d3.select(this).select("text tspan:nth-of-type(1)").text("");
+
+          d3.select(this).select("text tspan:nth-of-type(2)").text("");
+        });
+
+      groupBackground
+        .select("rect")
+        .transition(transitionBackground)
+        .attr("transform", "scale(0)");
+
+      groupData
+        .select("path")
+        .transition(transitionPath)
+        .attr("stroke-dashoffset", "1");
+
+      groupData.select("circle").transition(transitionPoint).attr("r", "0");
+
+      transitionPoint.on("end", () => {
+        const transition = d3
+          .transition()
+          .duration(1000)
+          .ease(d3.easeQuadInOut);
+
+        transition
+          .tween("focus", () => {
+            const i = d3.interpolateArray(
+              [startAngle, 0, 0],
+              [long > 0 ? endAngle + 30 : endAngle - 30, 0, 0]
+            );
+
+            return (t) => {
+              projection.rotate(i(t));
+
+              groupCountries.selectAll("path").attr("d", path);
+            };
+          })
+          .on("end", () => {
+            groupData
+              .select("circle")
+              .attr("transform", `translate(${projection(coordinates)})`);
+
+            groupDetails.select("text tspan:nth-of-type(1)").text(datum.Venue);
+
+            groupDetails
+              .select("text tspan:nth-of-type(2)")
+              .text(`${datum.Date}, ${datum["Grand Prix"]}`);
+
+            const { width, height } = groupDetails
+              .select("text")
+              .node()
+              .getBBox();
+
+            const x =
+              long > 0
+                ? Math.max(0, size / 3 - width / 2)
+                : Math.min(size - width, (size * 2) / 3 - width / 2);
+            const y = lat > 0 ? size / 2 - height : size / 2;
+
+            const [x1, y1] = projection(coordinates);
+            const x2 = x + width / 2;
+            const y2 = y + height / 2;
+
+            groupData.select("path").attr("d", `M ${x1} ${y1} ${x2} ${y2}`);
+
+            groupBackground
+              .attr("transform", `translate(${width / 2} ${height / 2})`)
+              .select("rect")
+              .attr("width", width)
+              .attr("height", height)
+              .attr("x", (width / 2) * -1)
+              .attr("y", (height / 2) * -1);
+
+            groupDetails.attr("transform", `translate(${x} ${y})`);
+
+            const transitionPoint = d3
+              .transition()
+              .duration(350)
+              .ease(d3.easeQuadIn);
+            const transitionPath = d3
+              .transition(transitionPoint)
+              .transition()
+              .duration(700)
+              .ease(d3.easeQuadInOut);
+            const transitionBackground = d3
+              .transition(transitionPath)
+              .transition()
+              .duration(400);
+            const transitionText = d3
+              .transition(transitionBackground)
+              .transition()
+              .duration(400)
+              .ease(d3.easeQuadOut);
+
+            groupData
+              .select("circle")
+              .attr("r", "0")
+              .transition(transitionPoint)
+              .attr("r", "7");
+
+            groupData
+              .select("path")
+              .attr("pathLength", "1")
+              .attr("stroke-dasharray", "1")
+              .attr("stroke-dashoffset", "1")
+              .transition(transitionPath)
+              .attr("stroke-dashoffset", "0");
+
+            groupBackground
+              .select("rect")
+              .attr("transform", "scale(0)")
+              .transition(transitionBackground)
+              .attr("transform", "scale(1.25 1.65)");
+
+            groupText.transition(transitionText).style("opacity", "1");
+
+            transitionText.on("end", () => {
+              const indexDatum = data.findIndex(
+                ({ Venue }) => datum.Venue === Venue
+              );
+              const { length } = data;
+
+              groupsControls
+                .style("cursor", "not-allowed")
+                .on("click", null)
+                .filter(({ index }) => {
+                  const i = indexDatum + index;
+                  return i >= 0 && i < length;
+                })
+                .style("cursor", "pointer")
+                .on(
+                  "click",
+                  (e, { index }) => {
+                    handleUpdate(data[indexDatum + index]);
+                  },
+                  {
+                    once: true,
+                  }
+                );
+            });
+          });
+      });
+    };
+
     intro.on("end", (d) => {
-      const [, , datum] = data;
+      const [datum] = data;
       const { Venue, coordinates } = datum;
       const [long, lat] = coordinates;
 
@@ -413,7 +603,28 @@ svg
               .transition()
               .attr("opacity", "1")
               .on("end", () => {
-                //
+                const indexDatum = data.findIndex(
+                  (datum) => datum.Venue === Venue
+                );
+                const { length } = data;
+
+                groupsControls
+                  .style("cursor", "not-allowed")
+                  .on("click", null)
+                  .filter(({ index }) => {
+                    const i = indexDatum + index;
+                    return i >= 0 && i < length;
+                  })
+                  .style("cursor", "pointer")
+                  .on(
+                    "click",
+                    (e, { index }) => {
+                      handleUpdate(data[indexDatum + index]);
+                    },
+                    {
+                      once: true,
+                    }
+                  );
               });
           });
         });
