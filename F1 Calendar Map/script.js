@@ -152,7 +152,7 @@ const getLongLat = (coordinates = "38°53′23″N 77°00′32″W") =>
     }, [])
     .reverse();
 
-const div = d3.select("body").append("div");
+const div = d3.select("body").append("div").attr("id", "root");
 
 const size = 600;
 
@@ -160,7 +160,8 @@ const svg = div
   .append("svg")
   .attr("viewBox", `0 0 ${size} ${size}`)
   .attr("width", size)
-  .attr("height", size);
+  .attr("height", size)
+  .attr("xmlns", "http://www.w3.org/2000/svg");
 
 const defs = svg.append("defs");
 
@@ -208,6 +209,35 @@ svg
     const groupGeo = groupMap.append("g");
     const groupOverlay = groupMap.append("g");
     const groupData = groupMap.append("g");
+    const groupControls = svg.append("g");
+
+    const controlSize = 56;
+    const controls = [
+      {
+        href: "arrow-left",
+        x: 0,
+      },
+      {
+        href: "arrow-right",
+        x: size - controlSize,
+      },
+    ];
+
+    groupControls
+      .attr("opacity", "0")
+      .attr("transform", `translate(0 ${size - controlSize})`);
+
+    groupControls
+      .selectAll("use")
+      .data(controls)
+      .enter()
+      .append("use")
+      .attr("href", ({ href }) => `#${href}`)
+      .attr("x", ({ x }) => x)
+      .attr("width", controlSize)
+      .attr("height", controlSize)
+      .style("color", "#37373f")
+      .style("pointer-events", "none");
 
     const intro = groupMap
       .attr("opacity", "0")
@@ -377,6 +407,15 @@ svg
             .attr("transform", "scale(1.25 1.65)");
 
           groupText.transition(transitionText).style("opacity", "1");
+
+          transitionText.on("end", () => {
+            groupControls
+              .transition()
+              .attr("opacity", "1")
+              .on("end", () => {
+                //
+              });
+          });
         });
     });
   });
