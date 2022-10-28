@@ -318,7 +318,7 @@ svg
       .attr("x", "0")
       .attr("dy", "30");
 
-    const handleUpdate = (datum) => {
+    const handleUpdate = (datum, from) => {
       const { coordinates } = datum;
 
       const [long, lat] = coordinates;
@@ -373,6 +373,17 @@ svg
       groupData.select("circle").transition(transitionPoint).attr("r", "0");
 
       transitionPoint.on("end", () => {
+        const { coordinates: source } = from;
+
+        const [x1, y1] = projection(source);
+        const [x2, y2] = projection(coordinates);
+        groupData
+          .select("path")
+          .attr("d", `M ${x1} ${y1} ${x2} ${y2}`)
+          .attr("pathLength", "1")
+          .attr("stroke-dasharray", "1")
+          .attr("stroke-dashoffset", "1");
+
         const transition = d3
           .transition()
           .duration(1000)
@@ -385,10 +396,22 @@ svg
               [long > 0 ? endAngle + 30 : endAngle - 30, 0, 0]
             );
 
+            const o = d3.interpolate(1, -1);
+
             return (t) => {
               projection.rotate(i(t));
 
               groupCountries.selectAll("path").attr("d", path);
+
+              const [x1, y1] = projection(source);
+              const [x2, y2] = projection(coordinates);
+
+              groupData
+                .select("path")
+                .attr("d", `M ${x1} ${y1} ${x2} ${y2}`)
+                .attr("pathLength", "1")
+                .attr("stroke-dasharray", "1")
+                .attr("stroke-dashoffset", o(t));
             };
           })
           .on("end", () => {
@@ -487,7 +510,7 @@ svg
                 .on(
                   "click",
                   (e, { index }) => {
-                    handleUpdate(data[indexDatum + index]);
+                    handleUpdate(data[indexDatum + index], datum);
                   },
                   {
                     once: true,
@@ -619,7 +642,7 @@ svg
                   .on(
                     "click",
                     (e, { index }) => {
-                      handleUpdate(data[indexDatum + index]);
+                      handleUpdate(data[indexDatum + index], datum);
                     },
                     {
                       once: true,
