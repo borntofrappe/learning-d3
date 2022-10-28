@@ -5,8 +5,8 @@
 }
 
 body {
-  color: #15151f;
-  background: #fdfdfd;
+  color: hsl(240, 19%, 10%);
+  background: hsl(0, 0%, 99%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   min-height: 100vh;
@@ -20,8 +20,8 @@ div {
   max-width: 42rem;
   margin: 1rem auto;
   padding: 4rem;
-  background: #fdfdfd;
-  border: 0.55rem solid #e10600;
+  background: hsl(0, 0%, 99%);
+  border: 0.55rem solid hsl(2, 100%, 44%);
   border-left: none;
   border-radius: 0 2rem 2rem 0;
   position: relative;

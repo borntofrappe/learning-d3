@@ -160,8 +160,7 @@ const svg = div
   .append("svg")
   .attr("viewBox", `0 0 ${size} ${size}`)
   .attr("width", size)
-  .attr("height", size)
-  .attr("xmlns", "http://www.w3.org/2000/svg");
+  .attr("height", size);
 
 const defs = svg.append("defs");
 
@@ -172,9 +171,15 @@ const radialGradient = defs
   .attr("cx", (size * 3) / 4)
   .attr("cy", size / 4);
 
-radialGradient.append("stop").attr("offset", 0).attr("stop-color", "#fdfdfd");
+radialGradient
+  .append("stop")
+  .attr("offset", 0)
+  .attr("stop-color", "hsl(0, 0%, 99%)");
 
-radialGradient.append("stop").attr("offset", 1).attr("stop-color", "#c3c3c3");
+radialGradient
+  .append("stop")
+  .attr("offset", 1)
+  .attr("stop-color", "hsl(0, 0%, 76%)");
 
 svg
   .append("g")
@@ -201,6 +206,7 @@ svg
     .select("g")
     .attr("opacity", "1")
     .transition()
+    .delay(400)
     .attr("opacity", "0")
     .remove();
 
@@ -241,7 +247,7 @@ svg
       .attr("href", ({ href }) => `#${href}`)
       .attr("width", controlSize)
       .attr("height", controlSize)
-      .style("color", "#37373f");
+      .style("color", "hsl(240, 7%, 23%)");
 
     groupsControls
       .append("rect")
@@ -265,7 +271,10 @@ svg
       .append("path")
       .attr("d", path(sphere));
 
-    groupGeo.append("path").attr("d", path(sphere)).attr("fill", "#fdfdfd");
+    groupGeo
+      .append("path")
+      .attr("d", path(sphere))
+      .attr("fill", "hsl(0, 0%, 99%)");
 
     const groupCountries = groupGeo.append("g");
 
@@ -275,8 +284,8 @@ svg
       .enter()
       .append("path")
       .attr("d", path)
-      .attr("fill", "#37373f")
-      .attr("stroke", "#fdfdfd");
+      .attr("fill", "hsl(240, 7%, 23%)")
+      .attr("stroke", "hsl(0, 0%, 99%)");
 
     groupOverlay
       .append("rect")
@@ -289,21 +298,21 @@ svg
     groupData
       .append("path")
       .attr("fill", "none")
-      .attr("stroke", "#15151f")
+      .attr("stroke", "hsl(240, 19%, 10%)")
       .attr("stroke-width", "2");
 
-    groupData.append("circle").attr("fill", "#15151f");
+    groupData.append("circle").attr("fill", "hsl(240, 19%, 10%)");
 
     const groupDetails = groupData.append("g");
 
     const groupBackground = groupDetails.append("g");
-    groupBackground.append("rect").attr("fill", "#15151f");
+    groupBackground.append("rect").attr("fill", "hsl(240, 19%, 10%)");
 
     const groupText = groupDetails.append("g").style("opacity", "0");
 
     const text = groupText
       .append("text")
-      .attr("fill", "#fdfdfd")
+      .attr("fill", "hsl(0, 0%, 99%)")
       .attr("font-family", "sans-serif");
 
     text
@@ -422,10 +431,7 @@ svg
           .attr("stroke-dasharray", "1")
           .attr("stroke-dashoffset", "1");
 
-        const transition = d3
-          .transition()
-          .duration(1000)
-          .ease(d3.easeQuadInOut);
+        const transition = d3.transition().duration(900).ease(d3.easeQuadInOut);
 
         transition
           .tween("focus", () => {
@@ -511,21 +517,21 @@ svg
 
             const transitionPoint = d3
               .transition()
-              .duration(350)
+              .duration(300)
               .ease(d3.easeQuadIn);
             const transitionPath = d3
               .transition(transitionPoint)
               .transition()
-              .duration(700)
+              .duration(500)
               .ease(d3.easeQuadInOut);
             const transitionBackground = d3
               .transition(transitionPath)
               .transition()
-              .duration(400);
+              .duration(350);
             const transitionText = d3
               .transition(transitionBackground)
               .transition()
-              .duration(400)
+              .duration(300)
               .ease(d3.easeQuadOut);
 
             groupData
@@ -639,21 +645,21 @@ svg
 
           const transitionPoint = d3
             .transition()
-            .duration(350)
+            .duration(300)
             .ease(d3.easeQuadIn);
           const transitionPath = d3
             .transition(transitionPoint)
             .transition()
-            .duration(700)
+            .duration(500)
             .ease(d3.easeQuadInOut);
           const transitionBackground = d3
             .transition(transitionPath)
             .transition()
-            .duration(400);
+            .duration(350);
           const transitionText = d3
             .transition(transitionBackground)
             .transition()
-            .duration(400)
+            .duration(300)
             .ease(d3.easeQuadOut);
 
           groupData

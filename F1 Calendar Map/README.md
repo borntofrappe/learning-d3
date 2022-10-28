@@ -1,14 +1,18 @@
-# F1 Calendar Map
+# [F1 Calendar Map](https://codepen.io/borntofrappe/full/GRGJYMN)
 
 > this project is based on a dated concept, but still worth pursuing
 
-Display the circuits of the programmed 2022 F1 season with a geographical visualization. Focus on one circuit at a time and rotate the globe, animating arcs between the tracks.
+## Goal
+
+Display the circuits of the programmed 2022 F1 season with a geographical visualization. Focus on one circuit at a time and rotate the globe, animating elements to highlight the different venues.
 
 ## Links
 
 - [2022 announced calendar](https://www.formula1.com/en/latest/article.formula-1-announces-23-race-calendar-for-2022.2HcIP34fK3Zznx7YZfWL6P.html) (whether the 2022 season actually took place as expected is outside of the project's scope)
 
 - [Faux-3D arc bl.ock](http://bl.ocks.org/dwtkns/4973620). The demo inspires the project by providing two challenges: 1. how to shade the orthographic projection to further the illusion of depth and 2. how to create arcs to connects the points on the map
+
+<!--
 
 ## Notes
 
@@ -324,12 +328,4 @@ groupData.select("text").node().getBBox();
 
 Use width and height for the attributes of the rectangle.
 
-In terms of flow, the logic is relevant 1. as the visualization first focuses on the initial track and 2. as you pick different track. -in both instances show the circle, then animate stroke of a line to connect the point to the text.
-
-<!--
-- [x] redesign
-- [x] move between venues
-- [ ] add stroke animation between venues
-- [ ] document
-
--->
+In terms of flow, the logic is relevant 1. as the visualization first focuses on the initial track and 2. as you pick different track. -in both instances show the circle, then animate stroke of a line to connect the point to the text. -->
