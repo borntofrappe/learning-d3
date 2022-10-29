@@ -1,38 +1,29 @@
 # [F1 Calendar Map](https://codepen.io/borntofrappe/full/GRGJYMN)
 
-> this project is based on a dated concept, but still worth pursuing
+On the 15th of October 2021 the F1 website [ announced the 2022 calendar](https://www.formula1.com/en/latest/article.formula-1-announces-23-race-calendar-for-2022.2HcIP34fK3Zznx7YZfWL6P.html) with an informative table.
 
-## Goal
+Learning geomapping with the D3 library, inspired by a [an interesting demo](http://bl.ocks.org/dwtkns/4973620) creating faux-3D arcs, I wanted to present the information with a map of the world's countries.
 
-Display the circuits of the programmed 2022 F1 season with a geographical visualization. Focus on one circuit at a time and rotate the globe, animating elements to highlight the different venues.
+One year later I finally picked up the project and created this demo. I might not be following F1 any more, but I did checked the schedule to see if the calendar took place as tabled.
 
-## Links
+The final demo provides plenty of practice with the `d3-geo` module, orthographic projection, custom shapes and chained transitions.
 
-- [2022 announced calendar](https://www.formula1.com/en/latest/article.formula-1-announces-23-race-calendar-for-2022.2HcIP34fK3Zznx7YZfWL6P.html) (whether the 2022 season actually took place as expected is outside of the project's scope)
+## Coordinates
 
-- [Faux-3D arc bl.ock](http://bl.ocks.org/dwtkns/4973620). The demo inspires the project by providing two challenges: 1. how to shade the orthographic projection to further the illusion of depth and 2. how to create arcs to connects the points on the map
+On top of the track's location, venue and date I've manually added the geographic coordinates from Wikipedia. These values describe the number of degrees, minutes and seconds with the following format.
 
-<!--
+```
+26°1′57″N 50°30′38″E
+23°42′4″S 46°41′50″W
+```
 
-## Notes
+`getLongLat` is my tentative way to process the string and return the coordinates understood by D3 and the `d3-geo` module.
 
-### Data
+## World map
 
-Data for the programmed 2022 F1 season is taken directly from the cited F1 website. On top of the three keys describing the date, grand prix and venue I've manually added the geographic coordinates from Wikipedia.
+[`world-atlas`](https://github.com/topojson/world-atlas) gives a JSON file with the TopoJSON necessary to draw the world and its countries.
 
-| Date     | Grand Prix   | Venue  | Coordinates          |
-| -------- | ------------ | ------ | -------------------- |
-| 20 March | Bahrain      | Sakhir | 26°1′57″N 50°30′38″E |
-| 27 March | Saudi Arabia | Jeddah | 21°37′55″N 39°6′16″E |
-| ...      | ...          | ...    | ...                  |
-
-For each track the coordinates describe the location with degrees, minutes and seconds, so you need to compute the longitude and latitude understood by D3's projection function.
-
-### Geo
-
-[`world-atlas`](https://github.com/topojson/world-atlas) gives a JSON file with the TopoJSON necessary to draw the world and its countries
-
-D3 understands GeoJSON, so you need [`topojson`](https://github.com/topojson/topojson) to convert the topologies to the necessary geometries
+[`topojson`](https://github.com/topojson/topojson) helps to convert the topologies to GeoJSON features and geometries.
 
 In `index.html` require `topojson` on top of `d3`:
 
@@ -40,87 +31,56 @@ In `index.html` require `topojson` on top of `d3`:
 <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
 ```
 
-In `script.js` set up an SVG in which to display the map.
-
-```js
-const svg = div
-  .append("svg")
-  .attr("viewBox", `0 0 ${size} ${size}`)
-  .attr("width", size)
-  .attr("height", size);
-```
-
-Add default content as you need an async function to retrieve the json data.
-
-This is one way to avoid a layout shift and in a more elaborate demo should provide a fallback visual in the moment the async call fails.
-
-Past this setup immediately execute an async function.
+In `script.js` retrieve the geographical data with `d3.json`:
 
 ```js
 (async () => {
-  //
+  const json = await d3.json(
+    "https://unpkg.com/world-atlas@2.0.2/countries-110m.json"
+  );
 })();
 ```
 
-In the body retrieve the topojson from the world atlas.
-
-```js
-const json = await d3.json("https://unpkg.com/world-atlas@2.0.2/land-50m.json");
-```
-
-With the data remove the defaul content and add the world.
-
-Describe the world with an object with a `type` of `"Sphere"`.
+Draw the world with an object with a `type` of `"Sphere"`.
 
 ```js
 const sphere = { type: "Sphere" };
 ```
 
-Set up a projection to fit the map in the constraints of the SVG
+Pass the object to the path function mapping the data to the SVG with the desired projection.
 
 ```js
 const projection = d3.geoOrthographic().fitSize([size, size], sphere);
-```
 
-Set up geoPath to use the projection.
-
-```js
 const path = d3.geoPath().projection(projection);
-```
 
-Draw the world.
-
-```js
 groupGeo.append("path").attr("d", path(sphere)).attr("fill", "hsl(0, 0%, 97%)");
 ```
 
-Draw the world's countries.
+Draw the world's countries tapping into the `objects` and `countries` fields.
 
 ```js
-groupGeo
+groupCountries
+  .selectAll("path")
+  .data(topojson.feature(json, json.objects.countries).features)
+  .enter()
   .append("path")
-  .attr("d", path(topojson.feature(json, json.objects.land)))
-  .attr("fill", "hsl(0, 0%, 78%)");
+  .attr("d", path);
 ```
 
-Use `topojson.feature` for the desired geometries.
+`topojson.features` returns the GeoJSON syntax with a `features` collection for the countries.
 
-### Depth
-
-The orthographic projection already creates the illusion of depth. To further this illusion, following the faux-3d arcs cited example, add a radial gradient on the Earth's surface.
-
-Define the gradient relative to the SVG.
+Draw relative to a point in the world calling the projecting function with a given longitude and latitude.
 
 ```js
-const defs = svg.append("defs");
-
-const radialGradient = defs
-  .append("radialGradient")
-  .attr("id", "gradient-overlay")
-  .attr("gradientUnits", "userSpaceOnUse")
-  .attr("cx", (size * 3) / 4)
-  .attr("cy", size / 4);
+groupData
+  .select("circle")
+  .attr("transform", `translate(${projection([long, lat])})`);
 ```
+
+## Depth
+
+The orthographic projection already creates the illusion of depth. To further this illusion add a radial gradient on the world's surface.
 
 For the colors of the gradient I chose two arbitrary shades of white.
 
@@ -137,121 +97,39 @@ groupOverlay
 
 Clip the rectangle with the same path element used for the sphere.
 
-```js
-defs
-  .append("clipPath")
-  .attr("id", "clip-path-overlay")
-  .append("path")
-  .attr("d", path(sphere));
-
-// rect
-.attr("clip-path", "url(#clip-path-overlay)");
+```diff
++.attr("clip-path", "url(#clip-path-overlay)")
 ```
 
-## Points
+## Arcs
 
-Define getLongLat to return the values for a D3 projection, longitude and latitude, from an input coordinate. Given a certain direction the coversion follows the formula:
-
-```pseudo
-decimal = degrees + minutes / 60 + seconds / 3600
-```
-
-If the direction is South or West the value should be negative.
-
-You could call the function whenever you use a projection, but out of convenience loop through the input dataset to create the values for all destinations.
+The demo animates a path between venues, considering the coordinates for the start and end point.
 
 ```js
-const data = dataset.map((datum) => {
-  const { Coordinates } = datum;
-  const coordinates = getLongLat(Coordinates);
+const start = projection(source);
+const end = projection(coordinates);
 
-  return { ...datum, coordinates };
-});
+const [x1, y1] = start;
+const [x2, y2] = end;
 ```
 
-To draw single points use the projection with a specific geometry (similar to how you use an object for the sphere).
+With the edges you draw a straight line. With an additional point you can fake arcs with `d3.line` and a curve function.
 
 ```js
-const point = { type: "Point", coordinates: [long, lat] };
+const line = d3
+  .line()
+  .x(([x]) => x)
+  .y(([, y]) => y)
+  .curve(d3.curveBasis);
 ```
 
-Pass the object with the longitude and latitude to the instance of the `geoPath` function.
+For the additional point consider a point in between the start and end coordinates, offset on the normal perpendicular to the straight line.
 
-```js
-groupData.append("path").attr("d", path(point)).attr("fill", "hsl(0, 0%, 32%)");
-```
+Refer to [this Svelte REPL](https://svelte.dev/repl/7a2ab054457341b682f3b0bdb61a1c2f?version=3.52.0) for a simpler test case.
 
-The function is based on the projection and returns the d attribute for a path element. The syntax essentially draws a dot. Based on the projection it returns the attribute _or_ `null`, meaning the point is not displayed. This happens when the point is behind the 3D projection.
+## Rotation
 
-Repeat the operation for all data points to describe all tracks.
-
-Change the size of the point on the same path function.
-
-```js
-const path = d3.geoPath().projection(projection).pointRadius(7);
-```
-
-To test the visibility of the points rotate the projection.
-
-```js
-const projection = d3
-  .geoOrthographic()
-  .fitSize([size, size], sphere)
-  .rotate([180, 0]);
-```
-
-### Focus
-
-Ultimately you rotate the projection and update the elements which rely on the value, either directly through the projection or through the `geoPath` function which depends on the projection.
-
-If you use the land object referenced in the geo section you don't see a rotation, but a morphing of the shape (it seems d3 animates the d attribute of the single path). To fix this reference the topojson with the data for all the countries.
-
-```js
-const json = await d3.json(
-  "https://unpkg.com/world-atlas@2.0.2/countries-110m.json"
-);
-```
-
-Add multiple path elements, one for each country.
-
-```js
-const groupCountries = groupGeo.append("g");
-
-groupCountries
-  .selectAll("path")
-  .data(topojson.feature(json, json.objects.countries).features)
-  .enter()
-  .append("path")
-  .attr("d", path)
-  .attr("fill", "hsl(0, 0%, 78%)");
-```
-
-Bind the geometries to the path elements so that ultimately, with the updated projection, you just need to reference the `geoPath` function.
-
-```js
-groupCountries.selectAll("path").attr("d", path);
-```
-
-Repeat the process for the points. Bind data.
-
-```js
-const groupPoints = groupData.append("g");
-groupPoints
-  .selectAll("path")
-  .data(data.map(({ coordinates }) => ({ type: "Point", coordinates })))
-  .enter()
-  .append("path")
-  .attr("d", path)
-  .attr("fill", "hsl(0, 0%, 32%)");
-```
-
-Update.
-
-```js
-groupPoints.selectAll("path").attr("d", path);
-```
-
-To focus on a point the idea is to rotate the projection horizontally. Consider the longitude of a point.
+To focus on a point rotate the projection horizontally. Consider the longitude of a point.
 
 ```js
 [50.510555555555555, 26.0325];
@@ -265,7 +143,9 @@ projection.rotate([-50.510555555555555, 0]);
 
 To have an offset add, or remove, an arbitrary number of meridians.
 
-With the final value the goal is to animate the projection. One way is with `d3.timer`.
+## Animation
+
+One way to update the projection's rotation over time is with `d3.timer`.
 
 ```js
 const duration = 1000;
@@ -290,7 +170,7 @@ transition.tween("focus", () => {
 });
 ```
 
-Since the projection's rotation works with an array use d3.interpolateArray.
+Since the projection's rotation works with an array use `d3.interpolateArray`.
 
 ```js
 const i = d3.interpolateArray([startAngle, 0, 0], [endAngle, 0, 0]);
@@ -303,29 +183,72 @@ return (t) => {
   projection.rotate(i(t));
 
   groupCountries.selectAll("path").attr("d", path);
-
-  groupPoints.selectAll("path").attr("d", path);
 };
 ```
 
-### Highlight
+## Transition
 
-Instead of showing all points and rotate the projection to focus on the different ones the goal is to show only one dot a time, with additional information for the specific one.
-
-Remove the objects of type Point. Add instead a circle with no radius and text elements with no text. For the text I prefer to increase contrast by using a bright color and add a background in the form of a dark rectangle. Since the size of the text depends on content the size of the rectangle, and its position, are computed every time the text changes.
-
-Consider the _node_ which is the text.
+The demo includes and chains several transitions. Define ahead of time.
 
 ```js
-groupData.select("text").node();
+const transitionPoint = d3.transition().duration(300).ease(d3.easeQuadIn);
+const transitionPath = d3
+  .transition(transitionPoint)
+  .transition()
+  .duration(500)
+  .ease(d3.easeQuadInOut);
 ```
 
-Consider the width and height in terms of SVG unnit with getBBox()
+Pass the transition to the `transition` method.
 
 ```js
-groupData.select("text").node().getBBox();
+groupData
+  .select("circle")
+  .attr("r", "0")
+  .transition(transitionPoint)
+  .attr("r", "7");
+
+groupData
+  .select("path")
+  .attr("pathLength", "1")
+  .attr("stroke-dasharray", "1")
+  .attr("stroke-dashoffset", "1")
+  .transition(transitionPath)
+  .attr("stroke-dashoffset", "0");
 ```
 
-Use width and height for the attributes of the rectangle.
+If you need to do something once the animation ends listen to the `end` event.
 
-In terms of flow, the logic is relevant 1. as the visualization first focuses on the initial track and 2. as you pick different track. -in both instances show the circle, then animate stroke of a line to connect the point to the text. -->
+```js
+transitionPoint.on("end", () => {});
+```
+
+Remember that transitions are removed when they end. They are one-use only.
+
+## Additional remarks
+
+### Point
+
+It is possible to draw points on the map with a GeoJSON object with a specific type.
+
+```json
+{
+  "type": "Point",
+  "coordinates": [50.510555555555555, 26.0325]
+}
+```
+
+If you call the `geoPath` function on such an object it returns the syntax for the `d` attribute for a `path` element. Or `null` if the point should not be visible (consider a point on the other side of the orthographic) projection.
+
+```js
+path({
+  type: "Point",
+  coordinates: [50.510555555555555, 26.0325],
+});
+```
+
+Change the size of the radius on the path function.
+
+```js
+const path = d3.geoPath().projection(projection).pointRadius(7);
+```
