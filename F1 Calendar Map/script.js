@@ -223,11 +223,15 @@ svg
         href: "arrow-left",
         x: 0,
         index: -1,
+        key: "ArrowLeft",
+        label: "previous",
       },
       {
         href: "arrow-right",
         x: size - controlSize,
         index: 1,
+        key: "ArrowRight",
+        label: "next",
       },
     ];
 
@@ -579,6 +583,33 @@ svg
                     once: true,
                   }
                 );
+
+              const controlsKeyboard = controls.filter(({ index }) => {
+                const i = indexDatum + index;
+                return i >= 0 && i < length;
+              });
+
+              svg
+                .attr("tabindex", "0")
+                .attr(
+                  "aria-label",
+                  `Highlight the ${controlsKeyboard
+                    .map(({ label }) => label)
+                    .join(", ")} venue with the ${controlsKeyboard
+                    .map(({ key }) => key)
+                    .join(", ")} key.`
+                )
+                .on("keydown", function (e) {
+                  const controlKeyboard = controlsKeyboard.find(
+                    ({ key }) => key === e.key
+                  );
+                  if (controlKeyboard) {
+                    d3.select(this).attr("aria-label", "").on("keydown", null);
+
+                    const { index } = controlKeyboard;
+                    handleUpdate(data[indexDatum + index], datum);
+                  }
+                });
             });
           });
       });
@@ -711,6 +742,35 @@ svg
                       once: true,
                     }
                   );
+
+                const controlsKeyboard = controls.filter(({ index }) => {
+                  const i = indexDatum + index;
+                  return i >= 0 && i < length;
+                });
+
+                svg
+                  .attr("tabindex", "0")
+                  .attr(
+                    "aria-label",
+                    `Highlight the ${controlsKeyboard
+                      .map(({ label }) => label)
+                      .join(", ")} venue with the ${controlsKeyboard
+                      .map(({ key }) => key)
+                      .join(", ")} key.`
+                  )
+                  .on("keydown", function (e) {
+                    const controlKeyboard = controlsKeyboard.find(
+                      ({ key }) => key === e.key
+                    );
+                    if (controlKeyboard) {
+                      d3.select(this)
+                        .attr("aria-label", "")
+                        .on("keydown", null);
+
+                      const { index } = controlKeyboard;
+                      handleUpdate(data[indexDatum + index], datum);
+                    }
+                  });
               });
           });
         });
