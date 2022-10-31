@@ -101,5 +101,67 @@ const data = [
   { observation: 100, experiment: 5, run: 20, speed: 870 },
 ];
 
-const main = d3.select("body").append("main");
-main.append("h1").text("Boxplot Experiment");
+const dataBoxplots = [...d3.group(data, (d) => d.experiment)];
+
+const div = d3.select("body").append("div");
+div.append("h1").text("Boxplot Experiment");
+
+const width = 400;
+const height = 400;
+const margin = {
+  top: 5,
+  bottom: 50,
+  left: 50,
+  right: 5,
+};
+
+const xScale = d3
+  .scaleBand()
+  .domain(dataBoxplots.map(([boxplot]) => boxplot))
+  .range([0, width]);
+
+const yScale = d3
+  .scaleLinear()
+  .domain(d3.extent(data, (d) => d.speed))
+  .range([height, 0])
+  .nice();
+
+const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
+const yAxis = d3.axisLeft(yScale).ticks(4).tickSizeOuter(0);
+
+const svg = div
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g");
+
+const groupAxisX = groupAxis
+  .append("g")
+  .attr("transform", `translate(0 ${height})`)
+  .call(xAxis);
+const groupAxisY = groupAxis.append("g").call(yAxis);
+
+groupAxisY.select("g").remove();
+groupAxisY.select("g:last-of-type").remove();
+
+const groupAxisNode = groupAxis.node();
+
+groupAxis
+  .append("g")
+  .node()
+  .appendChild(groupAxisX.select("path").node().cloneNode(true));
+
+groupAxis
+  .append("g")
+  .attr("transform", `translate( ${width} 0)`)
+  .node()
+  .appendChild(groupAxisY.select("path").node().cloneNode(true));
