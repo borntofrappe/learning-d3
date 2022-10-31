@@ -110,8 +110,8 @@ const width = 400;
 const height = 400;
 const margin = {
   top: 5,
-  bottom: 50,
-  left: 50,
+  bottom: 55,
+  left: 75,
   right: 5,
 };
 
@@ -142,6 +142,8 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
+const groupLabels = group.append("g");
+const groupData = group.append("g");
 const groupAxis = group.append("g");
 
 const groupAxisX = groupAxis
@@ -165,3 +167,42 @@ groupAxis
   .attr("transform", `translate( ${width} 0)`)
   .node()
   .appendChild(groupAxisY.select("path").node().cloneNode(true));
+
+groupAxis.selectAll("text").attr("font-size", "12");
+groupLabels.attr("font-size", "16");
+
+groupLabels
+  .append("g")
+  .attr("transform", `translate(${width / 2} ${height + margin.bottom - 5})`)
+  .append("text")
+  .attr("text-anchor", "middle")
+  .text("Experiment No.");
+
+groupLabels
+  .append("g")
+  .attr(
+    "transform",
+    `translate(${-margin.left + 20} ${height / 2}) rotate(-90)`
+  )
+  .append("text")
+  .attr("text-anchor", "middle")
+  .text("Speed of light (km/h minus 290,000)");
+
+const groupsData = groupData
+  .selectAll("g")
+  .data(dataBoxplots)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    ([boxplot]) => `translate(${xScale(boxplot) + xScale.bandwidth() / 2} 0)`
+  );
+
+groupsData
+  .selectAll("circle")
+  .data(([, values]) => values)
+  .enter()
+  .append("circle")
+  .attr("transform", (d) => `translate(0 ${yScale(d.speed)})`)
+  .attr("r", 2)
+  .attr("opacity", 0.75);
