@@ -1,4 +1,4 @@
-const data = [
+const dataset = [
   {
     Label: "Flexbox",
     "Know about it": 8074,
@@ -319,5 +319,110 @@ const data = [
   },
 ];
 
-const main = d3.select("body").append("main");
-main.append("h1").text("CSS Packing Preferences");
+const formatRatio = d3.format(".2f");
+const data = dataset.map((d) => ({
+  ...d,
+  "Usage ratio": parseFloat(
+    formatRatio(d["Have used it"] / d["Know about it"])
+  ),
+}));
+
+const container = d3.select("body").append("article");
+
+// const controls = container.append("div");
+// controls.append("button").text("Grouped");
+// controls.append("button").text("By awareness");
+// controls.append("button").text("By usage");
+
+const svg = container.append("svg").attr("viewBox", "0 0 1 1");
+const groupFeatures = svg.append("g");
+const groupLabels = svg.append("g");
+
+// const children = [...d3.group(data, (d) => d.Feature)].map(([key, value]) => ({
+//   name: key,
+//   children: value,
+// }));
+
+const features = data
+  .map(({ Feature }) => Feature)
+  .reduce((a, c) => (a.includes(c) ? [...a] : [...a, c]), []);
+
+const children = features.map((feature) => ({
+  name: feature,
+  children: data.filter(({ Feature }) => feature === Feature),
+}));
+
+const scaleColor = d3
+  .scaleOrdinal()
+  .domain(features)
+  .range(["#4BC77D", "#7854C3", "#4861EC", "#ef4e88", "#FE6A6A", "#FFE589"]);
+
+const root = d3
+  .hierarchy({
+    name: "CSS",
+    children,
+  })
+  .sum((d) => d["Know about it"] || 0);
+
+const dataPack = d3.pack()(root);
+
+const dataLabel = dataPack.leaves();
+const dataFeature = dataPack.descendants().filter(({ depth }) => depth === 1);
+const groupsLabel = groupLabels
+  .selectAll("g")
+  .data(dataLabel)
+  .enter()
+  .append("g")
+  .attr("fill", (d) => scaleColor(d.data["Feature"]))
+  .attr("transform", ({ x, y }) => `translate(${x} ${y})`);
+
+groupsLabel
+  .append("circle")
+  .attr("r", ({ r }) => r)
+  .attr("opacity", "0.5");
+
+groupsLabel.append("circle").attr("r", (d) => {
+  return d.r * d.data["Usage ratio"];
+});
+
+const maxLength = 15;
+groupsLabel
+  .append("text")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "0.02")
+  .attr("letter-spacing", "0.001")
+  .attr("font-family", "sans-serif")
+  .attr("fill", "#FFF6E6")
+  .attr("stroke", "#272325")
+  .attr("stroke-width", "0.01")
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round")
+  .attr("paint-order", "stroke")
+  .text(({ data }) => {
+    const { Label: label } = data;
+    return label.length >= maxLength
+      ? label.slice(0, maxLength - 3).padEnd(maxLength, ".")
+      : label;
+  });
+
+groupsFeatures = groupFeatures
+  .selectAll("g")
+  .data(dataFeature)
+  .enter()
+  .append("g")
+  .attr("transform", ({ x, y }) => `translate(${x} ${y})`);
+
+groupsFeatures
+  .append("circle")
+  .attr("fill", "#FFF6E6")
+  .attr("r", ({ r }) => r)
+  .attr("opacity", "0.025");
+
+groupsFeatures
+  .append("circle")
+  .attr("fill", "none")
+  .attr("stroke", (d) => scaleColor(d.data["name"]))
+  .attr("stroke-width", "0.002")
+  .attr("stroke-dasharray", "0.003 0.01")
+  .attr("r", ({ r }) => r);

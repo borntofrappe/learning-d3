@@ -5,8 +5,25 @@
 }
 
 body {
-  background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
+  color: #fff6e6;
+  background: #272324;
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+}
+
+article {
+  margin: auto;
+  max-width: 42rem;
+  width: 95vmin;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 1rem;
+}
+
+svg {
+  width: 100%;
+  height: auto;
 }
