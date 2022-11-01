@@ -37,6 +37,7 @@ A table worth of projects exploring the D3 library, its features and modules.
 | [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)                 | line, interaction       |
 | [Perception of Probability](https://codepen.io/borntofrappe/pen/LYzqpwX)      | numerical, categorical  |
 | Beauteous Villages                                                            | geojson, transition     |
+| [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)             | scaleQuantile, datum    |
 
 A table worth of projects leaning on D3 to create interesting visualizations.
 

@@ -103,9 +103,6 @@ const data = [
 
 const dataBoxplots = [...d3.group(data, (d) => d.experiment)];
 
-const div = d3.select("body").append("div");
-div.append("h1").text("Boxplot Experiment");
-
 const width = 500;
 const height = 500;
 const margin = {
@@ -117,7 +114,7 @@ const margin = {
 
 const xScale = d3
   .scaleBand()
-  .domain(dataBoxplots.map(([boxplot]) => boxplot))
+  .domain(dataBoxplots.map(([experiment]) => experiment))
   .range([0, width])
   .padding(0.25);
 
@@ -127,10 +124,11 @@ const yScale = d3
   .range([height, 0])
   .nice();
 
-const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
-const yAxis = d3.axisLeft(yScale).ticks(4).tickSizeOuter(0);
+const xAxis = d3.axisBottom(xScale).tickSizeOuter(0).tickPadding(6);
+const yAxis = d3.axisLeft(yScale).ticks(4).tickSizeOuter(0).tickPadding(6);
 
-const svg = div
+const svg = d3
+  .select("body")
   .append("svg")
   .attr(
     "viewBox",
@@ -138,6 +136,20 @@ const svg = div
       height + margin.top + margin.bottom
     }`
   );
+
+const defs = svg.append("defs");
+const marker = defs
+  .append("marker")
+  .attr("id", "m")
+  .attr("viewBox", "-5 -0.5 10 1")
+  .attr("markerWidth", "10")
+  .attr("markerHeight", "1");
+
+marker
+  .append("line")
+  .attr("x1", "-5")
+  .attr("x2", "5")
+  .attr("stroke", "currentColor");
 
 const group = svg
   .append("g")
@@ -156,8 +168,6 @@ const groupAxisY = groupAxis.append("g").call(yAxis);
 groupAxisY.select("g").remove();
 groupAxisY.select("g:last-of-type").remove();
 
-const groupAxisNode = groupAxis.node();
-
 groupAxis
   .append("g")
   .node()
@@ -169,21 +179,24 @@ groupAxis
   .node()
   .appendChild(groupAxisY.select("path").node().cloneNode(true));
 
-groupAxis.selectAll("text").attr("font-size", "12");
-groupLabels.attr("font-size", "16");
+groupAxis.selectAll("text").attr("font-size", "14");
+
+const fontSizeLabels = 16;
+groupLabels.attr("font-size", fontSizeLabels);
 
 groupLabels
   .append("g")
-  .attr("transform", `translate(${width / 2} ${height + margin.bottom - 5})`)
+  .attr("transform", `translate(${width / 2} ${height + margin.bottom})`)
   .append("text")
   .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "ideographic")
   .text("Experiment No.");
 
 groupLabels
   .append("g")
   .attr(
     "transform",
-    `translate(${-margin.left + 20} ${height / 2}) rotate(-90)`
+    `translate(${-margin.left + fontSizeLabels} ${height / 2}) rotate(-90)`
   )
   .append("text")
   .attr("text-anchor", "middle")
@@ -227,19 +240,25 @@ groupsData.each(function ([, values]) {
     .append("g")
     .attr("stroke-dasharray", "2 5");
 
-  groupWhiskers.append("path").attr(
-    "d",
-    ([q0, q1]) =>
-      `M 0 ${yScale(q0)} 
+  groupWhiskers
+    .append("path")
+    .attr(
+      "d",
+      ([q0, q1]) =>
+        `M 0 ${yScale(q0)} 
         0 ${yScale(q1)}`
-  );
+    )
+    .attr("marker-start", "url(#m)");
 
-  groupWhiskers.append("path").attr(
-    "d",
-    ([, , , q3, q4]) =>
-      `M 0 ${yScale(q3)} 
+  groupWhiskers
+    .append("path")
+    .attr(
+      "d",
+      ([, , , q3, q4]) =>
+        `M 0 ${yScale(q3)} 
         0 ${yScale(q4)}`
-  );
+    )
+    .attr("marker-end", "url(#m)");
 
   groupQuantiles
     .append("path")
@@ -251,12 +270,4 @@ groupsData.each(function ([, values]) {
     .attr("width", w)
     .attr("y", ([, , , q3]) => yScale(q3))
     .attr("height", ([, q1, , q3]) => yScale(q1) - yScale(q3));
-
-  // groupQuantiles
-  //   .append("g")
-  //   .attr("transform", ([q0]) => `translate(0 ${yScale(q0)})`)
-  //   .append("line")
-  //   .attr("x1", "0")
-  //   .attr("x2", "10")
-  //   .attr("stroke", "currentColor");
 });
