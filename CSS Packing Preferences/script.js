@@ -355,13 +355,7 @@ const scaleColor = d3
 
 const container = d3.select("body").append("article");
 
-// const controls = container.append("div");
-// controls.append("button").text("Grouped");
-// controls.append("button").text("By awareness");
-// controls.append("button").text("By usage");
-
 const list = container.append("ul");
-
 const listItems = list.selectAll("li").data(features).enter().append("li");
 
 listItems
@@ -370,6 +364,11 @@ listItems
   .style("height", "1em")
   .style("background", (d) => scaleColor(d));
 listItems.append("span").text((d) => d);
+
+const controls = container.append("div");
+controls.append("button").text("Grouped");
+controls.append("button").text("By awareness");
+controls.append("button").text("By usage");
 
 const svg = container.append("svg").attr("viewBox", "0 0 1 1");
 const groupFeatures = svg.append("g");
@@ -397,7 +396,7 @@ groupsLabel
   .append("text")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
-  .attr("font-size", "0.02")
+  .attr("font-size", "0.022")
   .attr("letter-spacing", "0.001")
   .attr("font-family", "sans-serif")
   .attr("fill", "#FFF6E6")
@@ -430,6 +429,8 @@ groupsFeatures
   .append("circle")
   .attr("fill", "none")
   .attr("stroke", (d) => scaleColor(d.data["name"]))
-  .attr("stroke-width", "0.002")
-  .attr("stroke-dasharray", "0.003 0.01")
+  .attr("stroke-width", "0.003")
+  .attr("stroke-dasharray", "0.004 0.01")
   .attr("r", ({ r }) => r);
+
+controls.select("button").attr("class", "active");

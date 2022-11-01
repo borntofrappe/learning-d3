@@ -9,23 +9,17 @@ body {
   background: #272324;
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
 }
 
 article {
   margin: auto;
   max-width: 42rem;
+  margin: 1rem auto;
   width: 95vmin;
   display: flex;
   flex-direction: column;
   align-items: center;
-  row-gap: 1rem;
-}
-
-svg {
-  width: 100%;
-  height: auto;
+  row-gap: 2rem;
 }
 
 ul {
@@ -42,4 +36,30 @@ ul li {
   display: inline-flex;
   align-items: center;
   column-gap: 0.5rem;
+}
+
+div {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+}
+
+button {
+  color: inherit;
+  border: 0.1rem dashed currentColor;
+  border-radius: 0;
+  background: none;
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+button.active {
+  background: #fff6e609;
+  border-style: solid;
+}
+
+svg {
+  width: 100%;
+  height: auto;
 }
