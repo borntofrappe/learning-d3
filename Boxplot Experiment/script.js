@@ -118,7 +118,8 @@ const margin = {
 const xScale = d3
   .scaleBand()
   .domain(dataBoxplots.map(([boxplot]) => boxplot))
-  .range([0, width]);
+  .range([0, width])
+  .padding(0.2);
 
 const yScale = d3
   .scaleLinear()
@@ -199,10 +200,39 @@ const groupsData = groupData
   );
 
 groupsData
+  .append("g")
   .selectAll("circle")
   .data(([, values]) => values)
   .enter()
   .append("circle")
   .attr("transform", (d) => `translate(0 ${yScale(d.speed)})`)
   .attr("r", 2)
-  .attr("opacity", 0.75);
+  .attr("opacity", 0.5);
+
+const quantiles = d3.range(4);
+
+groupsData.each(function ([, values]) {
+  const domain = values.map((d) => d.speed);
+  const scaleQuantile = d3.scaleQuantile().domain(domain).range(quantiles);
+
+  const dataQuantile = quantiles.map((d) =>
+    scaleQuantile.invertExtent(quantiles[d])
+  );
+
+  d3.select(this)
+    .append("g")
+    .attr("fill", "none")
+    .attr("stroke", "currentColor")
+    .selectAll("rect")
+    .data(dataQuantile)
+    .enter()
+    .append("rect")
+    .attr(
+      "transform",
+      ([, d1]) => `translate(${-xScale.bandwidth() / 2} ${yScale(d1)})`
+    )
+    .attr("width", xScale.bandwidth())
+    .attr("height", ([d0, d1]) => {
+      return yScale(d0) - yScale(d1);
+    });
+});
