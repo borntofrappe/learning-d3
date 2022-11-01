@@ -106,8 +106,8 @@ const dataBoxplots = [...d3.group(data, (d) => d.experiment)];
 const div = d3.select("body").append("div");
 div.append("h1").text("Boxplot Experiment");
 
-const width = 400;
-const height = 400;
+const width = 500;
+const height = 500;
 const margin = {
   top: 5,
   bottom: 55,
@@ -119,7 +119,7 @@ const xScale = d3
   .scaleBand()
   .domain(dataBoxplots.map(([boxplot]) => boxplot))
   .range([0, width])
-  .padding(0.2);
+  .padding(0.25);
 
 const yScale = d3
   .scaleLinear()
@@ -199,40 +199,64 @@ const groupsData = groupData
     ([boxplot]) => `translate(${xScale(boxplot) + xScale.bandwidth() / 2} 0)`
   );
 
-groupsData
-  .append("g")
-  .selectAll("circle")
-  .data(([, values]) => values)
-  .enter()
-  .append("circle")
-  .attr("transform", (d) => `translate(0 ${yScale(d.speed)})`)
-  .attr("r", 2)
-  .attr("opacity", 0.5);
-
 const quantiles = d3.range(4);
+const w = xScale.bandwidth();
 
 groupsData.each(function ([, values]) {
   const domain = values.map((d) => d.speed);
   const scaleQuantile = d3.scaleQuantile().domain(domain).range(quantiles);
 
-  const dataQuantile = quantiles.map((d) =>
+  const dataExtents = quantiles.map((d) =>
     scaleQuantile.invertExtent(quantiles[d])
   );
 
-  d3.select(this)
+  const dataQuantiles = dataExtents.reduce(
+    (acc, curr) => [...acc, curr[1]],
+    [dataExtents[0][0]]
+  );
+
+  const groupQuantiles = d3
+    .select(this)
     .append("g")
     .attr("fill", "none")
     .attr("stroke", "currentColor")
-    .selectAll("rect")
-    .data(dataQuantile)
-    .enter()
+    .attr("stroke-width", "2")
+    .datum(dataQuantiles);
+
+  const groupWhiskers = groupQuantiles
+    .append("g")
+    .attr("stroke-dasharray", "2 5");
+
+  groupWhiskers.append("path").attr(
+    "d",
+    ([q0, q1]) =>
+      `M 0 ${yScale(q0)} 
+        0 ${yScale(q1)}`
+  );
+
+  groupWhiskers.append("path").attr(
+    "d",
+    ([, , , q3, q4]) =>
+      `M 0 ${yScale(q3)} 
+        0 ${yScale(q4)}`
+  );
+
+  groupQuantiles
+    .append("path")
+    .attr("d", ([, , q2]) => `M ${-w / 2} ${yScale(q2)} h ${w}`);
+
+  groupQuantiles
     .append("rect")
-    .attr(
-      "transform",
-      ([, d1]) => `translate(${-xScale.bandwidth() / 2} ${yScale(d1)})`
-    )
-    .attr("width", xScale.bandwidth())
-    .attr("height", ([d0, d1]) => {
-      return yScale(d0) - yScale(d1);
-    });
+    .attr("x", -w / 2)
+    .attr("width", w)
+    .attr("y", ([, , , q3]) => yScale(q3))
+    .attr("height", ([, q1, , q3]) => yScale(q1) - yScale(q3));
+
+  // groupQuantiles
+  //   .append("g")
+  //   .attr("transform", ([q0]) => `translate(0 ${yScale(q0)})`)
+  //   .append("line")
+  //   .attr("x1", "0")
+  //   .attr("x2", "10")
+  //   .attr("stroke", "currentColor");
 });
