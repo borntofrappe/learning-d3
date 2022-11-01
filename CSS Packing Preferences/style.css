@@ -27,3 +27,19 @@ svg {
   width: 100%;
   height: auto;
 }
+
+ul {
+  width: 100%;
+  padding: 1.5rem 2.5rem;
+  display: grid;
+  gap: 1rem 2rem;
+  border: 0.1rem solid currentColor;
+  font-size: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(100px, auto));
+}
+
+ul li {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.5rem;
+}

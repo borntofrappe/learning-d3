@@ -327,22 +327,6 @@ const data = dataset.map((d) => ({
   ),
 }));
 
-const container = d3.select("body").append("article");
-
-// const controls = container.append("div");
-// controls.append("button").text("Grouped");
-// controls.append("button").text("By awareness");
-// controls.append("button").text("By usage");
-
-const svg = container.append("svg").attr("viewBox", "0 0 1 1");
-const groupFeatures = svg.append("g");
-const groupLabels = svg.append("g");
-
-// const children = [...d3.group(data, (d) => d.Feature)].map(([key, value]) => ({
-//   name: key,
-//   children: value,
-// }));
-
 const features = data
   .map(({ Feature }) => Feature)
   .reduce((a, c) => (a.includes(c) ? [...a] : [...a, c]), []);
@@ -351,11 +335,6 @@ const children = features.map((feature) => ({
   name: feature,
   children: data.filter(({ Feature }) => feature === Feature),
 }));
-
-const scaleColor = d3
-  .scaleOrdinal()
-  .domain(features)
-  .range(["#4BC77D", "#7854C3", "#4861EC", "#ef4e88", "#FE6A6A", "#FFE589"]);
 
 const root = d3
   .hierarchy({
@@ -368,6 +347,34 @@ const dataPack = d3.pack()(root);
 
 const dataLabel = dataPack.leaves();
 const dataFeature = dataPack.descendants().filter(({ depth }) => depth === 1);
+
+const scaleColor = d3
+  .scaleOrdinal()
+  .domain(features)
+  .range(["#4861EC", "#EF4E88", "#FE6A6A", "#7854C3", "#FFE589", "#4BC77D"]);
+
+const container = d3.select("body").append("article");
+
+// const controls = container.append("div");
+// controls.append("button").text("Grouped");
+// controls.append("button").text("By awareness");
+// controls.append("button").text("By usage");
+
+const list = container.append("ul");
+
+const listItems = list.selectAll("li").data(features).enter().append("li");
+
+listItems
+  .append("span")
+  .style("width", "1em")
+  .style("height", "1em")
+  .style("background", (d) => scaleColor(d));
+listItems.append("span").text((d) => d);
+
+const svg = container.append("svg").attr("viewBox", "0 0 1 1");
+const groupFeatures = svg.append("g");
+const groupLabels = svg.append("g");
+
 const groupsLabel = groupLabels
   .selectAll("g")
   .data(dataLabel)
