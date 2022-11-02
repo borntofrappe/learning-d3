@@ -346,14 +346,16 @@ const root = d3
   })
   .sum((d) => d["Know about it"] || 0);
 
-const dataPack = d3.pack().size([400, 400])(root);
+const dataPack = d3.pack().padding(8).size([size, size])(root);
 
-const dataFeature = dataPack.descendants().filter(({ depth }) => depth === 1);
+const dataFeatures = dataPack.descendants().filter(({ depth }) => depth === 1);
 
-const dataLabel = dataPack.leaves();
-const dimensions = Math.ceil(dataLabel.length ** 0.5);
+const dataValues = dataPack.leaves();
+
+const dimensions = Math.ceil(dataValues.length ** 0.5);
 const cellSize = size / dimensions;
-dataLabel
+
+dataValues
   .sort((a, b) => b.data["Know about it"] - a.data["Know about it"])
   .forEach((d, i) => {
     const x = (i % dimensions) * cellSize + cellSize / 2;
@@ -363,7 +365,7 @@ dataLabel
     d.position["Know about it"] = { x, y };
   });
 
-dataLabel
+dataValues
   .sort((a, b) => b.data["Have used it"] - a.data["Have used it"])
   .forEach((d, i) => {
     const x = (i % dimensions) * cellSize + cellSize / 2;
@@ -371,7 +373,6 @@ dataLabel
 
     d.position["Have used it"] = { x, y };
     d.position["Grouped"] = { x: d.x, y: d.y };
-    d.r *= 0.8;
   });
 
 const scaleColor = d3
@@ -410,7 +411,7 @@ const groupLabels = svg.append("g");
 
 const groupsLabel = groupLabels
   .selectAll("g")
-  .data(dataLabel)
+  .data(dataValues)
   .enter()
   .append("g")
   .attr("fill", (d) => scaleColor(d.data["Feature"]))
@@ -448,7 +449,7 @@ groupsLabel
 
 groupsFeatures = groupFeatures
   .selectAll("g")
-  .data(dataFeature)
+  .data(dataFeatures)
   .enter()
   .append("g")
   .attr("transform", ({ x, y }) => `translate(${x} ${y})`);
