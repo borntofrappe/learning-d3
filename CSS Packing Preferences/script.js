@@ -320,6 +320,7 @@ const dataset = [
 ];
 
 const formatRatio = d3.format(".2f");
+const size = 400;
 const data = dataset.map((d) => ({
   ...d,
   "Usage ratio": parseFloat(
@@ -343,7 +344,7 @@ const root = d3
   })
   .sum((d) => d["Know about it"] || 0);
 
-const dataPack = d3.pack()(root);
+const dataPack = d3.pack().size([400, 400])(root);
 
 const dataLabel = dataPack.leaves();
 const dataFeature = dataPack.descendants().filter(({ depth }) => depth === 1);
@@ -370,7 +371,7 @@ controls.append("button").text("Grouped");
 controls.append("button").text("By awareness");
 controls.append("button").text("By usage");
 
-const svg = container.append("svg").attr("viewBox", "0 0 1 1");
+const svg = container.append("svg").attr("viewBox", `0 0 ${size} ${size}`);
 const groupFeatures = svg.append("g");
 const groupLabels = svg.append("g");
 
@@ -396,12 +397,12 @@ groupsLabel
   .append("text")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
-  .attr("font-size", "0.022")
-  .attr("letter-spacing", "0.001")
+  .attr("font-size", "9")
+  .attr("letter-spacing", "1")
   .attr("font-family", "sans-serif")
   .attr("fill", "#FFF6E6")
   .attr("stroke", "#272325")
-  .attr("stroke-width", "0.01")
+  .attr("stroke-width", "4")
   .attr("stroke-linecap", "round")
   .attr("stroke-linejoin", "round")
   .attr("paint-order", "stroke")
@@ -429,8 +430,8 @@ groupsFeatures
   .append("circle")
   .attr("fill", "none")
   .attr("stroke", (d) => scaleColor(d.data["name"]))
-  .attr("stroke-width", "0.003")
-  .attr("stroke-dasharray", "0.004 0.01")
+  .attr("stroke-width", "1")
+  .attr("stroke-dasharray", "2 4")
   .attr("r", ({ r }) => r);
 
 controls.select("button").attr("class", "active");
