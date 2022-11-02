@@ -13,7 +13,7 @@ body {
 
 article {
   margin: auto;
-  max-width: 42rem;
+  max-width: 64rem;
   margin: 1rem auto;
   width: 95vmin;
   display: flex;
@@ -23,13 +23,12 @@ article {
 }
 
 ul {
-  width: 100%;
-  padding: 1.5rem 2.5rem;
-  display: grid;
+  padding: 1.25rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem 2rem;
   border: 0.1rem solid currentColor;
-  font-size: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(100px, auto));
+  font-size: 0.9rem;
 }
 
 ul li {
@@ -48,9 +47,9 @@ button {
   border: 0.1rem dashed currentColor;
   border-radius: 0;
   background: none;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 0.8rem;
   cursor: pointer;
 }
 

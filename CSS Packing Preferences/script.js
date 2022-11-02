@@ -364,13 +364,14 @@ dataLabel
   });
 
 dataLabel
-  .sort((a, b) => b.data["Usage ratio"] - a.data["Usage ratio"])
+  .sort((a, b) => b.data["Have used it"] - a.data["Have used it"])
   .forEach((d, i) => {
     const x = (i % dimensions) * cellSize + cellSize / 2;
     const y = Math.floor(i / dimensions) * cellSize + cellSize / 2;
 
-    d.position["Usage ratio"] = { x, y };
+    d.position["Have used it"] = { x, y };
     d.position["Grouped"] = { x: d.x, y: d.y };
+    d.r *= 0.8;
   });
 
 const scaleColor = d3
@@ -396,7 +397,7 @@ controls
   .append("button")
   .text("By awareness")
   .attr("data-key", "Know about it");
-controls.append("button").text("By usage").attr("data-key", "Usage ratio");
+controls.append("button").text("By usage").attr("data-key", "Have used it");
 
 const svg = container
   .append("svg")
@@ -424,17 +425,17 @@ groupsLabel.append("circle").attr("r", (d) => {
   return d.r * d.data["Usage ratio"];
 });
 
-const maxLength = 15;
+const maxLength = 14;
 groupsLabel
   .append("text")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
-  .attr("font-size", "9")
+  .attr("font-size", "7")
   .attr("letter-spacing", "1")
   .attr("font-family", "sans-serif")
   .attr("fill", "#FFF6E6")
   .attr("stroke", "#272325")
-  .attr("stroke-width", "4")
+  .attr("stroke-width", "3")
   .attr("stroke-linecap", "round")
   .attr("stroke-linejoin", "round")
   .attr("paint-order", "stroke")
@@ -475,7 +476,7 @@ controls.selectAll("button").on("click", function () {
 
   const key = d3.select(this).attr("data-key");
 
-  const groupsLabel = groupLabels
+  groupLabels
     .selectAll("g")
     .transition()
     .duration(750)
@@ -485,14 +486,34 @@ controls.selectAll("button").on("click", function () {
       return `translate(${x} ${y})`;
     });
 
-  const scaleFeatures = key === "Grouped" ? 1 : 0;
-  const delayFeatures = key === "Grouped" ? 400 : 0;
-  const easeFeatures = key === "Grouped" ? d3.easeBackOut : d3.easeQuadInOut;
-  groupFeatures
-    .selectAll("circle")
-    .transition()
-    .delay(delayFeatures)
-    .duration(200)
-    .ease(easeFeatures)
-    .attr("transform", `scale(${scaleFeatures})`);
+  if (key === "Grouped") {
+    groupLabels
+      .selectAll("text")
+      .transition()
+      .duration(250)
+      .ease(d3.easeQuadInOut)
+      .attr("y", 0);
+
+    groupFeatures
+      .selectAll("circle")
+      .transition()
+      .duration(200)
+      .delay(350)
+      .ease(d3.easeBackOut)
+      .attr("transform", "scale(1)");
+  } else {
+    groupLabels
+      .selectAll("text")
+      .transition()
+      .duration(250)
+      .ease(d3.easeQuadInOut)
+      .attr("y", cellSize / 2);
+
+    groupFeatures
+      .selectAll("circle")
+      .transition()
+      .duration(200)
+      .ease(d3.easeQuadInOut)
+      .attr("transform", "scale(0)");
+  }
 });
