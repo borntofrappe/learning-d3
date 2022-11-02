@@ -319,15 +319,12 @@ const dataset = [
   },
 ];
 
-const formatRatio = d3.format(".2f");
 const size = 400;
 const margin = 25;
 
 const data = dataset.map((d) => ({
   ...d,
-  "Usage ratio": parseFloat(
-    formatRatio(d["Have used it"] / d["Know about it"])
-  ),
+  "Usage ratio": parseFloat(d["Have used it"] / d["Know about it"]),
 }));
 
 const features = data
@@ -380,19 +377,20 @@ const scaleColor = d3
   .domain(features)
   .range(["#4861EC", "#EF4E88", "#FE6A6A", "#7854C3", "#FFE589", "#4BC77D"]);
 
-const container = d3.select("body").append("article");
+const container = d3.select("body").append("article").attr("id", "root");
 
 const list = container.append("ul");
 const listItems = list.selectAll("li").data(features).enter().append("li");
 
 listItems
   .append("span")
+  .style("style", "inline-block")
   .style("width", "1em")
   .style("height", "1em")
   .style("background", (d) => scaleColor(d));
 listItems.append("span").text((d) => d);
 
-const controls = container.append("div");
+const controls = container.append("div").attr("id", "controls");
 controls.append("button").text("Grouped").attr("data-key", "Grouped");
 controls
   .append("button")
@@ -400,14 +398,29 @@ controls
   .attr("data-key", "Know about it");
 controls.append("button").text("By usage").attr("data-key", "Have used it");
 
-const svg = container
+const viz = container
+  .append("div")
+  .attr("id", "viz")
+  .style("position", "relative");
+
+const tooltip = viz
+  .append("div")
+  .attr("id", "tooltip")
+  .style("position", "absolute")
+  .style("pointer-events", "none")
+  .style("visibility", "hidden")
+  .style("opacity", "0");
+
+const svg = viz
   .append("svg")
-  .attr(
-    "viewBox",
-    `${-margin} ${-margin} ${size + margin * 2} ${size + margin * 2}`
-  );
-const groupFeatures = svg.append("g");
-const groupLabels = svg.append("g");
+  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin} ${margin})`);
+
+const groupFeatures = group.append("g");
+const groupLabels = group.append("g");
 
 const groupsLabel = groupLabels
   .selectAll("g")
@@ -429,6 +442,7 @@ groupsLabel.append("circle").attr("r", (d) => {
 const maxLength = 14;
 groupsLabel
   .append("text")
+  .style("pointer-events", "none")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
   .attr("font-size", "7")
@@ -518,3 +532,50 @@ controls.selectAll("button").on("click", function () {
       .attr("transform", "scale(0)");
   }
 });
+
+const formatRatio = d3.format(".2%");
+
+groupsLabel
+  .on("pointerenter", (e, d) => {
+    tooltip.style("visibility", "visible").style("opacity", "1");
+
+    const { data } = d;
+
+    tooltip.append("h2").text(data["Label"]);
+
+    const colorUsage = scaleColor(data["Feature"]);
+    const colorAwareness = d3.color(colorUsage);
+    colorAwareness.opacity = 0.5;
+
+    const dl = tooltip.append("dl");
+    for (const [key, value, background] of [
+      ["Know about it", data["Know about it"], colorAwareness.toString()],
+      ["Have used it", data["Have used it"], colorUsage],
+      [
+        "Usage ratio",
+        formatRatio(data["Usage ratio"]),
+        `linear-gradient(135deg, ${colorAwareness.toString()} 50%, ${colorUsage} 50%)`,
+      ],
+    ]) {
+      const dt = dl.append("dt");
+      dt.append("span")
+        .style("style", "inline-block")
+        .style("width", "1em")
+        .style("height", "1em")
+        .style("background", background);
+
+      dt.append("span").text(key);
+      dl.append("dd").text(value);
+    }
+  })
+  .on("pointermove", (e) => {
+    tooltip.style("left", `${e.offsetX}px`).style("top", `${e.offsetY - 25}px`);
+  })
+  .on("pointerleave", () => {
+    tooltip
+      .style("visibility", "hidden")
+      .style("opacity", "0")
+      .selectAll("*")
+      .remove();
+    //
+  });

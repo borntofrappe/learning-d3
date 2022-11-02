@@ -11,7 +11,7 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-article {
+#root {
   margin: 1rem auto;
   width: 100%;
   max-width: 56rem;
@@ -21,9 +21,12 @@ article {
   row-gap: 2rem;
 }
 
-ul {
+#root > ul {
   width: 100%;
   max-width: 42rem;
+}
+
+ul {
   padding: 1.25rem 2rem;
   display: grid;
   grid-template-columns: repeat(4, minmax(auto, 1fr));
@@ -38,13 +41,16 @@ ul li {
   column-gap: 0.5rem;
 }
 
-div {
+#root > #controls {
   max-width: 42rem;
+}
+
+#controls {
   display: grid;
   grid-template-columns: repeat(3, auto);
 }
 
-button {
+#controls button {
   color: inherit;
   border: 0.1rem dashed currentColor;
   margin-left: -0.025rem;
@@ -57,12 +63,57 @@ button {
   cursor: pointer;
 }
 
-button.active {
+#controls button.active {
   background: #fff6e609;
   border-style: solid;
 }
 
-svg {
+#root > #viz {
   width: 100%;
-  height: auto;
+}
+
+#viz {
+  position: relative;
+}
+
+#viz > #tooltip {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+}
+
+#tooltip {
+  width: max-content;
+  color: #272324;
+  background: #fff6e6de;
+  display: inline-block;
+  padding: 0.65rem 0.75rem;
+  box-shadow: 0 0 0 0.3rem #00000022;
+}
+
+#tooltip > * + * {
+  margin-top: 0.75em;
+}
+
+#tooltip h2 {
+  font-size: 1em;
+}
+
+#tooltip dl {
+  display: grid;
+  gap: 0.6rem 1.1rem;
+  grid-template-columns: repeat(2, auto);
+  font-size: 0.95rem;
+}
+
+#tooltip dl dt {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.5rem;
+  letter-spacing: 0.05rem;
+}
+
+#tooltip dl dd {
+  font-weight: 700;
+  text-align: right;
 }
