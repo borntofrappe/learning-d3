@@ -321,6 +321,8 @@ const dataset = [
 
 const formatRatio = d3.format(".2f");
 const size = 400;
+const margin = 25;
+
 const data = dataset.map((d) => ({
   ...d,
   "Usage ratio": parseFloat(
@@ -346,8 +348,30 @@ const root = d3
 
 const dataPack = d3.pack().size([400, 400])(root);
 
-const dataLabel = dataPack.leaves();
 const dataFeature = dataPack.descendants().filter(({ depth }) => depth === 1);
+
+const dataLabel = dataPack.leaves();
+const dimensions = Math.ceil(dataLabel.length ** 0.5);
+const cellSize = size / dimensions;
+dataLabel
+  .sort((a, b) => b.data["Know about it"] - a.data["Know about it"])
+  .forEach((d, i) => {
+    const x = (i % dimensions) * cellSize + cellSize / 2;
+    const y = Math.floor(i / dimensions) * cellSize + cellSize / 2;
+
+    d.position = {};
+    d.position["Know about it"] = { x, y };
+  });
+
+dataLabel
+  .sort((a, b) => b.data["Usage ratio"] - a.data["Usage ratio"])
+  .forEach((d, i) => {
+    const x = (i % dimensions) * cellSize + cellSize / 2;
+    const y = Math.floor(i / dimensions) * cellSize + cellSize / 2;
+
+    d.position["Usage ratio"] = { x, y };
+    d.position["Grouped"] = { x: d.x, y: d.y };
+  });
 
 const scaleColor = d3
   .scaleOrdinal()
@@ -367,11 +391,19 @@ listItems
 listItems.append("span").text((d) => d);
 
 const controls = container.append("div");
-controls.append("button").text("Grouped");
-controls.append("button").text("By awareness");
-controls.append("button").text("By usage");
+controls.append("button").text("Grouped").attr("data-key", "Grouped");
+controls
+  .append("button")
+  .text("By awareness")
+  .attr("data-key", "Know about it");
+controls.append("button").text("By usage").attr("data-key", "Usage ratio");
 
-const svg = container.append("svg").attr("viewBox", `0 0 ${size} ${size}`);
+const svg = container
+  .append("svg")
+  .attr(
+    "viewBox",
+    `${-margin} ${-margin} ${size + margin * 2} ${size + margin * 2}`
+  );
 const groupFeatures = svg.append("g");
 const groupLabels = svg.append("g");
 
@@ -435,3 +467,32 @@ groupsFeatures
   .attr("r", ({ r }) => r);
 
 controls.select("button").attr("class", "active");
+controls.selectAll("button").on("click", function () {
+  if (d3.select(this).classed("active")) return;
+
+  controls.select("button.active").classed("active", false);
+  d3.select(this).classed("active", true);
+
+  const key = d3.select(this).attr("data-key");
+
+  const groupsLabel = groupLabels
+    .selectAll("g")
+    .transition()
+    .duration(750)
+    .ease(d3.easeBackOut)
+    .attr("transform", (d) => {
+      const { x, y } = d.position[key];
+      return `translate(${x} ${y})`;
+    });
+
+  const scaleFeatures = key === "Grouped" ? 1 : 0;
+  const delayFeatures = key === "Grouped" ? 400 : 0;
+  const easeFeatures = key === "Grouped" ? d3.easeBackOut : d3.easeQuadInOut;
+  groupFeatures
+    .selectAll("circle")
+    .transition()
+    .delay(delayFeatures)
+    .duration(200)
+    .ease(easeFeatures)
+    .attr("transform", `scale(${scaleFeatures})`);
+});
