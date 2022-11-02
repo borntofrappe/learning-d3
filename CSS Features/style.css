@@ -1,0 +1,68 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: #fff6e6;
+  background: #272324;
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+article {
+  margin: 1rem auto;
+  width: 100%;
+  max-width: 56rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 2rem;
+}
+
+ul {
+  width: 100%;
+  max-width: 42rem;
+  padding: 1.25rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(auto, 1fr));
+  gap: 1rem 2rem;
+  border: 0.1rem solid currentColor;
+  font-size: 0.9rem;
+}
+
+ul li {
+  display: flex;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+div {
+  max-width: 42rem;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+}
+
+button {
+  color: inherit;
+  border: 0.1rem dashed currentColor;
+  margin-left: -0.025rem;
+  margin-right: -0.025rem;
+  border-radius: 0;
+  background: none;
+  padding: 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+button.active {
+  background: #fff6e609;
+  border-style: solid;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+}

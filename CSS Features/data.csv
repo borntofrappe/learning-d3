@@ -1,0 +1,54 @@
+Label,Know about it,Have used it,Feature
+Flexbox,8074,7987,Layout
+CSS position:sticky,7834,6747,Layout
+Grid,8075,6746,Layout
+Flexbox Gap,6404,4440,Layout
+Multi-Column Layout,5082,3136,Layout
+Break Rules,3516,1952,Layout
+CSS property: aspect-ratio,6728,2997,Layout
+CSS content-visibility,4618,1953,Layout
+Writing Modes,3459,1241,Layout
+CSS Logical Properties,4341,1420,Layout
+Subgrid,5663,1024,Layout
+CSS property: @container,4822,435,Layout
+object-fit,6216,5216,Shapes & Graphic
+Filters & Effects,6600,4962,Shapes & Graphic
+Intrinsic Sizing,5123,3601,Shapes & Graphic
+clip-path,6482,4226,Shapes & Graphic
+backdrop-filter,4499,2710,Shapes & Graphic
+blend-mode,5153,2936,Shapes & Graphic
+Perspective,3630,1990,Shapes & Graphic
+Masking,5455,2543,Shapes & Graphic
+Shapes,4385,1744,Shapes & Graphic
+color(),2959,1163,Shapes & Graphic
+conic-gradient(),3019,710,Shapes & Graphic
+accent-color,2893,543,Shapes & Graphic
+color-gamut,1420,119,Shapes & Graphic
+pointer-events,5928,5136,Interactions
+overscroll-behavior,3398,1730,Interactions
+Scroll Snap,4656,2161,Interactions
+touch-action,2714,1225,Interactions
+overflow-anchor,1706,561,Interactions
+scroll-timeline,1192,178,Interactions
+font-display,3999,2784,Typography
+line-clamp,3621,2112,Typography
+font-variant-numeric,2138,899,Typography
+font-variant,3379,1419,Typography
+initial-letter,4241,1703,Typography
+Variable Fonts,4288,1503,Typography
+ARIA attributes,6608,5658,Accessibility
+tabindex,6191,5191,Accessibility
+prefers-color-scheme,4510,2016,Accessibility
+prefers-reduced-motion,4354,1866,Accessibility
+color-scheme,2084,521,Accessibility
+color-contrast(),1835,238,Accessibility
+prefers-reduced-data,2537,275,Accessibility
+calc(),6951,6597,Other Features
+Variables,6771,5876,Other Features
+CSS Comparison Functions,6118,4407,Other Features
+will-change,3670,2357,Other Features
+::marker,3756,2330,Other Features
+@supports,5306,3226,Other Features
+Contain,1958,670,Other Features
+@property,1912,286,Other Features
+CSS Houdini,3361,253,Other Features
