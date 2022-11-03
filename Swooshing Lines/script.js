@@ -323,5 +323,135 @@ const data = [
   },
 ];
 
+const options = Object.keys(data[0]).slice(1);
+const years = data[0][options[0]].map(({ year }) => year);
+
+const [option] = options;
+
+const width = 600;
+const height = 800;
+const margin = {
+  x: 140,
+  y: 20,
+};
+
+const scaleX = d3.scaleBand().domain(years).range([0, width]);
+const scaleY = d3
+  .scaleBand()
+  .domain(d3.range(1, data.length + 1))
+  .range([0, height]);
+
+const line = d3
+  .line()
+  .x((d) => scaleX(d.year) + scaleX.bandwidth() / 2)
+  .y((d) => scaleY(d.ranking) + scaleY.bandwidth() / 2)
+  .defined((d) => d.ranking)
+  .curve(d3.curveBumpX);
+
+const formatPercentage = d3.format(".0%");
+const dataOption = data.map((d) => ({ label: d.label, values: d[option] }));
+
+const strokeWidth = 4;
+const markerWidth = scaleX.bandwidth() / 3;
+const markerHeight = strokeWidth;
 const div = d3.select("body").append("div");
-div.append("h1").text("Swooshing Lines");
+
+const svg = div
+  .append("svg")
+  .attr("viewBox", `0 0 ${width + margin.x * 2} ${height + margin.y * 2}`);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.x} ${margin.y})`);
+
+const defs = svg.append("defs");
+const marker = defs
+  .append("marker")
+  .attr("id", "marker-swooshing-line")
+  .attr("viewBox", `0 -${markerHeight / 2} ${markerWidth} ${markerHeight}`)
+  .attr("orient", "auto-start-reverse")
+  .attr("markerUnits", "userSpaceOnUse")
+  .attr("markerWidth", markerWidth)
+  .attr("markerHeight", markerHeight);
+
+marker
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr("stroke-linecap", "round")
+  .attr("d", `M ${strokeWidth / 2} 0 H ${markerWidth - strokeWidth / 2}`);
+
+const groupData = group.append("g");
+const groupsData = groupData
+  .selectAll("g")
+  .data(dataOption)
+  .enter()
+  .append("g");
+
+groupsData
+  .filter((d) => d.values[0].ranking)
+  .append("text")
+  .attr("text-anchor", "end")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "12")
+  .attr("font-family", "sans-serif")
+  .attr("fill", "#FFF6E6")
+  .text(({ label }) => label)
+  .attr("transform", (d) => {
+    const { ranking } = d.values[0];
+    const y = scaleY(ranking);
+    return `translate(0 ${y + scaleY.bandwidth() / 2})`;
+  });
+
+groupsData
+  .filter(({ values }) => values[values.length - 1].ranking)
+  .append("text")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "12")
+  .attr("font-family", "sans-serif")
+  .attr("fill", "#FFF6E6")
+  .text(({ label }) => label)
+  .attr("transform", ({ values }) => {
+    const { ranking } = values[values.length - 1];
+    const y = scaleY(ranking) + scaleY.bandwidth() / 2;
+    return `translate(${width} ${y})`;
+  });
+
+groupsData
+  .append("path")
+  .attr("marker-start", "url(#marker-swooshing-line)")
+  .attr("marker-end", "url(#marker-swooshing-line)")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr("d", (d) => line(d.values));
+
+groupsPercentages = groupsData
+  .selectAll("g")
+  .data((d) => d.values)
+  .enter()
+  .append("g")
+  .filter((d) => d.ranking !== null)
+  .attr("transform", ({ year, ranking }) => {
+    const x = scaleX(year) + scaleX.bandwidth() / 2;
+    const y = scaleY(ranking) + scaleY.bandwidth() / 2;
+
+    return `translate(${x} ${y})`;
+  });
+
+groupsPercentages
+  .append("circle")
+  .attr("fill", "#FFF6E6")
+  .attr("stroke", "#272324")
+  .attr("stroke-width", "2")
+  .attr("r", "20");
+
+groupsPercentages
+  .append("text")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "12")
+  .attr("font-family", "sans-serif")
+  .attr("fill", "#272324")
+  .text((d) => formatPercentage(d.percentage));
