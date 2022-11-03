@@ -342,11 +342,11 @@ const years = data[0][options[0]].map(({ year }) => year);
 
 const [option] = options;
 
-const width = 600;
-const height = 800;
+const width = 900;
+const height = 900;
 const margin = {
-  x: 140,
-  y: 20,
+  x: 150,
+  y: 50,
 };
 
 const scaleX = d3.scaleBand().domain(years).range([0, width]);
@@ -367,9 +367,9 @@ const formatPercentage = d3.format(".0%");
 const strokeWidth = 4;
 const markerWidth = scaleX.bandwidth() / 3;
 const markerHeight = strokeWidth;
-const div = d3.select("body").append("div");
+const root = d3.select("body").append("div").attr("id", "root");
 
-const svg = div
+const svg = root
   .append("svg")
   .attr("viewBox", `0 0 ${width + margin.x * 2} ${height + margin.y * 2}`);
 
@@ -398,6 +398,7 @@ data.forEach(({ label, color }) => {
     .attr("d", `M ${strokeWidth / 2} 0 H ${markerWidth - strokeWidth / 2}`);
 });
 
+const groupYears = group.append("g");
 const groupData = group.append("g");
 
 const groupsData = groupData
@@ -470,14 +471,49 @@ groupsPercentages
   .append("circle")
   .attr("fill", "#272324")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "3")
-  .attr("r", "16");
+  .attr("stroke-width", "3.5")
+  .attr("r", "20");
 
 groupsPercentages
   .append("text")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
-  .attr("font-size", "10")
+  .attr("font-size", "11")
   .attr("font-family", "sans-serif")
   .attr("fill", "#FFF6E6")
   .text((d) => formatPercentage(d.percentage));
+
+const groupsYears = groupYears
+  .selectAll("g")
+  .data(years)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    (d) => `translate(${scaleX(d) + scaleX.bandwidth() / 2} 0)`
+  );
+
+groupsYears
+  .append("path")
+  .attr("opacity", "0.5")
+  .attr("fill", "none")
+  .attr("stroke", "#FFF6E6")
+  .attr("stroke-width", "1")
+  .attr("stroke-dasharray", "3 5")
+  .attr("d", `M 0 0 V ${height}`);
+
+const groupLabels = groupsYears
+  .append("g")
+  .attr("text-anchor", "middle")
+  .attr("font-size", "11")
+  .attr("font-family", "sans-serif")
+  .attr("fill", "currentColor");
+
+groupLabels
+  .append("text")
+  .text((d) => d)
+  .attr("y", "-8");
+groupLabels
+  .append("text")
+  .text((d) => d)
+  .attr("y", height + 12);
