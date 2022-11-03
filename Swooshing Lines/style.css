@@ -15,4 +15,40 @@ body {
   width: 100%;
   max-width: 78rem;
   margin: 1rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 2rem;
+}
+
+#root > #controls {
+  max-width: 42rem;
+}
+
+#root > #viz {
+  width: 100%;
+}
+
+#controls {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+}
+
+#controls button {
+  text-transform: capitalize;
+  color: inherit;
+  border: 0.1rem dashed currentColor;
+  margin-left: -0.025rem;
+  margin-right: -0.025rem;
+  border-radius: 0;
+  background: none;
+  padding: 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+#controls button.active {
+  background: #fff6e609;
+  border-style: solid;
 }

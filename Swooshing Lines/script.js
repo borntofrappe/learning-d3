@@ -369,7 +369,19 @@ const markerWidth = scaleX.bandwidth() / 3;
 const markerHeight = strokeWidth;
 const root = d3.select("body").append("div").attr("id", "root");
 
-const svg = root
+const controls = root.append("div").attr("id", "controls");
+
+controls
+  .selectAll("button")
+  .data(options)
+  .enter()
+  .append("button")
+  .text((d) => d)
+  .style("text-transform", "capitalize");
+
+const viz = root.append("div").attr("id", "viz");
+
+const svg = viz
   .append("svg")
   .attr("viewBox", `0 0 ${width + margin.x * 2} ${height + margin.y * 2}`);
 
@@ -411,6 +423,7 @@ const groupsData = groupData
 groupsData
   .filter((d) => d[option][0].ranking)
   .append("text")
+  .attr("class", "start")
   .attr("text-anchor", "end")
   .attr("dominant-baseline", "central")
   .attr("font-size", "12")
@@ -427,6 +440,7 @@ groupsData
 groupsData
   .filter((d) => d[option][d[option].length - 1].ranking)
   .append("text")
+  .attr("class", "end")
   .attr("dominant-baseline", "central")
   .attr("font-size", "12")
   .attr("font-weight", "700")
@@ -441,6 +455,7 @@ groupsData
 
 groupsData
   .append("path")
+  .attr("class", "swooshing-line")
   .attr(
     "marker-start",
     ({ label }) => `url(#marker-swooshing-line-${label.replace(/\s/g, "")})`
@@ -454,11 +469,12 @@ groupsData
   .attr("stroke-width", strokeWidth)
   .attr("d", (d) => line(d[option]));
 
-groupsPercentages = groupsData
-  .selectAll("g")
+const groupsPercentages = groupsData
+  .selectAll("g.percentages")
   .data((d) => d[option])
   .enter()
   .append("g")
+  .attr("class", "percentages")
   .filter((d) => d.ranking !== null)
   .attr("transform", ({ year, ranking }) => {
     const x = scaleX(year) + scaleX.bandwidth() / 2;
@@ -517,3 +533,51 @@ groupLabels
   .append("text")
   .text((d) => d)
   .attr("y", height + 12);
+
+controls.select("button").attr("class", "active");
+controls.selectAll("button").on("click", function (e, option) {
+  if (d3.select(this).classed("active")) return;
+
+  controls.select("button.active").classed("active", false);
+  d3.select(this).classed("active", true);
+
+  const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
+
+  groupsData
+    .filter((d) => d[option][0].ranking)
+    .select("text.start")
+    .transition(transition)
+    .attr("transform", (d) => {
+      const { ranking } = d[option][0];
+      const y = scaleY(ranking);
+      return `translate(0 ${y + scaleY.bandwidth() / 2})`;
+    });
+
+  groupsData
+    .filter((d) => d[option][d[option].length - 1].ranking)
+    .select("text.end")
+    .transition(transition)
+    .attr("transform", (d) => {
+      const { ranking } = d[option][d[option].length - 1];
+      const y = scaleY(ranking) + scaleY.bandwidth() / 2;
+      return `translate(${width} ${y})`;
+    });
+
+  groupsData
+    .select("path.swooshing-line")
+    .transition(transition)
+    .attr("d", (d) => line(d[option]));
+
+  const groupsPercentages = groupsData
+    .selectAll("g.percentages")
+    .data((d) => d[option])
+    .transition(transition)
+    .attr("transform", ({ year, ranking }) => {
+      const x = scaleX(year) + scaleX.bandwidth() / 2;
+      const y = scaleY(ranking) + scaleY.bandwidth() / 2;
+
+      return `translate(${x} ${y})`;
+    });
+
+  groupsPercentages.select("text").text((d) => formatPercentage(d.percentage));
+});
