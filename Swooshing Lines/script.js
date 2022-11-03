@@ -418,6 +418,7 @@ const groupsData = groupData
   .data(data)
   .enter()
   .append("g")
+  .attr("id", ({ label }) => label.replace(/\s/g, ""))
   .style("color", (d) => d.color);
 
 groupsData
@@ -498,6 +499,48 @@ groupsPercentages
   .attr("font-family", "sans-serif")
   .attr("fill", "#FFF6E6")
   .text((d) => formatPercentage(d.percentage));
+
+const groupsInteraction = groupsData
+  .append("g")
+  .attr("class", "interaction")
+  .attr("opacity", "0");
+
+groupsInteraction
+  .append("rect")
+  .attr("class", "start")
+  .attr("fill", "currentColor")
+  .attr("transform", (d) => {
+    const { year, ranking } = d[option].find((d) => d.ranking !== null);
+
+    const x = scaleX(year) + scaleX.bandwidth() / 2 - markerWidth;
+    const y = scaleY(ranking);
+
+    return `translate(${x} ${y})`;
+  })
+  .attr("width", markerWidth)
+  .attr("height", scaleY.bandwidth());
+
+groupsInteraction
+  .append("rect")
+  .attr("class", "end")
+  .attr("fill", "currentColor")
+  .attr("transform", (d) => {
+    const { year, ranking } = d[option][d[option].length - 1];
+
+    const x = scaleX(year) + scaleX.bandwidth() / 2;
+    const y = scaleY(ranking);
+
+    return `translate(${x} ${y})`;
+  })
+  .attr("width", markerWidth)
+  .attr("height", scaleY.bandwidth());
+
+groupsInteraction
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", scaleY.bandwidth())
+  .attr("d", (d) => line(d[option]));
 
 const groupsYears = groupYears
   .selectAll("g")
@@ -580,4 +623,64 @@ controls.selectAll("button").on("click", function (e, option) {
     });
 
   groupsPercentages.select("text").text((d) => formatPercentage(d.percentage));
+
+  const groupsInteraction = groupsData.select("g.interaction");
+
+  groupsInteraction
+    .select("rect.start")
+    .transition(transition)
+    .attr("transform", (d) => {
+      const { year, ranking } = d[option].find((d) => d.ranking !== null);
+
+      const x = scaleX(year) + scaleX.bandwidth() / 2 - markerWidth;
+      const y = scaleY(ranking);
+
+      return `translate(${x} ${y})`;
+    });
+
+  groupsInteraction
+    .select("rect.end")
+    .transition(transition)
+    .attr("transform", (d) => {
+      const { year, ranking } = d[option][d[option].length - 1];
+
+      const x = scaleX(year) + scaleX.bandwidth() / 2;
+      const y = scaleY(ranking);
+
+      return `translate(${x} ${y})`;
+    });
+
+  groupsInteraction
+    .select("path")
+    .transition(transition)
+    .attr("d", (d) => line(d[option]));
+});
+
+groupsInteraction.on("pointerenter", function (e, d) {
+  const label = d.label.replace(/\s/g, "");
+  groupsData.transition().attr("opacity", "0.5");
+  groupsData
+    .selectAll("g.percentages circle")
+    .transition()
+    .attr("transform", "scale(0)");
+  groupsData.selectAll("g.percentages text").transition().attr("opacity", "0");
+
+  d3.select(`g#${label}`).transition().attr("opacity", "1");
+  d3.select(`g#${label}`)
+    .selectAll("g.percentages circle")
+    .transition()
+    .attr("transform", "scale(1.1)");
+  d3.select(`g#${label}`)
+    .selectAll("g.percentages text")
+    .transition()
+    .attr("opacity", "1");
+});
+
+svg.on("pointerleave", () => {
+  groupsData.transition().attr("opacity", "1");
+  groupsData
+    .selectAll("g.percentages circle")
+    .transition()
+    .attr("transform", "scale(1)");
+  groupsData.selectAll("g.percentages text").transition().attr("opacity", "1");
 });
