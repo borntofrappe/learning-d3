@@ -380,7 +380,15 @@ controls
   .text((d) => d)
   .style("text-transform", "capitalize");
 
-const viz = root.append("div").attr("id", "viz");
+const viz = root.append("div").attr("id", "viz").style("position", "relative");
+
+const tooltip = viz
+  .append("div")
+  .attr("id", "tooltip")
+  .style("position", "absolute")
+  .style("pointer-events", "none")
+  .style("visibility", "hidden")
+  .style("opacity", "0");
 
 const svg = viz
   .append("svg")
@@ -677,24 +685,49 @@ controls.selectAll("button").on("click", function (e, option) {
     });
 });
 
-groupsInteraction.on("pointerenter", function (e, { key }) {
-  groupsData.transition().attr("opacity", "0.35");
-  groupsData.select("g.swooshing-line").transition().attr("stroke-width", "4");
-  groupsData
-    .selectAll("g.percentages g")
-    .transition()
-    .attr("transform", "scale(0)");
+groupsInteraction
+  .on("pointerenter", function (e, { label, color, key }) {
+    groupsData.transition().attr("opacity", "0.35");
+    groupsData
+      .select("g.swooshing-line")
+      .transition()
+      .attr("stroke-width", "4");
+    groupsData
+      .selectAll("g.percentages g")
+      .transition()
+      .attr("transform", "scale(0)");
 
-  d3.select(`g#${key}`).transition().attr("opacity", "1");
-  d3.select(`g#${key}`)
-    .select("g.swooshing-line")
-    .transition()
-    .attr("stroke-width", "5.5");
-  d3.select(`g#${key}`)
-    .selectAll("g.percentages g")
-    .transition()
-    .attr("transform", "scale(1.15)");
-});
+    d3.select(`g#${key}`).transition().attr("opacity", "1");
+    d3.select(`g#${key}`)
+      .select("g.swooshing-line")
+      .transition()
+      .attr("stroke-width", "5.5");
+    d3.select(`g#${key}`)
+      .selectAll("g.percentages g")
+      .transition()
+      .attr("transform", "scale(1.15)");
+
+    tooltip.style("visibility", "visible").style("opacity", "1");
+
+    tooltip
+      .append("span")
+      .style("display", "block")
+      .style("width", "0.9em")
+      .style("height", "0.9em")
+      .style("background", color);
+
+    tooltip.append("h2").text(label);
+  })
+  .on("pointermove", (e) => {
+    tooltip.style("left", `${e.offsetX}px`).style("top", `${e.offsetY - 7}px`);
+  })
+  .on("pointerleave", () => {
+    tooltip
+      .style("visibility", "hidden")
+      .style("opacity", "0")
+      .selectAll("*")
+      .remove();
+  });
 
 svg.on("pointerleave", () => {
   groupsData.transition().attr("opacity", "1");

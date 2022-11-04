@@ -52,3 +52,29 @@ body {
   background: hsla(38, 100%, 95%, 0.035);
   border-style: solid;
 }
+
+#viz {
+  position: relative;
+}
+
+#viz > #tooltip {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+}
+
+#tooltip {
+  width: max-content;
+  color: hsl(345, 5%, 15%);
+  background: hsla(38, 100%, 95%, 0.95);
+  display: inline-flex;
+  align-items: center;
+  column-gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+#tooltip h2 {
+  font-weight: 400;
+  font-size: 1em;
+}
