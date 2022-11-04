@@ -340,7 +340,7 @@ const data = [
   key: d.label.replace(/\s/g, ""),
 }));
 
-const options = ["satisfaction", "usage", "satisfaction", "awareness"];
+const options = ["satisfaction", "interest", "usage", "awareness"];
 const years = [2019, 2020, 2021];
 
 const [option] = options;
