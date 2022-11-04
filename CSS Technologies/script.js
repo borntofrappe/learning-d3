@@ -362,7 +362,7 @@ const line = d3
   .line()
   .x((d) => scaleX(d.year) + scaleX.bandwidth() / 2)
   .y((d) => scaleY(d.ranking) + scaleY.bandwidth() / 2)
-  .defined((d) => d.ranking)
+  .defined((d) => d.ranking !== null)
   .curve(d3.curveBumpX);
 
 const formatPercentage = d3.format(".0%");
@@ -547,6 +547,13 @@ const groupsInteraction = groupsData
   .attr("opacity", "0");
 
 groupsInteraction
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", scaleY.bandwidth())
+  .attr("d", (d) => line(d[option]));
+
+groupsInteraction
   .append("rect")
   .attr("class", "start")
   .attr("fill", "currentColor")
@@ -575,13 +582,6 @@ groupsInteraction
   })
   .attr("width", markerWidth)
   .attr("height", scaleY.bandwidth());
-
-groupsInteraction
-  .append("path")
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", scaleY.bandwidth())
-  .attr("d", (d) => line(d[option]));
 
 controls.select("button").attr("class", "active");
 controls.selectAll("button").on("click", function (e, option) {
