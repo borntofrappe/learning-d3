@@ -100,3 +100,62 @@ const data = [
   { word: "also", polysemy: 2 },
   { word: "these", polysemy: 2 },
 ];
+
+const width = 300;
+const height = 300;
+
+const root = d3
+  .hierarchy({
+    label: "Cloud",
+    children: data.map(({ word: label, polysemy: value }) => ({
+      label,
+      value,
+    })),
+  })
+  .sum((d) => d.value);
+
+const leaves = d3.treemap().size([width, height])(root).leaves();
+
+const words = leaves.map((d) => {
+  const { x0, y0, x1, y1, data } = d;
+  const width = x1 - x0;
+  const height = y1 - y0;
+
+  let transform = `translate(${x0} ${y0})`;
+  let fontSize = height;
+  let textLength = width;
+
+  if (width < height) {
+    [fontSize, textLength] = [textLength, fontSize];
+    transform = `translate(${x0} ${y0 + height}) rotate(-90)`;
+  }
+
+  const { label: text } = data;
+
+  return {
+    transform,
+    fontSize,
+    textLength,
+    text,
+  };
+});
+
+const colors = d3.schemeSet2;
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr("viewBox", `0 0 ${width} ${height}`);
+
+svg
+  .selectAll("text")
+  .data(words)
+  .enter()
+  .append("text")
+  .attr("fill", (_, i) => colors[i % colors.length])
+  .attr("transform", ({ transform }) => transform)
+  .attr("dominant-baseline", "hanging")
+  .attr("font-size", ({ fontSize }) => fontSize)
+  .attr("textLength", ({ textLength }) => textLength)
+  .attr("lengthAdjust", "spacingAndGlyphs")
+  .text(({ text }) => text);
