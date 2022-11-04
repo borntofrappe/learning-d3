@@ -472,11 +472,10 @@ groupsData
 
 const groupsPercentages = groupsData
   .selectAll("g.percentages")
-  .data((d) => d[option])
+  .data((d) => d[option].filter(({ ranking }) => ranking !== null))
   .enter()
   .append("g")
   .attr("class", "percentages")
-  .filter((d) => d.ranking !== null)
   .attr("transform", ({ year, ranking }) => {
     const x = scaleX(year) + scaleX.bandwidth() / 2;
     const y = scaleY(ranking) + scaleY.bandwidth() / 2;
@@ -613,7 +612,7 @@ controls.selectAll("button").on("click", function (e, option) {
 
   const groupsPercentages = groupsData
     .selectAll("g.percentages")
-    .data((d) => d[option])
+    .data((d) => d[option].filter(({ ranking }) => ranking !== null))
     .transition(transition)
     .attr("transform", ({ year, ranking }) => {
       const x = scaleX(year) + scaleX.bandwidth() / 2;
