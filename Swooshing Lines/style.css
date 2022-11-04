@@ -5,8 +5,8 @@
 }
 
 body {
-  color: #fff6e6;
-  background: #272324;
+  color: hsl(38, 100%, 95%);
+  background: hsl(345, 5%, 15%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
@@ -49,6 +49,6 @@ body {
 }
 
 #controls button.active {
-  background: #fff6e609;
+  background: hsla(38, 100%, 95%, 0.035);
   border-style: solid;
 }
