@@ -101,16 +101,23 @@ const data = [
   { word: "these", polysemy: 2 },
 ];
 
-const width = 300;
+const dataPyramid = [];
+for (let i = 0; i < data.length; i++) {
+  const { word: label, polysemy: value } = data[i];
+  if (i % 2 === 0) {
+    dataPyramid.push({ label, value });
+  } else {
+    dataPyramid.unshift({ label, value });
+  }
+}
+
+const width = 400;
 const height = 300;
 
 const root = d3
   .hierarchy({
     label: "Cloud",
-    children: data.map(({ word: label, polysemy: value }) => ({
-      label,
-      value,
-    })),
+    children: dataPyramid,
   })
   .sum((d) => d.value);
 
@@ -140,7 +147,7 @@ const words = leaves.map((d) => {
   };
 });
 
-const colors = d3.schemeSet2;
+const colors = d3.schemeDark2;
 
 const svg = d3
   .select("body")
