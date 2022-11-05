@@ -114,6 +114,8 @@ for (let i = 0; i < data.length; i++) {
 const width = 400;
 const height = 300;
 
+const colors = d3.schemeDark2;
+
 const root = d3
   .hierarchy({
     label: "Cloud",
@@ -146,8 +148,6 @@ const words = leaves.map((d) => {
     text,
   };
 });
-
-const colors = d3.schemeDark2;
 
 const svg = d3
   .select("body")
