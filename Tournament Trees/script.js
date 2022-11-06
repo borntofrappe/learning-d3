@@ -37,11 +37,31 @@ const brackets = {
   ],
 };
 
-const data = brackets.top;
-
 const width = 400;
 const height = 400;
 const padding = 20;
+
+const dataIds = [{ id: 0, parentId: null }];
+const depth = 3;
+let id = 0;
+let parentId = 0;
+for (let i = 0; i < 2 ** depth - 1; i++) {
+  dataIds.push({ id: ++id, parentId });
+  dataIds.push({ id: ++id, parentId });
+  parentId++;
+}
+
+const root = d3
+  .stratify()
+  .id((d) => d.id)
+  .parentId((d) => d.parentId)(dataIds);
+
+const dataTree = d3.tree().size([width, height])(root);
+
+const link = d3
+  .linkVertical()
+  .x((d) => d.x)
+  .y((d) => d.y);
 
 const svg = d3
   .select("body")
@@ -53,55 +73,30 @@ const svg = d3
     }`
   );
 
-const groupLabels = svg.append("g");
 const groupLinks = svg.append("g");
+const groupData = svg.append("g");
 
 groupLinks
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "2")
-  .selectAll("path")
-  .append("path");
+  .attr("stroke-width", "2");
 
-groupLabels
+groupData
   .attr("font-size", "12")
   .attr("font-size", "currentColor")
-  .attr("font-family", "sans-serif")
-  .append("text");
+  .attr("font-family", "sans-serif");
 
-const scaleY = d3.scaleBand().domain(data).range([0, height]);
-
-const text = groupLabels
-  .selectAll("text")
-  .data(data)
-  .enter()
-  .append("text")
-  .attr(
-    "transform",
-    (d) => `translate(0 ${scaleY(d) + scaleY.bandwidth() / 2})`
-  );
-
-groupLabels
+groupData
   .selectAll("circle")
-  .data(data)
+  .data(dataTree.descendants())
   .enter()
   .append("circle")
-  .attr(
-    "transform",
-    (d) => `translate(0 ${scaleY(d) + scaleY.bandwidth() / 2})`
-  )
-  .attr("r", 2);
+  .attr("transform", (d) => `translate(${d.x} ${d.y})`)
+  .attr("r", "4");
 
-const fontSize = 8;
-const gap = 4;
-text
-  .attr("font-size", fontSize)
-  .attr("dominant-baseline", "hanging")
-  .attr("y", (fontSize + gap / 2) * -1)
-  .selectAll("tspan")
-  .data((d) => d)
+groupLinks
+  .selectAll("path")
+  .data(dataTree.links())
   .enter()
-  .append("tspan")
-  .attr("x", "0")
-  .attr("dy", (_, i) => i * (fontSize + gap))
-  .text((d) => d);
+  .append("path")
+  .attr("d", link);
