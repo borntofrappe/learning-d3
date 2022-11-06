@@ -37,7 +37,7 @@ const brackets = {
   ],
 };
 
-const width = 400;
+const width = 250;
 const height = 400;
 const padding = 10;
 
@@ -86,7 +86,7 @@ const drawBracket = (half = "top") => {
     .id((d) => d.id)
     .parentId((d) => d.parentId)(dataIds);
 
-  const dataTree = d3.tree().size([width, height])(root);
+  const dataTree = d3.tree().size([height, width])(root);
 
   const link = d3
     .link(d3.curveStep)
