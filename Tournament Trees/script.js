@@ -37,8 +37,16 @@ const brackets = {
   ],
 };
 
-(() => {
-  const bracket = brackets.top;
+const drawBracket = (half = "top") => {
+  let bracket = [...brackets[half]];
+  let getX = (d) => width - d.y;
+  let textAnchor = "start";
+
+  if (half === "bottom") {
+    bracket = [...bracket].reverse();
+    getX = (d) => d.y;
+    textAnchor = "end";
+  }
 
   const width = 400;
   const height = 400;
@@ -66,7 +74,7 @@ const brackets = {
 
   const link = d3
     .link(d3.curveStep)
-    .x((d) => width - d.y)
+    .x(getX)
     .y((d) => d.x);
 
   const svg = d3
@@ -90,14 +98,15 @@ const brackets = {
   groupText
     .attr("font-size", fontSize)
     .attr("fill", "currentColor")
-    .attr("font-family", "sans-serif");
+    .attr("font-family", "sans-serif")
+    .attr("text-anchor", textAnchor);
 
   const text = groupText
     .selectAll("text")
     .data(dataTree.leaves())
     .enter()
     .append("text")
-    .attr("transform", (d) => `translate(${width - d.y} ${d.x - 1 - gap / 2})`);
+    .attr("transform", (d) => `translate(${getX(d)} ${d.x - 1 - gap / 2})`);
 
   text
     .selectAll("tspan")
@@ -114,4 +123,7 @@ const brackets = {
     .enter()
     .append("path")
     .attr("d", link);
-})();
+};
+
+drawBracket("top");
+drawBracket("bottom");
