@@ -37,6 +37,29 @@ const brackets = {
   ],
 };
 
+const width = 400;
+const height = 400;
+const padding = 10;
+
+const fontSize = 6;
+const gap = 2;
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `${padding * -1} ${padding * -1} ${width * 2 + padding * 2} ${
+      height + padding * 2
+    }`
+  );
+
+const groupTop = svg.append("g").attr("id", "top");
+const groupBottom = svg
+  .append("g")
+  .attr("transform", `translate(${width} 0)`)
+  .attr("id", "bottom");
+
 const drawBracket = (half = "top") => {
   let bracket = [...brackets[half]];
   let getX = (d) => width - d.y;
@@ -47,13 +70,6 @@ const drawBracket = (half = "top") => {
     getX = (d) => d.y;
     textAnchor = "end";
   }
-
-  const width = 400;
-  const height = 400;
-  const padding = 20;
-
-  const fontSize = 6;
-  const gap = 2;
 
   const dataIds = [{ id: 0, parentId: null }];
   const depth = bracket.length ** 0.5;
@@ -77,18 +93,10 @@ const drawBracket = (half = "top") => {
     .x(getX)
     .y((d) => d.x);
 
-  const svg = d3
-    .select("body")
-    .append("svg")
-    .attr(
-      "viewBox",
-      `${padding * -1} ${padding * -1} ${width + padding * 2} ${
-        height + padding * 2
-      }`
-    );
+  const group = svg.select(`g#${half}`);
 
-  const groupLinks = svg.append("g");
-  const groupText = svg.append("g");
+  const groupLinks = group.append("g");
+  const groupText = group.append("g");
 
   groupLinks
     .attr("fill", "none")
