@@ -5,9 +5,9 @@
 }
 
 body {
+  color: hsl(40, 75%, 95%);
   background: hsl(205, 98%, 20%);
   --accent: hsl(40, 63%, 69%);
-  color: hsl(40, 75%, 95%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }

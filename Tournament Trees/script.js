@@ -41,6 +41,7 @@ const width = 200;
 const height = 325;
 const padding = 5;
 const inset = 35;
+const radius = 18;
 
 const fontSize = 5;
 const gap = 2;
@@ -68,7 +69,7 @@ svg
   .append("g")
   .attr("transform", `translate(${width - inset / 2} ${height / 2})`)
   .append("circle")
-  .attr("r", inset / 2)
+  .attr("r", radius)
   .attr("fill", "none")
   .attr("stroke", "var(--accent, currentColor)")
   .attr("stroke-width", strokeWidth);
@@ -101,14 +102,13 @@ const drawBracket = (half = "top") => {
   let getX = (d) => width - d.y;
   let textAnchor = "start";
   let sweepFlag = 1;
-  let cx = width - inset / 2;
+  let centerX = width - inset / 2;
 
   if (half === "bottom") {
-    bracket = [...bracket].reverse();
     getX = (d) => d.y;
     textAnchor = "end";
     sweepFlag = 0;
-    cx = inset / 2;
+    centerX = inset / 2;
   }
 
   const dataIds = [{ id: 0, parentId: null }];
@@ -136,17 +136,20 @@ const drawBracket = (half = "top") => {
   const leaves = dataTree.leaves();
   const links = dataTree.links().slice(2);
 
-  const [m, l] = link(links[links.length - 16])
+  const [m, l] = link(
+    links.find((d) => d.source.depth === depth - 1 && d.target.depth === depth)
+  )
     .split("L")
     .map((d) => parseFloat(d.match(/\d+/)[0]));
 
-  const descendants = dataTree.descendants();
-  const target = descendants[descendants.length - 1];
-  const source = descendants[descendants.length - 16];
+  const source = leaves[0];
+  const target = leaves[leaves.length - 1];
 
   const sx = getX(source);
+
   const sy = source.x;
   const ty = target.x;
+
   const dx = m - l;
   const dy = ty - sy;
 
@@ -156,7 +159,7 @@ const drawBracket = (half = "top") => {
 
   const clipPath = defs.append("clipPath").attr("id", `clip-path-${half}`);
 
-  clipPath.append("path").attr("d", `${arc} z`).attr("stroke", "currentColor");
+  clipPath.append("path").attr("d", arc);
 
   const group = svg.select(`g#${half}`);
 
@@ -185,10 +188,9 @@ const drawBracket = (half = "top") => {
     .attr("text-anchor", textAnchor);
 
   groupClipPath
-    .append("g")
-    .attr("transform", `translate(${cx} ${height / 2})`)
     .append("circle")
-    .attr("r", inset / 2 - 1)
+    .attr("transform", `translate(${centerX} ${height / 2})`)
+    .attr("r", radius - 1)
     .attr("fill", "var(--accent, currentColor)");
 
   groupLinks
