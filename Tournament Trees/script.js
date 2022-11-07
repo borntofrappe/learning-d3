@@ -40,11 +40,11 @@ const brackets = {
 const width = 200;
 const height = 325;
 const padding = 5;
-const inset = 33;
+const inset = 35;
 
 const fontSize = 5;
-const gap = 1;
-const strokeWidth = 1;
+const gap = 2;
+const strokeWidth = 0.75;
 
 const svg = d3
   .select("body")
@@ -70,20 +70,45 @@ svg
   .append("circle")
   .attr("r", inset / 2)
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "var(--accent, currentColor)")
   .attr("stroke-width", strokeWidth);
+
+const groupTitle = svg
+  .append("g")
+  .attr("transform", `translate(${width - inset / 2} 30)`)
+  .attr("text-anchor", "middle");
+
+groupTitle
+  .append("text")
+  .attr("fill", "var(--accent, currentColor)")
+  .attr("font-size", "26")
+  .attr("font-weight", "700")
+  .text("2022");
+
+const { width: widthText } = groupTitle.select("text").node().getBBox();
+
+groupTitle
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("font-size", "6")
+  .attr("textLength", widthText)
+  .attr("y", "8")
+  .style("text-transform", "uppercase")
+  .text("Paris Masters");
 
 const drawBracket = (half = "top") => {
   let bracket = [...brackets[half]];
   let getX = (d) => width - d.y;
   let textAnchor = "start";
   let sweepFlag = 1;
+  let cx = width - inset / 2;
 
   if (half === "bottom") {
     bracket = [...bracket].reverse();
     getX = (d) => d.y;
     textAnchor = "end";
     sweepFlag = 0;
+    cx = inset / 2;
   }
 
   const dataIds = [{ id: 0, parentId: null }];
@@ -135,42 +160,36 @@ const drawBracket = (half = "top") => {
 
   const group = svg.select(`g#${half}`);
 
-  const groupLinks = group.append("g");
+  const groupClipPath = group.append("g");
+  const groupLinks = groupClipPath.append("g");
+
   const groupArc = group.append("g");
   const groupText = group.append("g");
 
+  groupClipPath.attr("clip-path", `url(#clip-path-${half})`);
+
   groupLinks
-    .attr("clip-path", `url(#clip-path-${half})`)
     .attr("fill", "none")
-    .attr("stroke", "currentColor")
+    .attr("stroke", "var(--accent, currentColor)")
     .attr("stroke-width", strokeWidth);
 
   groupArc
     .attr("fill", "none")
-    .attr("stroke", "currentColor")
+    .attr("stroke", "var(--accent, currentColor)")
     .attr("stroke-width", strokeWidth);
 
   groupText
     .attr("font-size", fontSize)
     .attr("fill", "currentColor")
-    .attr("font-family", "sans-serif")
+    .attr("font-weight", "700")
     .attr("text-anchor", textAnchor);
 
-  const text = groupText
-    .selectAll("text")
-    .data(leaves)
-    .enter()
-    .append("text")
-    .attr("transform", (d) => `translate(${getX(d)} ${d.x - 1 - gap / 2})`);
-
-  text
-    .selectAll("tspan")
-    .data((_, i) => bracket[i])
-    .enter()
-    .append("tspan")
-    .attr("x", "0")
-    .attr("dy", (_, i) => i * (fontSize + gap))
-    .text((d) => d);
+  groupClipPath
+    .append("g")
+    .attr("transform", `translate(${cx} ${height / 2})`)
+    .append("circle")
+    .attr("r", inset / 2 - 1)
+    .attr("fill", "var(--accent, currentColor)");
 
   groupLinks
     .selectAll("path")
@@ -179,7 +198,23 @@ const drawBracket = (half = "top") => {
     .append("path")
     .attr("d", link);
 
-  groupArc.append("path").attr("d", arc).attr("stroke", "currentColor");
+  groupArc.append("path").attr("d", arc);
+
+  const textBracket = groupText
+    .selectAll("text")
+    .data(leaves)
+    .enter()
+    .append("text")
+    .attr("transform", (d) => `translate(${getX(d)} ${d.x - 1 - gap / 2})`);
+
+  textBracket
+    .selectAll("tspan")
+    .data((_, i) => bracket[i])
+    .enter()
+    .append("tspan")
+    .attr("x", "0")
+    .attr("dy", (_, i) => i * (fontSize + gap))
+    .text((d) => d);
 };
 
 drawBracket("top");
