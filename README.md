@@ -1,20 +1,12 @@
 # Learning D3
 
-## Development
+[d3.js](https://d3js.org/) is a _vast_ library.
 
-Run `script.js` to create a folder based on **data-viz-folder**.
+Here's a list of projects to master the library, its many modules and powerful features.
 
-```bash
-node script
-## or
-# npm run dev
-```
+Projects exploring the D3 library.
 
-## Projects
-
-A table worth of projects exploring the D3 library, its features and modules.
-
-| Title                                                                         | Keys                    |
+| Title                                                                         | Keywords                |
 | ----------------------------------------------------------------------------- | ----------------------- |
 | [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)                      | enter-update-exit, join |
 | [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)            | random, normal          |
@@ -40,9 +32,9 @@ A table worth of projects exploring the D3 library, its features and modules.
 | [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)             | scaleQuantile, datum    |
 | [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)                       | treemap, text           |
 
-A table worth of projects leaning on D3 to create interesting visualizations.
+Projects leaning on D3 to create interesting visualizations.
 
-| Title                                                                         | Keys                       |
+| Title                                                                         | Keywords                   |
 | ----------------------------------------------------------------------------- | -------------------------- |
 | [The Seasons of 2019](https://codepen.io/borntofrappe/pen/jOPeKZp)            | lineRadial, areaRadial     |
 | [Positivity Tree](https://codepen.io/borntofrappe/pen/eYpNRRX)                | hierarchy, tree            |
@@ -68,3 +60,18 @@ A table worth of projects leaning on D3 to create interesting visualizations.
 | [CSS Features](https://codepen.io/borntofrappe/pen/qBKZNyb)                   | pack, grid, transition     |
 | [CSS Technologies](https://codepen.io/borntofrappe/pen/qBKNPXY)               | line, transition           |
 | [Tournament Trees](https://codepen.io/borntofrappe/pen/oNyzrBJ)               | hierarchy, tree            |
+
+## script
+
+`script.js` hides my pitiful attempt to create a data visualization starter project<!--, and save a several keystrokes whenever I start a new demo -->. Running `npm run dev` creates a folder with a basic structure.
+
+```text
+folderName
+|
+| README.md
+| index.html
+| style.css
+| script.js
+```
+
+`index.html` references the D3 library - version 7.6.1 at the time of writing. `style.css` adds properties to set helpful defaults. `script.js` expects further instructions. `README.md` waits for a few words on the most salient features, on the main lessons learned.
