@@ -1043,7 +1043,7 @@ const width = 1000;
 const height = 500;
 const margin = {
   top: 10,
-  right: 70,
+  right: 75,
   bottom: 30,
   left: 20,
 };
@@ -1076,10 +1076,13 @@ const axisY = d3
   .ticks(5)
   .tickFormat((d) => (d ? numberFormat(d) : ""));
 
-const div = d3.select("body").append("div");
-div.append("h1").text("Names of the Future");
+const root = d3.select("body").append("div").attr("id", "root");
+const header = root.append("header");
+header.append("h1").text("Names of the Future");
 
-const svg = div
+const visualization = root.append("div").attr("class", "visualization");
+
+const svg = visualization
   .append("svg")
   .attr(
     "viewBox",
@@ -1087,6 +1090,16 @@ const svg = div
       height + (margin.top + margin.bottom)
     }`
   );
+
+visualization.style("position", "relative");
+
+const tooltip = visualization
+  .append("div")
+  .attr("class", "tooltip")
+  .style("position", "absolute")
+  .style("pointer-events", "none")
+  .style("visibility", "hidden")
+  .style("opacity", "0");
 
 const group = svg
   .append("g")
@@ -1098,8 +1111,8 @@ const clipPath = defs.append("clipPath").attr("id", "clip-path-chart");
 
 clipPath.append("rect").attr("width", width).attr("height", height);
 
-const groupData = group.append("g").attr("clip-path", "url(#clip-path-chart)");
 const groupAxis = group.append("g");
+const groupData = group.append("g").attr("clip-path", "url(#clip-path-chart)");
 
 groupAxis
   .append("g")
@@ -1112,6 +1125,15 @@ groupAxis
   .attr("class", "axis y-axis")
   .call(axisY);
 
+d3.select(".y-axis").select("path").remove();
+d3.select(".y-axis")
+  .selectAll("g.tick")
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-dasharray", "2 5")
+  .attr("d", `M 0 0 h ${-width}`);
+
 groupData
   .selectAll("path")
   .data(dataStacked)
@@ -1119,3 +1141,31 @@ groupData
   .append("path")
   .attr("fill", (_, i) => scaleColor(i))
   .attr("d", area);
+
+groupData
+  .selectAll("path")
+  .on("pointerenter", function (e, { key }) {
+    groupData.selectAll("path").style("filter", "brightness(90%)");
+
+    d3.select(this).style("filter", "brightness(100%)");
+
+    tooltip
+      .style("visibility", "visible")
+      .style("opacity", "1")
+      .style("left", `${e.layerX}px`)
+      .style("top", `${e.layerY}px`);
+
+    tooltip.append("p").html(`Letter: <strong>${key}</strong>`);
+  })
+  .on("pointermove", (e) => {
+    tooltip.style("left", `${e.layerX}px`).style("top", `${e.layerY}px`);
+  })
+  .on("pointerleave", () => {
+    groupData.selectAll("path").style("filter", "brightness(100%)");
+
+    tooltip
+      .style("visibility", "hidden")
+      .style("opacity", "0")
+      .selectAll("*")
+      .remove();
+  });

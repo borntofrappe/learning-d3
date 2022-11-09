@@ -1,12 +1,54 @@
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
 body {
-  background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
+  color: #161616;
+  background: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  max-width: 52rem;
+  width: 95vw;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#root > * + * {
+  margin-top: 1em;
+}
+
+h1 {
+  max-width: 40ch;
+}
+
+svg {
+  color: #77747f;
+}
+
+svg text {
+  font-size: 1rem;
+}
+
+.visualization {
+  position: relative;
+}
+
+.visualization .tooltip {
+  position: absolute;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+}
+
+.tooltip {
+  width: max-content;
+  color: #f8f7fc;
+  background: #161616;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.2rem;
+  font-size: 0.9rem;
 }
