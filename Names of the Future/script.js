@@ -1001,5 +1001,121 @@ const data = [
   { year: "2012", name: "Wassim", value: 740 },
 ];
 
+const timeParse = d3.timeParse("%Y");
+const numberFormat = d3.format(",");
+
+const names = data
+  .map(({ name }) => name)
+  .reduce((acc, curr) => (acc.includes(curr) ? [...acc] : [...acc, curr]), []);
+
+const letters = names
+  .map((name) => name[0])
+  .reduce((acc, curr) => (acc.includes(curr) ? [...acc] : [...acc, curr]), []);
+
+const dataStack = [...d3.group(data, (d) => d.year)].reduce(
+  (acc, [year, values]) => {
+    return [
+      ...acc,
+      {
+        year: timeParse(year),
+        ...values.reduce((a, { name, value }) => {
+          const [letter] = name;
+
+          return {
+            ...a,
+            [letter]: a[letter] ? a[letter] + value : value,
+          };
+        }, {}),
+      },
+    ];
+  },
+  []
+);
+
+const stack = d3
+  .stack()
+  .keys(letters)
+  .value((d, key) => d[key] || 0);
+
+const dataStacked = stack(dataStack);
+
+const width = 1000;
+const height = 500;
+const margin = {
+  top: 10,
+  right: 70,
+  bottom: 30,
+  left: 20,
+};
+
+const scaleX = d3
+  .scaleTime()
+  .domain(d3.extent(dataStack, ({ year }) => year))
+  .range([0, width]);
+
+const scaleY = d3
+  .scaleLinear()
+  .domain([0, d3.max(dataStacked[dataStacked.length - 1], ([, d1]) => d1)])
+  .range([height, 0])
+  .nice();
+
+const scaleColor = d3.scaleOrdinal(d3.schemeSet3);
+
+const area = d3
+  .area()
+  .x(({ data }) => scaleX(data.year))
+  .y0(([y0]) => scaleY(y0))
+  .y1(([, y1]) => scaleY(y1))
+  .curve(d3.curveBumpX);
+
+const axisX = d3.axisBottom(scaleX).tickSize(0).tickPadding(12);
+const axisY = d3
+  .axisRight(scaleY)
+  .tickSize(0)
+  .tickPadding(10)
+  .ticks(5)
+  .tickFormat((d) => (d ? numberFormat(d) : ""));
+
 const div = d3.select("body").append("div");
 div.append("h1").text("Names of the Future");
+
+const svg = div
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + (margin.left + margin.right)} ${
+      height + (margin.top + margin.bottom)
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const defs = svg.append("defs");
+
+const clipPath = defs.append("clipPath").attr("id", "clip-path-chart");
+
+clipPath.append("rect").attr("width", width).attr("height", height);
+
+const groupData = group.append("g").attr("clip-path", "url(#clip-path-chart)");
+const groupAxis = group.append("g");
+
+groupAxis
+  .append("g")
+  .attr("class", "axis x-axis")
+  .attr("transform", `translate(0 ${height})`)
+  .call(axisX);
+groupAxis
+  .append("g")
+  .attr("transform", `translate(${width} 0)`)
+  .attr("class", "axis y-axis")
+  .call(axisY);
+
+groupData
+  .selectAll("path")
+  .data(dataStacked)
+  .enter()
+  .append("path")
+  .attr("fill", (_, i) => scaleColor(i))
+  .attr("d", area);
