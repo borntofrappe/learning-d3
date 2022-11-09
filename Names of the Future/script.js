@@ -1045,9 +1045,9 @@ const width = 1000;
 const height = 500;
 const margin = {
   top: 10,
-  right: 75,
+  right: 10,
   bottom: 30,
-  left: 20,
+  left: 10,
 };
 
 const scaleX = d3
@@ -1108,7 +1108,17 @@ const clipPath = defs.append("clipPath").attr("id", "clip-path-chart");
 clipPath.append("rect").attr("width", width).attr("height", height);
 
 const groupAxis = group.append("g");
-const groupData = group.append("g").attr("clip-path", "url(#clip-path-chart)");
+const groupData = group.append("g");
+
+const groupLetters = groupData
+  .append("g")
+  .attr("clip-path", "url(#clip-path-chart)");
+
+const groupOverlay = groupData.append("g");
+
+const groupLetter = groupData
+  .append("g")
+  .attr("clip-path", "url(#clip-path-chart)");
 
 groupAxis
   .append("g")
@@ -1118,7 +1128,7 @@ groupAxis
 
 d3.select(".x-axis").select("path").remove();
 
-groupData
+groupLetters
   .selectAll("path")
   .data(dataStacked)
   .enter()
@@ -1126,10 +1136,19 @@ groupData
   .attr("fill", (_, i) => scaleColor(i))
   .attr("d", area);
 
-groupData
+groupOverlay
+  .style("pointer-events", "none")
+  .style("cursor", "zoom-out")
+  .attr("opacity", "0")
+  .append("rect")
+  .attr("transform", `translate(${-margin.left} ${-margin.top})`)
+  .attr("width", width + (margin.left + margin.right))
+  .attr("height", height + margin.top);
+
+groupLetters
   .selectAll("path")
   .on("pointerenter", function (e, { key }) {
-    groupData.selectAll("path").style("filter", "brightness(90%)");
+    groupLetters.selectAll("path").style("filter", "brightness(90%)");
 
     d3.select(this).style("filter", "brightness(100%)");
 
@@ -1145,11 +1164,105 @@ groupData
     tooltip.style("left", `${e.layerX}px`).style("top", `${e.layerY}px`);
   })
   .on("pointerleave", () => {
-    groupData.selectAll("path").style("filter", "brightness(100%)");
+    groupLetters.selectAll("path").style("filter", "brightness(100%)");
 
     tooltip
       .style("visibility", "hidden")
       .style("opacity", "0")
       .selectAll("*")
       .remove();
+  });
+
+groupLetters
+  .selectAll("path")
+  .style("cursor", "zoom-in")
+  .on("click", function (e, d) {
+    groupLetters.selectAll("path").style("filter", "brightness(100%)");
+
+    tooltip
+      .style("visibility", "hidden")
+      .style("opacity", "0")
+      .selectAll("*")
+      .remove();
+
+    groupOverlay.style("pointer-events", "initial");
+
+    const letter = d.key;
+
+    const dataStackedLetter = d3
+      .stack()
+      .keys(letters)
+      .value((d, key) => {
+        if (key !== letter) return 0;
+
+        return d[key] || 0;
+      })
+      .offset(d3.stackOffsetWiggle)
+      .order(d3.stackOrderInsideOut)(dataStack);
+
+    const scaleYLetter = d3
+      .scaleLinear()
+      .domain(d3.extent(dataStackedLetter.flat(2)))
+      .range([0, height])
+      .nice();
+
+    const areaLetter = d3
+      .area()
+      .x(({ data }) => scaleX(data.year))
+      .y0(([y0]) => scaleYLetter(y0))
+      .y1(([, y1]) => scaleYLetter(y1))
+      .curve(d3.curveBumpX);
+
+    const transition = d3.transition().duration(750).ease(d3.easeQuadInOut);
+
+    const i = dataStacked.findIndex((d) => d.key === letter);
+    groupLetter
+      .append("path")
+      .datum(dataStacked[i])
+      .attr("d", area)
+      .attr("fill", scaleColor(i));
+
+    groupLetter
+      .select("path")
+      .datum(dataStackedLetter[i])
+      .transition(transition)
+      .attr("d", areaLetter);
+
+    groupLetters
+      .selectAll("path")
+      .data(dataStackedLetter)
+      .transition(transition)
+      .attr("d", areaLetter);
+
+    transition.on("end", () => {
+      groupOverlay.on(
+        "click",
+        function (e, d) {
+          const transition = d3
+            .transition()
+            .duration(750)
+            .ease(d3.easeQuadInOut);
+
+          groupLetter
+            .select("path")
+            .datum(dataStacked[i])
+            .transition(transition)
+            .attr("d", area)
+            .remove();
+
+          groupLetters
+            .selectAll("path")
+            .data(dataStacked)
+            .transition(transition)
+            .attr("d", area);
+
+          transition.on("end", () => {
+            groupOverlay.style("pointer-events", "none");
+          });
+        },
+        {
+          once: true,
+        }
+      );
+    });
   });
