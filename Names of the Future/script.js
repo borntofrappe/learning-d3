@@ -1035,7 +1035,9 @@ const dataStack = [...d3.group(data, (d) => d.year)].reduce(
 const stack = d3
   .stack()
   .keys(letters)
-  .value((d, key) => d[key] || 0);
+  .value((d, key) => d[key] || 0)
+  .offset(d3.stackOffsetWiggle)
+  .order(d3.stackOrderInsideOut);
 
 const dataStacked = stack(dataStack);
 
@@ -1055,8 +1057,8 @@ const scaleX = d3
 
 const scaleY = d3
   .scaleLinear()
-  .domain([0, d3.max(dataStacked[dataStacked.length - 1], ([, d1]) => d1)])
-  .range([height, 0])
+  .domain(d3.extent(dataStacked.flat(2)))
+  .range([0, height])
   .nice();
 
 const scaleColor = d3.scaleOrdinal(d3.schemeSet3);
@@ -1069,12 +1071,6 @@ const area = d3
   .curve(d3.curveBumpX);
 
 const axisX = d3.axisBottom(scaleX).tickSize(0).tickPadding(12);
-const axisY = d3
-  .axisRight(scaleY)
-  .tickSize(0)
-  .tickPadding(10)
-  .ticks(5)
-  .tickFormat((d) => (d ? numberFormat(d) : ""));
 
 const root = d3.select("body").append("div").attr("id", "root");
 const header = root.append("header");
@@ -1119,20 +1115,8 @@ groupAxis
   .attr("class", "axis x-axis")
   .attr("transform", `translate(0 ${height})`)
   .call(axisX);
-groupAxis
-  .append("g")
-  .attr("transform", `translate(${width} 0)`)
-  .attr("class", "axis y-axis")
-  .call(axisY);
 
-d3.select(".y-axis").select("path").remove();
-d3.select(".y-axis")
-  .selectAll("g.tick")
-  .append("path")
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-dasharray", "2 5")
-  .attr("d", `M 0 0 h ${-width}`);
+d3.select(".x-axis").select("path").remove();
 
 groupData
   .selectAll("path")
