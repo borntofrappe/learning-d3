@@ -2140,6 +2140,7 @@ const dataset = [
   { date: "2017-01-01", value: 63.18 },
 ];
 
+const valueFormat = d3.format(".0%");
 const timeParse = d3.timeParse("%Y-%m-%d");
 const data = dataset.map(({ date, value }) => ({
   date: timeParse(date),
@@ -2172,6 +2173,21 @@ const svg = div
   .append("svg")
   .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
 
+const defs = svg.append("defs");
+const marker = defs
+  .append("marker")
+  .attr("id", "marker")
+  .attr("viewBox", "0 -1.5 3 3")
+  .attr("markerWidth", "4")
+  .attr("markerHeight", "4")
+  .attr("orient", "auto-start-reverse");
+
+marker
+  .append("path")
+  .attr("d", "M 0 -1.5 3 0 0 1.5")
+  .attr("fill", "hsl(199, 100%, 46%)")
+  .attr("stroke", "none");
+
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin} ${margin})`);
@@ -2185,9 +2201,39 @@ const groupData = groupCenter
   .append("g")
   .style("color", "hsl(199, 100%, 46%)");
 
+groupData.append("circle").attr("r", "2").attr("fill", "currentColor");
+groupData
+  .append("text")
+  .attr("x", size / 20)
+  .attr("y", size / 8)
+  .attr("fill", "currentColor")
+  .attr("dominant-baseline", "hanging")
+  .attr("font-size", "12")
+  .attr("font-weight", "700")
+  .attr("font-family", "sans-serif")
+  .text("2022");
+
+groupData
+  .append("text")
+  .datum((d) => d[0])
+  .attr("transform", (d) => {
+    const angle = (scaleAngle(d.date) * 180) / Math.PI;
+    const radius = scaleRadius(d.value);
+
+    return `rotate(${angle}) translate(0 ${radius * -1}) rotate(${angle * -1})`;
+  })
+  .attr("x", (size / 40) * -1)
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "end")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "10")
+  .attr("font-weight", "700")
+  .attr("font-family", "sans-serif")
+  .text((d) => valueFormat(d.value / 100));
+
 groupData
   .append("path")
-  .attr("d", lineRadial)
+  .attr("d", (d) => lineRadial(d) + " 0 0")
   .attr("fill", "currentColor")
   .attr("opacity", "0.3 ");
 
@@ -2196,4 +2242,5 @@ groupData
   .attr("d", lineRadial)
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "2");
+  .attr("stroke-width", "2")
+  .attr("marker-start", "url(#marker)");
