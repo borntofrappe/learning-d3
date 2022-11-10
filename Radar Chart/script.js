@@ -1,5 +1,5 @@
 // https://agsi.gie.eu/
-const data = [
+const dataset = [
   { date: "2022-11-08", value: 95.31 },
   { date: "2022-11-07", value: 95.34 },
   { date: "2022-11-06", value: 95.3 },
@@ -2140,5 +2140,60 @@ const data = [
   { date: "2017-01-01", value: 63.18 },
 ];
 
+const timeParse = d3.timeParse("%Y-%m-%d");
+const data = dataset.map(({ date, value }) => ({
+  date: timeParse(date),
+  value,
+}));
+
+const dataYear = data.filter(({ date }) => date.getFullYear() === 2022);
+
+const size = 500;
+const margin = 25;
+
+const scaleAngle = d3
+  .scaleLinear()
+  .domain([new Date(2022, 0, 1), new Date(2023, 0, 1)])
+  .range([0, Math.PI * 2]);
+
+const scaleRadius = d3
+  .scaleLinear()
+  .domain([0, 100])
+  .range([0, size / 2]);
+
+const lineRadial = d3
+  .lineRadial()
+  .angle((d) => scaleAngle(d.date))
+  .radius((d) => scaleRadius(d.value));
+
 const div = d3.select("body").append("div");
-div.append("h1").text("Radar Chart");
+
+const svg = div
+  .append("svg")
+  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin} ${margin})`);
+
+const groupCenter = group
+  .append("g")
+  .attr("transform", `translate(${size / 2} ${size / 2})`);
+
+const groupData = groupCenter
+  .datum(dataYear)
+  .append("g")
+  .style("color", "hsl(199, 100%, 46%)");
+
+groupData
+  .append("path")
+  .attr("d", lineRadial)
+  .attr("fill", "currentColor")
+  .attr("opacity", "0.3 ");
+
+groupData
+  .append("path")
+  .attr("d", lineRadial)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "2");
