@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=Tinos:ital,wght@1,700&display=swap");
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -7,23 +9,28 @@
 body {
   color: #161616;
   background: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
-    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 #root {
-  max-width: 52rem;
+  max-width: 56rem;
   width: 95vw;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0.75rem auto;
 }
 
 #root > * + * {
-  margin-top: 1em;
+  margin-top: 1.5em;
+}
+
+header > * + *,
+article > * + * {
+  margin-top: 0.5em;
 }
 
 h1 {
   max-width: 40ch;
+  font-size: 2.2rem;
+  font-family: "Tinos", serif;
 }
 
 svg {

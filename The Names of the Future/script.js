@@ -1,3 +1,4 @@
+//https://www.insee.fr/fr/statistiques/3532172
 const data = [
   { year: "2021", name: "Gabriel", value: 4974 },
   { year: "2021", name: "Léo", value: 4358 },
@@ -1081,10 +1082,25 @@ header
   );
 header.append("p").text("What can we learn looking at the most monickers?");
 
+const dataSpotlight = Object.entries(dataStack[dataStack.length - 1])
+  .sort((a, b) => b[1] - a[1])
+  .slice(1, 5)
+  .map(([letter]) => ({
+    letter,
+    color: scaleColor(dataStacked.findIndex((d) => d.key === letter)),
+  }));
+
 const article = root.append("article");
 article
   .append("p")
-  .text("Considering the first letter a few values take the spotlight.");
+  .html(
+    `Considering the first letter a few values take the spotlight: ${dataSpotlight
+      .map(
+        ({ letter, color }) =>
+          `<strong style="border-bottom: 2px solid ${color}">${letter}</strong>`
+      )
+      .join(", ")}.`
+  );
 
 article
   .append("p")
@@ -1113,15 +1129,15 @@ const tooltip = visualization
   .style("visibility", "hidden")
   .style("opacity", "0");
 
-const group = svg
-  .append("g")
-  .attr("transform", `translate(${margin.left} ${margin.top})`);
-
 const defs = svg.append("defs");
 
 const clipPath = defs.append("clipPath").attr("id", "clip-path-chart");
 
 clipPath.append("rect").attr("width", width).attr("height", height);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 const groupAxis = group.append("g");
 const groupData = group.append("g");

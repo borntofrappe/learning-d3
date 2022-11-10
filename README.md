@@ -60,6 +60,7 @@ Projects leaning on D3 to create interesting visualizations.
 | [CSS Features](https://codepen.io/borntofrappe/pen/qBKZNyb)                   | pack, grid, transition     |
 | [CSS Technologies](https://codepen.io/borntofrappe/pen/qBKNPXY)               | line, transition           |
 | [Tournament Trees](https://codepen.io/borntofrappe/pen/oNyzrBJ)               | hierarchy, tree            |
+| [The Names of the Future](https://codepen.io/borntofrappe/pen/MWXpeve)        | stack, streamgraph         |
 
 ## script
 
