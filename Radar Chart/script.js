@@ -2141,16 +2141,18 @@ const dataset = [
 ];
 
 const valueFormat = d3.format(".0%");
+const tickFormat = d3.timeFormat("%b");
 const timeParse = d3.timeParse("%Y-%m-%d");
-const data = dataset.map(({ date, value }) => ({
-  date: timeParse(date),
-  value,
-}));
+const data = dataset
+  .map(({ date, value }) => ({
+    date: timeParse(date),
+    value,
+  }))
+  .sort((a, b) => a.date - b.date);
 
-const dataYear = data.filter(({ date }) => date.getFullYear() === 2022);
-
+const dataYear = [...data].filter(({ date }) => date.getFullYear() === 2022);
 const size = 500;
-const margin = 25;
+const margin = 30;
 
 const scaleAngle = d3
   .scaleLinear()
@@ -2162,14 +2164,21 @@ const scaleRadius = d3
   .domain([0, 100])
   .range([0, size / 2]);
 
+const ticks = d3.timeMonths(...scaleAngle.domain());
+
+const offset = 100 / 12 / 2;
+const scaleOffset = d3
+  .scaleBand()
+  .domain(ticks)
+  .range([offset, 100 + offset]);
+
 const lineRadial = d3
   .lineRadial()
   .angle((d) => scaleAngle(d.date))
   .radius((d) => scaleRadius(d.value));
 
-const div = d3.select("body").append("div");
-
-const svg = div
+const svg = d3
+  .select("body")
   .append("svg")
   .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
 
@@ -2178,15 +2187,35 @@ const marker = defs
   .append("marker")
   .attr("id", "marker")
   .attr("viewBox", "0 -1.5 3 3")
-  .attr("markerWidth", "4")
-  .attr("markerHeight", "4")
-  .attr("orient", "auto-start-reverse");
+  .attr("markerWidth", "5")
+  .attr("markerHeight", "5")
+  .attr("orient", "auto");
 
 marker
   .append("path")
   .attr("d", "M 0 -1.5 3 0 0 1.5")
   .attr("fill", "hsl(199, 100%, 46%)")
   .attr("stroke", "none");
+
+defs
+  .append("path")
+  .attr("id", "text-path-outer")
+  .attr("d", () => {
+    const r = scaleRadius(100) + 20;
+    const d = r * 2;
+
+    return `M 0 ${-r} a ${r} ${r} 0 0 1 0 ${d} ${r} ${r} 0 0 1 0 ${-d}`;
+  });
+
+defs
+  .append("path")
+  .attr("id", "text-path-inner")
+  .attr("d", () => {
+    const r = scaleRadius(100) + 20;
+    const d = r * 2;
+
+    return `M 0 ${-r} a ${r} ${r} 0 0 0 0 ${d} ${r} ${r} 0 0 0 0 ${-d}`;
+  });
 
 const group = svg
   .append("g")
@@ -2196,46 +2225,128 @@ const groupCenter = group
   .append("g")
   .attr("transform", `translate(${size / 2} ${size / 2})`);
 
+const groupAxis = groupCenter.append("g");
+const groupLines = groupAxis.append("g").style("color", " hsl(0, 0%, 80%)");
+const groupTicks = groupAxis.append("g").style("color", " hsl(0, 0%, 50%)");
+
+const groupGoal = groupCenter.append("g").style("color", " hsl(0, 0%, 7%)");
+
 const groupData = groupCenter
   .datum(dataYear)
   .append("g")
   .style("color", "hsl(199, 100%, 46%)");
 
+const groupsLines = groupLines
+  .selectAll("g")
+  .data([20, 50, 100])
+  .enter()
+  .append("g");
+
+groupsLines
+  .append("circle")
+  .attr("r", scaleRadius)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
+
+groupsLines
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "12")
+  .attr("font-family", "sans-serif")
+  .attr("transform", (d) => `translate(${scaleRadius(d) * -1} 0)`)
+  .attr("x", "5")
+  .text((d) => valueFormat(d / 100));
+
+const groupsTicks = groupTicks.selectAll("g").data(ticks).enter().append("g");
+
+groupsTicks
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "13")
+  .attr("font-family", "sans-serif")
+  .append("textPath")
+  .attr("href", (d) => {
+    const offset = scaleOffset(d);
+
+    if (offset < 25 || offset > 75) return "#text-path-outer";
+    return "#text-path-inner";
+  })
+  .attr("startOffset", (d) => {
+    const offset = scaleOffset(d);
+
+    if (offset < 25 || offset > 75) return `${scaleOffset(d)}%`;
+    return `${100 - scaleOffset(d)}%`;
+  })
+  .text((d) => tickFormat(d));
+
+groupsTicks
+  .append("path")
+  .attr("d", `M 0 ${-scaleRadius(100) - 15} v -10`)
+  .attr("transform", (_, i, { length }) => `rotate(${(360 / length) * i})`)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
+
+groupGoal.datum(80);
+
+groupGoal
+  .append("circle")
+  .attr("r", scaleRadius)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("stroke-dasharray", "4");
+
+groupGoal
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "12")
+  .attr("font-weight", "700")
+  .attr("font-family", "sans-serif")
+  .attr("transform", (d) => `translate(${scaleRadius(d) * -1} 0)`)
+  .attr("x", "5")
+  .text((d) => valueFormat(d / 100));
+
 groupData.append("circle").attr("r", "2").attr("fill", "currentColor");
 groupData
   .append("text")
-  .attr("x", size / 20)
-  .attr("y", size / 8)
+  .attr("x", "15")
+  .attr("y", "40")
   .attr("fill", "currentColor")
   .attr("dominant-baseline", "hanging")
-  .attr("font-size", "12")
+  .attr("font-size", "15")
   .attr("font-weight", "700")
   .attr("font-family", "sans-serif")
   .text("2022");
 
 groupData
   .append("text")
-  .datum((d) => d[0])
+  .datum((d) => d[d.length - 1])
   .attr("transform", (d) => {
     const angle = (scaleAngle(d.date) * 180) / Math.PI;
     const radius = scaleRadius(d.value);
 
     return `rotate(${angle}) translate(0 ${radius * -1}) rotate(${angle * -1})`;
   })
-  .attr("x", (size / 40) * -1)
+  .attr("x", "-15")
   .attr("fill", "currentColor")
   .attr("text-anchor", "end")
   .attr("dominant-baseline", "central")
-  .attr("font-size", "10")
+  .attr("font-size", "14")
   .attr("font-weight", "700")
   .attr("font-family", "sans-serif")
   .text((d) => valueFormat(d.value / 100));
 
 groupData
   .append("path")
-  .attr("d", (d) => lineRadial(d) + " 0 0")
+  .attr("d", (d) => `${lineRadial(d)} 0 0`)
   .attr("fill", "currentColor")
-  .attr("opacity", "0.3 ");
+  .attr("opacity", "0.3");
 
 groupData
   .append("path")
@@ -2243,4 +2354,4 @@ groupData
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "2")
-  .attr("marker-start", "url(#marker)");
+  .attr("marker-end", "url(#marker)");
