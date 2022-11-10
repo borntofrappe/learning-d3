@@ -1073,9 +1073,26 @@ const axisX = d3.axisBottom(scaleX).tickSize(0).tickPadding(12);
 
 const root = d3.select("body").append("div").attr("id", "root");
 const header = root.append("header");
-header.append("h1").text("Names of the Future");
+header.append("h1").text("Les noms de l'avenir");
+header
+  .append("p")
+  .text(
+    "Popular baby names change through the years, between solid options and often fleeting preferences."
+  );
+header.append("p").text("What can we learn looking at the most monickers?");
 
-const visualization = root.append("div").attr("class", "visualization");
+const article = root.append("article");
+article
+  .append("p")
+  .text("Considering the first letter a few values take the spotlight.");
+
+article
+  .append("p")
+  .text(
+    "What names are behind each letter, though? Select an area to discover them all."
+  );
+
+const visualization = article.append("div").attr("class", "visualization");
 
 const svg = visualization
   .append("svg")
@@ -1151,9 +1168,9 @@ groupOverlay
 groupLetters
   .selectAll("path")
   .on("pointerenter", function (e, { key }) {
-    groupLetters.selectAll("path").style("filter", "brightness(90%)");
+    groupLetters.selectAll("path").style("filter", "contrast(65%)");
 
-    d3.select(this).style("filter", "brightness(100%)");
+    d3.select(this).style("filter", "contrast(110%)");
 
     tooltip
       .style("visibility", "visible")
@@ -1167,7 +1184,7 @@ groupLetters
     tooltip.style("left", `${e.offsetX}px`).style("top", `${e.offsetY}px`);
   })
   .on("pointerleave", () => {
-    groupLetters.selectAll("path").style("filter", "brightness(100%)");
+    groupLetters.selectAll("path").style("filter", "contrast(100%)");
 
     tooltip
       .style("visibility", "hidden")
@@ -1180,7 +1197,7 @@ groupLetters
   .selectAll("path")
   .style("cursor", "zoom-in")
   .on("click", function (e, d) {
-    groupLetters.selectAll("path").style("filter", "brightness(100%)");
+    groupLetters.selectAll("path").style("filter", "contrast(100%)");
 
     tooltip
       .style("visibility", "hidden")
@@ -1260,7 +1277,7 @@ groupLetters
     const scaleColorNames = d3
       .scaleLinear()
       .domain([-1, dataStackedNames.length - 1])
-      .range([scaleColor(i), d3.color(scaleColor(i)).darker(1).hex()]);
+      .range([scaleColor(i), d3.color(scaleColor(i)).darker(2).hex()]);
 
     groupNames
       .selectAll("path")
@@ -1290,9 +1307,9 @@ groupLetters
         groupNames
           .selectAll("path")
           .on("pointerenter", function (e, { key }) {
-            groupNames.selectAll("path").style("filter", "brightness(90%)");
+            groupNames.selectAll("path").style("filter", "contrast(65%)");
 
-            d3.select(this).style("filter", "brightness(100%)");
+            d3.select(this).style("filter", "contrast(120%)");
 
             tooltip
               .style("visibility", "visible")
@@ -1308,7 +1325,7 @@ groupLetters
               .style("top", `${e.offsetY}px`);
           })
           .on("pointerleave", function () {
-            groupNames.selectAll("path").style("filter", "brightness(100%)");
+            groupNames.selectAll("path").style("filter", "contrast(100%)");
 
             tooltip
               .style("visibility", "hidden")
@@ -1320,6 +1337,14 @@ groupLetters
         groupOverlay.on(
           "click",
           function (e, d) {
+            groupNames.selectAll("path").style("filter", "contrast(100%)");
+
+            tooltip
+              .style("visibility", "hidden")
+              .style("opacity", "0")
+              .selectAll("*")
+              .remove();
+
             const transition = d3
               .transition()
               .duration(750)
