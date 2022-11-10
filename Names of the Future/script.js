@@ -1158,13 +1158,13 @@ groupLetters
     tooltip
       .style("visibility", "visible")
       .style("opacity", "1")
-      .style("left", `${e.layerX}px`)
-      .style("top", `${e.layerY}px`);
+      .style("left", `${e.offsetX}px`)
+      .style("top", `${e.offsetY}px`);
 
     tooltip.append("p").html(`Letter: <strong>${key}</strong>`);
   })
   .on("pointermove", (e) => {
-    tooltip.style("left", `${e.layerX}px`).style("top", `${e.layerY}px`);
+    tooltip.style("left", `${e.offsetX}px`).style("top", `${e.offsetY}px`);
   })
   .on("pointerleave", () => {
     groupLetters.selectAll("path").style("filter", "brightness(100%)");
@@ -1257,20 +1257,19 @@ groupLetters
       .offset(d3.stackOffsetSilhouette)
       .order(d3.stackOrderInsideOut)(dataStackNames);
 
-    const areaNames = d3
-      .area()
-      .x(({ data }) => scaleX(data.year))
-      .y0(([y0, y1]) => scaleYLetter((y0 + y1) / 2))
-      .y1(([y0, y1]) => scaleYLetter((y0 + y1) / 2))
-      .curve(d3.curveBumpX);
+    const scaleColorNames = d3
+      .scaleLinear()
+      .domain([-1, dataStackedNames.length - 1])
+      .range([scaleColor(i), d3.color(scaleColor(i)).darker(1).hex()]);
 
     groupNames
       .selectAll("path")
       .data(dataStackedNames)
       .enter()
       .append("path")
-      .attr("fill", (_, i) => scaleColor(i))
-      .attr("d", areaNames);
+      .attr("fill", (_, i) => scaleColorNames(i))
+      .attr("d", areaLetter)
+      .attr("opacity", "0");
 
     groupLetters
       .selectAll("path")
@@ -1285,7 +1284,7 @@ groupLetters
         .delay(50)
         .ease(d3.easeQuadInOut);
 
-      groupNames.selectAll("path").transition(transition).attr("d", areaLetter);
+      groupNames.selectAll("path").transition(transition).attr("opacity", "1");
 
       transition.on("end", () => {
         groupNames
@@ -1298,15 +1297,15 @@ groupLetters
             tooltip
               .style("visibility", "visible")
               .style("opacity", "1")
-              .style("left", `${e.layerX}px`)
-              .style("top", `${e.layerY}px`);
+              .style("left", `${e.offsetX}px`)
+              .style("top", `${e.offsetY}px`);
 
             tooltip.append("p").html(`Name: <strong>${key}</strong>`);
           })
           .on("pointermove", (e) => {
             tooltip
-              .style("left", `${e.layerX}px`)
-              .style("top", `${e.layerY}px`);
+              .style("left", `${e.offsetX}px`)
+              .style("top", `${e.offsetY}px`);
           })
           .on("pointerleave", function () {
             groupNames.selectAll("path").style("filter", "brightness(100%)");
@@ -1329,7 +1328,7 @@ groupLetters
             groupNames
               .selectAll("path")
               .transition(transition)
-              .attr("d", areaNames)
+              .attr("opacity", "0")
               .remove();
 
             transition.on("end", () => {
