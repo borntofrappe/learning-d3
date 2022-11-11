@@ -5,8 +5,8 @@
 }
 
 body {
-  color: hsl(210, 10%, 23%);
-  background: hsl(0, 0%, 94%);
+  color: hsl(210, 11%, 15%);
+  background: hsl(0, 0%, 100%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   display: flex;
@@ -15,7 +15,7 @@ body {
 
 svg {
   margin: auto;
-  max-width: 38rem;
+  max-width: 28rem;
   width: 95vw;
   height: auto;
   display: block;

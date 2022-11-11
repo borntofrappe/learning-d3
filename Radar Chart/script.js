@@ -2140,9 +2140,20 @@ const dataset = [
   { date: "2017-01-01", value: 63.18 },
 ];
 
+const year = 2022;
+const size = 500;
+const margin = 30;
+const radius = size / 2;
+
+const domainDates = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
+const ticksValues = [20, 50, 100];
+const ticksDates = d3.timeMonths(...domainDates);
+const goalValue = 80;
+
 const valueFormat = d3.format(".0%");
-const tickFormat = d3.timeFormat("%b");
+const dateFormat = d3.timeFormat("%b");
 const timeParse = d3.timeParse("%Y-%m-%d");
+
 const data = dataset
   .map(({ date, value }) => ({
     date: timeParse(date),
@@ -2150,27 +2161,16 @@ const data = dataset
   }))
   .sort((a, b) => a.date - b.date);
 
-const dataYear = [...data].filter(({ date }) => date.getFullYear() === 2022);
-const size = 500;
-const margin = 30;
+const dataYear = [...data].filter(({ date }) => date.getFullYear() === year);
 
 const scaleAngle = d3
   .scaleLinear()
-  .domain([new Date(2022, 0, 1), new Date(2023, 0, 1)])
+  .domain(domainDates)
   .range([0, Math.PI * 2]);
 
-const scaleRadius = d3
-  .scaleLinear()
-  .domain([0, 100])
-  .range([0, size / 2]);
+const scaleRadius = d3.scaleLinear().domain([0, 100]).range([0, radius]);
 
-const ticks = d3.timeMonths(...scaleAngle.domain());
-
-const offset = 100 / 12 / 2;
-const scaleOffset = d3
-  .scaleBand()
-  .domain(ticks)
-  .range([offset, 100 + offset]);
+const scaleStartOffset = d3.scaleBand().domain(ticksDates).range([0, 100]);
 
 const lineRadial = d3
   .lineRadial()
@@ -2183,6 +2183,7 @@ const svg = d3
   .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
 
 const defs = svg.append("defs");
+
 const marker = defs
   .append("marker")
   .attr("id", "marker")
@@ -2199,22 +2200,12 @@ marker
 
 defs
   .append("path")
-  .attr("id", "text-path-outer")
+  .attr("id", "text-path-dates")
   .attr("d", () => {
-    const r = scaleRadius(100) + 20;
+    const r = radius + 20;
     const d = r * 2;
 
     return `M 0 ${-r} a ${r} ${r} 0 0 1 0 ${d} ${r} ${r} 0 0 1 0 ${-d}`;
-  });
-
-defs
-  .append("path")
-  .attr("id", "text-path-inner")
-  .attr("d", () => {
-    const r = scaleRadius(100) + 20;
-    const d = r * 2;
-
-    return `M 0 ${-r} a ${r} ${r} 0 0 0 0 ${d} ${r} ${r} 0 0 0 0 ${-d}`;
   });
 
 const group = svg
@@ -2226,72 +2217,74 @@ const groupCenter = group
   .attr("transform", `translate(${size / 2} ${size / 2})`);
 
 const groupAxis = groupCenter.append("g");
-const groupLines = groupAxis.append("g").style("color", " hsl(0, 0%, 80%)");
-const groupTicks = groupAxis.append("g").style("color", " hsl(0, 0%, 50%)");
+const groupTicksValues = groupAxis
+  .append("g")
+  .style("color", " hsl(0, 0%, 80%)");
+const groupTicksDates = groupAxis
+  .append("g")
+  .style("color", " hsl(0, 0%, 50%)");
 
 const groupGoal = groupCenter.append("g").style("color", " hsl(0, 0%, 7%)");
 
-const groupData = groupCenter
-  .datum(dataYear)
-  .append("g")
-  .style("color", "hsl(199, 100%, 46%)");
+const groupData = groupCenter.append("g").style("color", "hsl(199, 100%, 46%)");
 
-const groupsLines = groupLines
+const groupsTicksValues = groupTicksValues
   .selectAll("g")
-  .data([20, 50, 100])
+  .data(ticksValues)
   .enter()
   .append("g");
 
-groupsLines
+groupsTicksValues
   .append("circle")
   .attr("r", scaleRadius)
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "1");
+  .attr("stroke-width", "0.5");
 
-groupsLines
+groupsTicksValues
   .append("text")
   .attr("fill", "currentColor")
   .attr("dominant-baseline", "central")
   .attr("font-size", "12")
-  .attr("font-family", "sans-serif")
   .attr("transform", (d) => `translate(${scaleRadius(d) * -1} 0)`)
   .attr("x", "5")
   .text((d) => valueFormat(d / 100));
 
-const groupsTicks = groupTicks.selectAll("g").data(ticks).enter().append("g");
+const groupsTicksDates = groupTicksDates
+  .selectAll("g")
+  .data(ticksDates)
+  .enter()
+  .append("g");
 
-groupsTicks
+groupsTicksDates
   .append("text")
   .attr("fill", "currentColor")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "central")
   .attr("font-size", "13")
-  .attr("font-family", "sans-serif")
   .append("textPath")
-  .attr("href", (d) => {
-    const offset = scaleOffset(d);
+  .attr("href", "#text-path-dates")
+  .attr(
+    "startOffset",
+    (d) => `${scaleStartOffset(d) + scaleStartOffset.bandwidth() / 2}%`
+  )
+  .text((d) => dateFormat(d));
 
-    if (offset < 25 || offset > 75) return "#text-path-outer";
-    return "#text-path-inner";
-  })
-  .attr("startOffset", (d) => {
-    const offset = scaleOffset(d);
-
-    if (offset < 25 || offset > 75) return `${scaleOffset(d)}%`;
-    return `${100 - scaleOffset(d)}%`;
-  })
-  .text((d) => tickFormat(d));
-
-groupsTicks
+groupsTicksDates
   .append("path")
-  .attr("d", `M 0 ${-scaleRadius(100) - 15} v -10`)
-  .attr("transform", (_, i, { length }) => `rotate(${(360 / length) * i})`)
+  .attr("d", `M 0 6 v -12`)
+  .attr(
+    "transform",
+    (d) =>
+      `rotate(${(scaleAngle(d) * 180) / Math.PI}) translate(0 ${
+        (radius + 20) * -1
+      })`
+  )
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
 
-groupGoal.datum(80);
+groupGoal.datum(goalValue);
 
 groupGoal
   .append("circle")
@@ -2307,22 +2300,22 @@ groupGoal
   .attr("dominant-baseline", "central")
   .attr("font-size", "12")
   .attr("font-weight", "700")
-  .attr("font-family", "sans-serif")
   .attr("transform", (d) => `translate(${scaleRadius(d) * -1} 0)`)
   .attr("x", "5")
   .text((d) => valueFormat(d / 100));
 
+groupData.datum(dataYear);
+
 groupData.append("circle").attr("r", "2").attr("fill", "currentColor");
 groupData
   .append("text")
-  .attr("x", "15")
-  .attr("y", "40")
+  .attr("x", "12")
+  .attr("y", "38")
   .attr("fill", "currentColor")
   .attr("dominant-baseline", "hanging")
   .attr("font-size", "15")
   .attr("font-weight", "700")
-  .attr("font-family", "sans-serif")
-  .text("2022");
+  .text(year);
 
 groupData
   .append("text")
@@ -2339,7 +2332,6 @@ groupData
   .attr("dominant-baseline", "central")
   .attr("font-size", "14")
   .attr("font-weight", "700")
-  .attr("font-family", "sans-serif")
   .text((d) => valueFormat(d.value / 100));
 
 groupData
