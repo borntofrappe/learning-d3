@@ -2140,21 +2140,6 @@ const dataset = [
   { date: "2017-01-01", value: 63.18 },
 ];
 
-const year = 2022;
-const size = 500;
-const margin = 75;
-const radius = size / 2;
-
-const domainDates = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
-const ticksValues = [20, 50, 100];
-const ticksDates = d3.timeMonths(...domainDates);
-const goalValue = 80;
-
-const highlight = {
-  date: "2022-02-24",
-  label: "Russia invades\nUkraine, Feb 24",
-};
-
 const valueFormat = d3.format(".0%");
 const dateFormat = d3.timeFormat("%b");
 const timeParse = d3.timeParse("%Y-%m-%d");
@@ -2166,7 +2151,47 @@ const data = dataset
   }))
   .sort((a, b) => a.date - b.date);
 
-const dataYear = [...data].filter(({ date }) => date.getFullYear() === year);
+const dataMap = d3.group(data, (d) => d.date.getFullYear());
+const dataYears = [...dataMap];
+
+const [year, dataYear] = dataYears[dataYears.length - 1];
+
+const domainDates = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
+const ticksValues = [20, 50, 100];
+const ticksDates = d3.timeMonths(...domainDates);
+const goalValue = 80;
+
+const highlight = {
+  date: "2022-02-24",
+  label: "Russia invades\nUkraine, Feb 24",
+};
+
+const years = dataYears.slice(0, -1).map(([year]) => year);
+
+const dataAverage = d3.timeDays(...domainDates).map((date) => {
+  const day = date.getDate();
+  const month = date.getMonth();
+
+  const value = d3.mean(
+    years.map(
+      (year) =>
+        dataMap
+          .get(year)
+          .find(
+            ({ date }) => date.getDate() === day && date.getMonth() === month
+          ).value
+    )
+  );
+
+  return {
+    date,
+    value,
+  };
+});
+
+const size = 500;
+const margin = 75;
+const radius = size / 2;
 
 const scaleAngle = d3
   .scaleLinear()
@@ -2220,6 +2245,8 @@ const group = svg
 const groupCenter = group
   .append("g")
   .attr("transform", `translate(${size / 2} ${size / 2})`);
+
+const groupAverage = groupCenter.append("g").style("color", " hsl(0, 0%, 60%)");
 
 const groupAxis = groupCenter.append("g");
 const groupTicksValues = groupAxis
@@ -2292,6 +2319,26 @@ groupsTicksDates
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
+
+groupAverage.datum(dataAverage);
+
+groupAverage
+  .append("path")
+  .attr("d", lineRadial)
+  .attr("fill", "currentColor")
+  .attr("fill-opacity", "0.2");
+
+groupAverage
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("font-size", "12")
+  .attr("font-weight", "700")
+  .attr("transform", "translate(-130 -90)")
+  .text(`${years[0]}-${years[years.length - 1]}`)
+  .append("tspan")
+  .attr("x", "0")
+  .attr("dy", "14")
+  .text("average");
 
 groupGoal.datum(goalValue);
 
@@ -2416,7 +2463,7 @@ if (!prefersReducedMotion) {
   groupData.select("#year").attr("opacity", "0");
   groupData.select("#line").attr("d", "");
 
-  const transition = d3.transition().duration(2000).delay(250);
+  const transition = d3.transition().duration(2000).delay(350);
 
   transition.tween("line", function () {
     const i = d3.interpolate(0, dataYear.length);
