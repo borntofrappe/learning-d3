@@ -2318,6 +2318,7 @@ groupData.datum(dataYear);
 groupData.append("circle").attr("r", "2").attr("fill", "currentColor");
 groupData
   .append("text")
+  .attr("id", "year")
   .attr("x", "12")
   .attr("y", "38")
   .attr("fill", "currentColor")
@@ -2329,6 +2330,7 @@ groupData
 groupData
   .append("text")
   .datum((d) => d[d.length - 1])
+  .attr("id", "value")
   .attr("transform", (d) => {
     const angle = (scaleAngle(d.date) * 180) / Math.PI;
     const radius = scaleRadius(d.value);
@@ -2345,12 +2347,14 @@ groupData
 
 groupData
   .append("path")
+  .attr("id", "area")
   .attr("d", (d) => `${lineRadial(d)} 0 0`)
   .attr("fill", "currentColor")
-  .attr("opacity", "0.3");
+  .attr("fill-opacity", "0.3");
 
 groupData
   .append("path")
+  .attr("id", "line")
   .attr("d", lineRadial)
   .attr("fill", "none")
   .attr("stroke", "currentColor")
@@ -2401,3 +2405,34 @@ groupHighlightLabel
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
+
+const { matches: prefersReducedMotion } = matchMedia(
+  "(prefers-reduced-motion)"
+);
+
+if (!prefersReducedMotion) {
+  groupData.select("#area").attr("opacity", "0");
+  groupData.select("#value").attr("opacity", "0");
+  groupData.select("#year").attr("opacity", "0");
+  groupData.select("#line").attr("d", "");
+
+  const transition = d3.transition().duration(2000).delay(250);
+
+  transition.tween("line", function () {
+    const i = d3.interpolate(0, dataYear.length);
+    return function (t) {
+      const index = Math.floor(i(t));
+      groupData
+        .select("#line")
+        .datum((d) => d.slice(0, index))
+        .attr("d", lineRadial);
+    };
+  });
+
+  transition.on("end", () => {
+    const transition = d3.transition().duration(375);
+    groupData.select("#area").transition(transition).attr("opacity", "1");
+    groupData.select("#value").transition(transition).attr("opacity", "1");
+    groupData.select("#year").transition(transition).attr("opacity", "1");
+  });
+}
