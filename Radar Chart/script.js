@@ -2142,13 +2142,18 @@ const dataset = [
 
 const year = 2022;
 const size = 500;
-const margin = 30;
+const margin = 75;
 const radius = size / 2;
 
 const domainDates = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
 const ticksValues = [20, 50, 100];
 const ticksDates = d3.timeMonths(...domainDates);
 const goalValue = 80;
+
+const highlight = {
+  date: "2022-02-24",
+  label: "Russia invades\nUkraine, Feb 24",
+};
 
 const valueFormat = d3.format(".0%");
 const dateFormat = d3.timeFormat("%b");
@@ -2227,6 +2232,10 @@ const groupTicksDates = groupAxis
 const groupGoal = groupCenter.append("g").style("color", " hsl(0, 0%, 7%)");
 
 const groupData = groupCenter.append("g").style("color", "hsl(199, 100%, 46%)");
+
+const groupHighlight = groupCenter
+  .append("g")
+  .style("color", "hsl(352, 78%, 60%)");
 
 const groupsTicksValues = groupTicksValues
   .selectAll("g")
@@ -2347,3 +2356,48 @@ groupData
   .attr("stroke", "currentColor")
   .attr("stroke-width", "2")
   .attr("marker-end", "url(#marker)");
+
+groupHighlight.datum(highlight).attr("transform", (d) => {
+  const angle = (scaleAngle(timeParse(d.date)) * 180) / Math.PI;
+  return `rotate(${angle}) translate(0 ${radius * -1})`;
+});
+
+groupHighlight
+  .append("rect")
+  .attr("x", "-3")
+  .attr("y", "-8")
+  .attr("width", "6")
+  .attr("height", "18")
+  .attr("fill", "currentColor");
+
+groupHighlightLabel = groupHighlight.append("g").attr("transform", (d) => {
+  const angle = (scaleAngle(timeParse(d.date)) * 180) / Math.PI;
+  return `rotate(${angle * -1})`;
+});
+
+groupHighlightLabelText = groupHighlightLabel
+  .append("text")
+  .attr("transform", "translate(5 -50)")
+  .attr("fill", "currentColor")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "15");
+
+groupHighlightLabelText
+  .selectAll("tspan")
+  .data((d) => d.label.split(/ ?\n/))
+  .enter()
+  .append("tspan")
+  .attr("x", "0")
+  .attr("dy", (_, i) => i * 18)
+  .text((d) => d);
+
+groupHighlightLabel
+  .append("path")
+  .attr("d", () => {
+    const { width } = groupHighlightLabelText.node().getBBox();
+
+    return `M 0 0 v -20 h ${width}`;
+  })
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
