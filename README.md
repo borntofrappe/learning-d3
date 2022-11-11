@@ -31,7 +31,7 @@ Projects exploring the D3 library.
 | Beauteous Villages                                                            | geojson, transition     |
 | [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)             | scaleQuantile, datum    |
 | [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)                       | treemap, text           |
-| Radar Chart                                                                   | lineRadial              |
+| EU Gas Storage                                                                | lineRadial, transition  |
 
 Projects leaning on D3 to create interesting visualizations.
 

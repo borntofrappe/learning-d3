@@ -5,8 +5,6 @@
 }
 
 body {
-  color: hsl(210, 11%, 15%);
-  background: hsl(0, 0%, 100%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   display: flex;

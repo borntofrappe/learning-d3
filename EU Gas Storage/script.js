@@ -2157,8 +2157,10 @@ const dataYears = [...dataMap];
 const [year, dataYear] = dataYears[dataYears.length - 1];
 
 const domainDates = [new Date(year, 0, 1), new Date(year + 1, 0, 1)];
-const ticksValues = [20, 50, 100];
 const ticksDates = d3.timeMonths(...domainDates);
+
+const ticksValues = [20, 50, 100];
+
 const goalValue = 80;
 
 const highlight = {
@@ -2249,9 +2251,11 @@ const groupCenter = group
 const groupAverage = groupCenter.append("g").style("color", " hsl(0, 0%, 60%)");
 
 const groupAxis = groupCenter.append("g");
+
 const groupTicksValues = groupAxis
   .append("g")
   .style("color", " hsl(0, 0%, 80%)");
+
 const groupTicksDates = groupAxis
   .append("g")
   .style("color", " hsl(0, 0%, 50%)");
@@ -2263,6 +2267,26 @@ const groupData = groupCenter.append("g").style("color", "hsl(199, 100%, 46%)");
 const groupHighlight = groupCenter
   .append("g")
   .style("color", "hsl(352, 78%, 60%)");
+
+groupAverage.datum(dataAverage);
+
+groupAverage
+  .append("path")
+  .attr("d", lineRadial)
+  .attr("fill", "currentColor")
+  .attr("fill-opacity", "0.2");
+
+groupAverage
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("font-size", "12")
+  .attr("font-weight", "700")
+  .attr("transform", "translate(-130 -90)")
+  .text(`${years[0]}-${years[years.length - 1]}`)
+  .append("tspan")
+  .attr("x", "0")
+  .attr("dy", "14")
+  .text("average");
 
 const groupsTicksValues = groupTicksValues
   .selectAll("g")
@@ -2320,26 +2344,6 @@ groupsTicksDates
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
 
-groupAverage.datum(dataAverage);
-
-groupAverage
-  .append("path")
-  .attr("d", lineRadial)
-  .attr("fill", "currentColor")
-  .attr("fill-opacity", "0.2");
-
-groupAverage
-  .append("text")
-  .attr("fill", "currentColor")
-  .attr("font-size", "12")
-  .attr("font-weight", "700")
-  .attr("transform", "translate(-130 -90)")
-  .text(`${years[0]}-${years[years.length - 1]}`)
-  .append("tspan")
-  .attr("x", "0")
-  .attr("dy", "14")
-  .text("average");
-
 groupGoal.datum(goalValue);
 
 groupGoal
@@ -2363,6 +2367,7 @@ groupGoal
 groupData.datum(dataYear);
 
 groupData.append("circle").attr("r", "2").attr("fill", "currentColor");
+
 groupData
   .append("text")
   .attr("id", "year")
