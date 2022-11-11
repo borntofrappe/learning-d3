@@ -1,4 +1,3 @@
-// https://agsi.gie.eu/
 const dataset = [
   { date: "2022-11-08", value: 95.31 },
   { date: "2022-11-07", value: 95.34 },
