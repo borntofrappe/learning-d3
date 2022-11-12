@@ -539,6 +539,19 @@ groupAxis
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.5");
 
+groupWindRose
+  .append("text")
+  .attr("y", "-12")
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .attr("font-size", "10")
+  .text("Calm")
+  .append("tspan")
+  .attr("x", "0")
+  .attr("dy", "12")
+  .text(`${calm}%`);
+
 const groupsWindRose = groupWindRose
   .selectAll("g")
   .data(windRose)
