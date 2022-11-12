@@ -401,13 +401,32 @@ const data = {
   ],
 };
 
+const points = [
+  "N",
+  "NNE",
+  "NE",
+  "ENE",
+  "E",
+  "ESE",
+  "SE",
+  "SSE",
+  "S",
+  "SSW",
+  "SW",
+  "WSW",
+  "W",
+  "WNW",
+  "NW",
+  "NNW",
+];
+
 const size = 500;
-const margin = 25;
+const margin = 40;
 const radius = size / 2;
 const innerRadius = radius / 10;
 
 const legendHeight = 60;
-const gapHeight = 30;
+const gapHeight = 40;
 
 const { calm, directions } = data;
 
@@ -421,7 +440,9 @@ const maxCumulativeValue = d3.max(directions, (d) =>
   d.speed.reduce((a, c) => a + c.value, 0)
 );
 
-const scaleLegendX = d3.scaleBand().domain(intervals).range([0, size]);
+const scaleLegend = d3.scaleBand().domain(intervals).range([0, size]);
+const scalePoints = d3.scaleBand().domain(points).range([0, 360]);
+
 const scaleColor = d3.scaleOrdinal().domain(intervals).range(colors);
 
 const scaleValue = d3
@@ -483,6 +504,7 @@ const groupCenter = group
 
 const groupLegend = group.append("g");
 const groupAxis = groupCenter.append("g");
+const groupPoints = groupAxis.append("g");
 const groupTicks = groupAxis.append("g");
 const groupWindRose = groupCenter.append("g");
 
@@ -514,7 +536,7 @@ const groupsLegend = groupLegend
   .attr(
     "transform",
     (d) =>
-      `translate(${scaleLegendX(d) + scaleLegendX.bandwidth() / 2} ${
+      `translate(${scaleLegend(d) + scaleLegend.bandwidth() / 2} ${
         legendHeight - 16
       })`
   );
@@ -541,6 +563,35 @@ groupAxis
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.5");
+
+const groupsPoints = groupPoints
+  .selectAll("g")
+  .data(points)
+  .enter()
+  .append("g");
+
+groupsPoints
+  .append("path")
+  .attr("transform", (d) => `rotate(${scalePoints(d)})`)
+  .attr("d", `M 0 ${innerRadius * -1} V ${radius * -1}`)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "0.5");
+
+groupsPoints
+  .append("text")
+  .attr(
+    "transform",
+    (d) =>
+      `rotate(${scalePoints(d)}) translate(0 ${(radius + 20) * -1}) rotate(${
+        scalePoints(d) * -1
+      })`
+  )
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "middle")
+  .attr("font-size", "12")
+  .text((d) => d);
 
 const groupsTicks = groupTicks
   .selectAll("g")
