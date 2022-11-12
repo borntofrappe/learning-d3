@@ -32,6 +32,7 @@ Projects exploring the D3 library.
 | [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)             | scaleQuantile, datum    |
 | [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)                       | treemap, text           |
 | [EU Gas Storage](https://codepen.io/borntofrappe/pen/JjZNoRB)                 | lineRadial, transition  |
+| Wind Rose                                                                     | lineRadial, data join   |
 
 Projects leaning on D3 to create interesting visualizations.
 
