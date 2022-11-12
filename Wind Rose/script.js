@@ -487,3 +487,46 @@ groupsLegend
   .attr("dominant-baseline", "central")
   .attr("font-size", "14")
   .text((d) => d);
+
+const arc = d3.arc();
+
+const maxCumulativeValue = d3.max(data, (d) =>
+  d.speed.reduce((a, c) => a + c.value, 0)
+);
+
+const minRadius = radius / 10;
+const scaleValue = d3
+  .scaleLinear()
+  .domain([0, maxCumulativeValue])
+  .range([minRadius, radius])
+  .nice();
+
+data.forEach((datum) => {
+  let [startAngle, endAngle] = datum.direction.map((d) => (d / 180) * Math.PI);
+
+  if (endAngle < startAngle) {
+    endAngle += Math.PI * 2;
+  }
+
+  let currentValue = 0;
+  datum.speed.forEach((d) => {
+    const innerRadius = scaleValue(currentValue);
+    currentValue += d.value;
+    const outerRadius = scaleValue(currentValue);
+
+    d.innerRadius = innerRadius;
+    d.outerRadius = outerRadius;
+    d.startAngle = startAngle;
+    d.endAngle = endAngle;
+  });
+});
+
+const groupsData = groupData.selectAll("g").data(data).enter().append("g");
+
+groupsData
+  .selectAll("path")
+  .data((d) => d.speed)
+  .enter()
+  .append("path")
+  .attr("d", arc)
+  .attr("fill", (d) => scaleColor(d.interval));
