@@ -430,6 +430,8 @@ const scaleValue = d3
   .range([innerRadius, radius])
   .nice();
 
+const ticksValue = scaleValue.ticks(4).slice(1);
+
 const arc = d3.arc();
 
 const windRose = directions.map(({ angles, speed }) => {
@@ -481,6 +483,7 @@ const groupCenter = group
 
 const groupLegend = group.append("g");
 const groupAxis = groupCenter.append("g");
+const groupTicks = groupAxis.append("g");
 const groupWindRose = groupCenter.append("g");
 
 groupLegend.attr("transform", `translate(0 ${size + gapHeight})`);
@@ -538,6 +541,30 @@ groupAxis
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.5");
+
+const groupsTicks = groupTicks
+  .selectAll("g")
+  .data(ticksValue)
+  .enter()
+  .append("g");
+
+groupsTicks
+  .append("circle")
+  .attr("r", (d) => scaleValue(d))
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "0.5");
+
+groupsTicks
+  .append("text")
+  .attr(
+    "transform",
+    (d) => `rotate(-30) translate(${scaleValue(d) + 8} 0) rotate(30)`
+  )
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("font-size", "12")
+  .text((d) => `${d}%`);
 
 groupWindRose
   .append("text")
