@@ -511,14 +511,6 @@ const groupWindRose = groupCenter.append("g");
 groupLegend.attr("transform", `translate(0 ${size + gapHeight})`);
 
 groupLegend
-  .append("rect")
-  .attr("width", size)
-  .attr("height", legendHeight)
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "0.5");
-
-groupLegend
   .append("text")
   .attr("transform", (d) => `translate(${size / 2} 0)`)
   .attr("fill", "currentColor")
@@ -526,6 +518,7 @@ groupLegend
   .attr("dominant-baseline", "hanging")
   .attr("y", "5")
   .attr("font-size", "14")
+  .attr("font-weight", "700")
   .text("Wind speed (mph)");
 
 const groupsLegend = groupLegend
@@ -555,13 +548,14 @@ groupsLegend
   .attr("fill", "currentColor")
   .attr("dominant-baseline", "central")
   .attr("font-size", "14")
+  .attr("font-weight", "700")
   .text((d) => d);
 
 groupAxis
   .append("circle")
   .attr("r", radius)
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "var(--color-lines, currentColor)")
   .attr("stroke-width", "0.5");
 
 const groupsPoints = groupPoints
@@ -575,7 +569,7 @@ groupsPoints
   .attr("transform", (d) => `rotate(${scalePoints(d)})`)
   .attr("d", `M 0 ${innerRadius * -1} V ${radius * -1}`)
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "var(--color-lines, currentColor)")
   .attr("stroke-width", "0.5");
 
 groupsPoints
@@ -591,6 +585,7 @@ groupsPoints
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "middle")
   .attr("font-size", "12")
+  .attr("font-weight", "700")
   .text((d) => d);
 
 const groupsTicks = groupTicks
@@ -603,17 +598,21 @@ groupsTicks
   .append("circle")
   .attr("r", (d) => scaleValue(d))
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "var(--color-lines, currentColor)")
   .attr("stroke-width", "0.5");
 
 groupsTicks
   .append("text")
   .attr(
     "transform",
-    (d) => `rotate(-30) translate(${scaleValue(d) + 8} 0) rotate(30)`
+    (d) =>
+      `rotate(${scalePoints.bandwidth() * 1.5 * -1}) translate(${
+        scaleValue(d) + 10
+      } 0) rotate(${scalePoints.bandwidth() * 1.5})`
   )
   .attr("fill", "currentColor")
   .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "middle")
   .attr("font-size", "12")
   .text((d) => `${d}%`);
 
@@ -628,6 +627,7 @@ groupWindRose
   .append("tspan")
   .attr("x", "0")
   .attr("dy", "12")
+  .attr("font-weight", "700")
   .text(`${calm}%`);
 
 const groupsWindRose = groupWindRose
