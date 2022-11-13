@@ -78,3 +78,17 @@ folderName
 ```
 
 `index.html` references the D3 library - version 7.6.1 at the time of writing. `style.css` adds properties to set helpful defaults. `script.js` expects further instructions. `README.md` waits for a few words on the most salient features, on the main lessons learned.
+
+## Contributing
+
+At the time of writing there is no intention of accepting contributions in terms of code. This repository is purely my attempt to practice with the D3 library and to teach by example. That being said, if you are so inclined, feel free to file an issue to:
+
+1. [ask for clarification](https://github.com/borntofrappe/learning-d3/issues/new?title=Question:%20&labels=question)
+
+   Documentation is often sporadic and focuses on the sections I consider to be most important for the project at hand. It is a way to ease other developers <!-- my future-self included --> in the visualization.
+
+   Any question you have is is more than welcomed.
+
+2. [propose a visualization](https://github.com/borntofrappe/learning-d3/issues/new?title=Proposition:%20&labels=idea)
+
+   I'll try my best to answer with a D3 demo.
