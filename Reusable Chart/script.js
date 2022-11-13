@@ -1,4 +1,4 @@
-const data = [
+const datasets = [
   [
     [10, 8.04],
     [8, 6.95],
@@ -53,5 +53,103 @@ const data = [
   ],
 ];
 
-const div = d3.select("body").append("div");
-div.append("h1").text("Reusable Chart");
+const domainX = [
+  0,
+  d3.max(datasets, (dataset) => d3.max(dataset, (d) => d[0])),
+];
+const domainY = [
+  0,
+  d3.max(datasets, (dataset) => d3.max(dataset, (d) => d[1])),
+];
+
+const [dataset] = datasets;
+
+const width = 650;
+const height = 400;
+const margin = {
+  top: 5,
+  bottom: 50,
+  left: 50,
+  right: 5,
+};
+
+const scaleX = d3.scaleLinear().domain(domainX).range([0, width]).nice();
+
+const scaleY = d3.scaleLinear().domain(domainY).range([height, 0]).nice();
+
+const axisX = d3.axisBottom(scaleX).ticks(8).tickSizeOuter(0);
+const axisY = d3.axisLeft(scaleY).ticks(6).tickSizeOuter(0);
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g");
+const groupAxisLabels = groupAxis.append("g");
+
+const groupDataset = group.append("g");
+
+groupAxis
+  .append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
+
+groupAxis
+  .append("g")
+  .attr("class", "axis x-axis")
+  .call(axisX)
+  .attr("transform", `translate(0 ${height})`);
+
+groupAxis.append("g").attr("class", "axis y-axis").call(axisY);
+
+groupAxis.selectAll(".axis").select("path").remove();
+groupAxis.selectAll(".axis").select(".tick").remove();
+groupAxis.selectAll(".axis").select(".tick:last-of-type").remove();
+
+groupAxisLabels
+  .attr("stroke", "currentColor")
+  .attr("font-size", "18")
+  .style("text-transform", "uppercase");
+
+groupAxisLabels
+  .append("text")
+  .attr("transform", `translate(${width / 2} ${height + margin.bottom - 1})`)
+  .attr("text-anchor", "middle")
+  .text("x");
+
+groupAxisLabels
+  .append("text")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .attr("transform", `translate(${-margin.left} ${height / 2}) rotate(-90)`)
+  .text("y");
+
+const groupsDataset = groupDataset
+  .selectAll("circle")
+  .data(dataset)
+  .enter()
+  .append("circle")
+  .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
+  .attr("r", "7")
+  .attr("fill", "var(--color-data, currentColor)")
+  .attr("fill-opacity", "0.3")
+  .attr("stroke", "var(--color-data, currentColor)")
+  .attr("stroke-width", "1");
+
+groupDataset
+  .append("path")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");

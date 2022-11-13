@@ -10,4 +10,14 @@ body {
   --color-data: hsl(349, 63%, 46%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+}
+
+svg {
+  margin: auto;
+  display: block;
+  max-width: 42rem;
+  width: 95vw;
+  height: auto;
 }
