@@ -118,6 +118,7 @@ groupAxis.append("g").attr("class", "axis y-axis").call(axisY);
 groupAxis.selectAll(".axis").select("path").remove();
 groupAxis.selectAll(".axis").select(".tick").remove();
 groupAxis.selectAll(".axis").select(".tick:last-of-type").remove();
+groupAxis.selectAll("text").attr("font-size", "15");
 
 groupAxisLabels
   .attr("stroke", "currentColor")
@@ -151,5 +152,20 @@ const groupsDataset = groupDataset
 
 groupDataset
   .append("path")
+  .datum(() => {})
+  .attr("d", () => {
+    const { length: n } = dataset;
+    const sumX = dataset.reduce((a, c) => a + c[0], 0);
+    const sumY = dataset.reduce((a, c) => a + c[1], 0);
+    const sumXY = dataset.reduce((a, c) => a + c[0] * c[1], 0);
+    const sumX2 = dataset.reduce((a, c) => a + c[0] ** 2, 0);
+
+    const a = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX ** 2);
+    const b = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX ** 2);
+
+    return `M ${[0, width]
+      .map((x) => [x, scaleY(a + b * scaleX.invert(x))].join(" "))
+      .join(" ")}`;
+  })
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
