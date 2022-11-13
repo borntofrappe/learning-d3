@@ -401,6 +401,15 @@ const data = {
   ],
 };
 
+const size = 500;
+const margin = 40;
+const radius = size / 2;
+const innerRadius = radius / 9;
+const legendHeight = 60;
+const gapHeight = 40;
+
+const { calm, directions } = data;
+
 const points = [
   "N",
   "NNE",
@@ -420,30 +429,21 @@ const points = [
   "NNW",
 ];
 
-const size = 500;
-const margin = 40;
-const radius = size / 2;
-const innerRadius = radius / 10;
-
-const legendHeight = 60;
-const gapHeight = 40;
-
-const { calm, directions } = data;
-
 const intervals = directions[0].speed.map(({ interval }) => interval);
 
 const colors = Array(intervals.length)
   .fill()
   .map((_, i, { length }) => d3.interpolateTurbo((i + 1) / length));
 
+const scaleLegend = d3.scaleBand().domain(intervals).range([0, size]);
+
+const scaleColor = d3.scaleOrdinal().domain(intervals).range(colors);
+
+const scalePoints = d3.scaleBand().domain(points).range([0, 360]);
+
 const maxCumulativeValue = d3.max(directions, (d) =>
   d.speed.reduce((a, c) => a + c.value, 0)
 );
-
-const scaleLegend = d3.scaleBand().domain(intervals).range([0, size]);
-const scalePoints = d3.scaleBand().domain(points).range([0, 360]);
-
-const scaleColor = d3.scaleOrdinal().domain(intervals).range(colors);
 
 const scaleValue = d3
   .scaleLinear()
@@ -503,9 +503,11 @@ const groupCenter = group
   .attr("transform", `translate(${size / 2} ${size / 2})`);
 
 const groupLegend = group.append("g");
+
 const groupAxis = groupCenter.append("g");
 const groupPoints = groupAxis.append("g");
 const groupTicks = groupAxis.append("g");
+
 const groupWindRose = groupCenter.append("g");
 
 groupLegend.attr("transform", `translate(0 ${size + gapHeight})`);

@@ -5,9 +5,9 @@
 }
 
 body {
-  color: #ffffff;
-  background: linear-gradient(#253d59, #193052);
-  --color-lines: #8ab0f9;
+  color: hsl(0, 0%, 100%);
+  background: linear-gradient(hsl(212, 41%, 25%), hsl(216, 53%, 21%));
+  --color-lines: hsl(219, 90%, 76%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   min-height: 100vh;
