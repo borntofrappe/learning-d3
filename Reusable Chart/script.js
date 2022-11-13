@@ -53,8 +53,6 @@ const datasets = [
   ],
 ];
 
-const [, dataset] = datasets;
-
 const width = 650;
 const height = 400;
 const margin = {
@@ -63,6 +61,13 @@ const margin = {
   left: 50,
   right: 5,
 };
+
+const gap = {
+  horizontal: 70,
+  vertical: 40,
+};
+const totalWidth = (width + margin.left + margin.right) * 2 + gap.horizontal;
+const totalHeight = (height + margin.top + margin.bottom) * 2 + gap.vertical;
 
 const domainX = [
   0,
@@ -76,26 +81,68 @@ const domainY = [
 const svg = d3
   .select("body")
   .append("svg")
-  .attr(
-    "viewBox",
-    `0 0 ${width + margin.left + margin.right} ${
-      height + margin.top + margin.bottom
-    }`
-  );
+  .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-group.call(
-  chart()
-    .width(width)
-    .height(height)
-    .data(dataset)
-    .margin(margin)
-    .domainX(domainX)
-    .domainY(domainY)
-);
+group
+  .append("g")
+  .attr("transform", `translate(${0} ${0})`)
+  .call(
+    chart()
+      .width(width)
+      .height(height)
+      .data(datasets[0])
+      .margin(margin)
+      .domainX(domainX)
+      .domainY(domainY)
+  );
+
+group
+  .append("g")
+  .attr("transform", `translate(${width + margin.right + gap.horizontal} ${0})`)
+  .call(
+    chart()
+      .width(width)
+      .height(height)
+      .data(datasets[1])
+      .margin(margin)
+      .domainX(domainX)
+      .domainY(domainY)
+  );
+
+group
+  .append("g")
+  .attr("transform", `translate(${0} ${height + margin.bottom + gap.vertical})`)
+  .call(
+    chart()
+      .width(width)
+      .height(height)
+      .data(datasets[2])
+      .margin(margin)
+      .domainX(domainX)
+      .domainY(domainY)
+  );
+
+group
+  .append("g")
+  .attr(
+    "transform",
+    `translate(${width + margin.right + gap.horizontal} ${
+      height + margin.bottom + gap.vertical
+    })`
+  )
+  .call(
+    chart()
+      .width(width)
+      .height(height)
+      .data(datasets[3])
+      .margin(margin)
+      .domainX(domainX)
+      .domainY(domainY)
+  );
 
 function chart() {
   let width;
@@ -115,7 +162,7 @@ function chart() {
     const groupAxis = selection.append("g");
     const groupAxisLabels = groupAxis.append("g");
 
-    const groupDataset = selection.append("g");
+    const groupData = selection.append("g");
 
     groupAxis
       .append("rect")
@@ -159,9 +206,9 @@ function chart() {
       .attr("transform", `translate(${-margin.left} ${height / 2}) rotate(-90)`)
       .text("y");
 
-    const groupsDataset = groupDataset
+    const groupsData = groupData
       .selectAll("circle")
-      .data(dataset)
+      .data(data)
       .enter()
       .append("circle")
       .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
@@ -171,15 +218,15 @@ function chart() {
       .attr("stroke", "var(--color-data, currentColor)")
       .attr("stroke-width", "1");
 
-    groupDataset
+    groupData
       .append("path")
       .datum(() => {})
       .attr("d", () => {
-        const { length: n } = dataset;
-        const sumX = dataset.reduce((a, c) => a + c[0], 0);
-        const sumY = dataset.reduce((a, c) => a + c[1], 0);
-        const sumXY = dataset.reduce((a, c) => a + c[0] * c[1], 0);
-        const sumX2 = dataset.reduce((a, c) => a + c[0] ** 2, 0);
+        const { length: n } = data;
+        const sumX = data.reduce((a, c) => a + c[0], 0);
+        const sumY = data.reduce((a, c) => a + c[1], 0);
+        const sumXY = data.reduce((a, c) => a + c[0] * c[1], 0);
+        const sumX2 = data.reduce((a, c) => a + c[0] ** 2, 0);
 
         const a = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX ** 2);
         const b = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX ** 2);
