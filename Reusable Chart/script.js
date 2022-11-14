@@ -57,14 +57,16 @@ const width = 650;
 const height = 400;
 const margin = {
   top: 5,
-  bottom: 65,
-  left: 70,
+  bottom: 70,
+  left: 85,
   right: 5,
 };
+
 const radius = 10;
 const strokeWidth = 1;
 const fontSize = {
-  label: 30,
+  label: 40,
+  index: 20,
   tick: 18,
 };
 
@@ -73,8 +75,11 @@ const gap = {
   vertical: 50,
 };
 
-const totalWidth = (width + margin.left + margin.right) * 2 + gap.horizontal;
-const totalHeight = (height + margin.top + margin.bottom) * 2 + gap.vertical;
+const chartWidth = width + margin.left + margin.right;
+const chartHeight = height + margin.top + margin.bottom;
+
+const totalWidth = chartWidth * 2 + gap.horizontal;
+const totalHeight = chartHeight * 2 + gap.vertical;
 
 const domainX = [
   0,
@@ -93,70 +98,34 @@ const svg = d3
 
 const group = svg.append("g");
 
-group
-  .append("g")
-  .attr("transform", `translate(${0} ${0})`)
-  .call(
-    chart()
-      .width(width)
-      .height(height)
-      .data(datasets[0])
-      .margin(margin)
-      .domainX(domainX)
-      .domainY(domainY)
-  );
+const offsets = [
+  [0, 0],
+  [chartWidth + gap.horizontal, 0],
+  [0, chartHeight + gap.vertical],
+  [chartWidth + gap.horizontal, chartHeight + gap.vertical],
+];
 
-group
-  .append("g")
-  .attr(
-    "transform",
-    `translate(${width + margin.left + margin.right + gap.horizontal} ${0})`
-  )
-  .call(
-    chart()
-      .width(width)
-      .height(height)
-      .data(datasets[1])
-      .margin(margin)
-      .domainX(domainX)
-      .domainY(domainY)
-  );
+for (let i = 0; i < offsets.length; i++) {
+  const [x, y] = offsets[i];
+  const data = datasets[i];
 
-group
-  .append("g")
-  .attr(
-    "transform",
-    `translate(${0} ${height + margin.top + margin.bottom + gap.vertical})`
-  )
-  .call(
-    chart()
-      .width(width)
-      .height(height)
-      .data(datasets[2])
-      .margin(margin)
-      .domainX(domainX)
-      .domainY(domainY)
-  );
-
-group
-  .append("g")
-  .attr(
-    "transform",
-    `translate(${width + margin.left + margin.right + gap.horizontal} ${
-      height + margin.top + margin.bottom + gap.vertical
-    })`
-  )
-  .call(
-    chart()
-      .width(width)
-      .height(height)
-      .data(datasets[3])
-      .margin(margin)
-      .domainX(domainX)
-      .domainY(domainY)
-  );
+  group
+    .append("g")
+    .attr("transform", `translate(${x} ${y})`)
+    .call(
+      chart()
+        .index(i)
+        .width(width)
+        .height(height)
+        .data(data)
+        .margin(margin)
+        .domainX(domainX)
+        .domainY(domainY)
+    );
+}
 
 function chart() {
+  let index;
   let width;
   let height;
   let margin;
@@ -174,6 +143,7 @@ function chart() {
     const group = selection
       .append("g")
       .attr("transform", `translate(${margin.left} ${margin.top})`);
+
     const groupAxis = group.append("g");
     const groupAxisLabels = groupAxis.append("g");
 
@@ -200,25 +170,36 @@ function chart() {
     groupAxis.selectAll(".axis").select(".tick:last-of-type").remove();
     groupAxis.selectAll("text").attr("font-size", fontSize.tick);
 
-    groupAxisLabels
-      .attr("stroke", "currentColor")
-      .attr("font-size", fontSize.label);
+    groupAxisLabels.attr("stroke", "currentColor");
 
     groupAxisLabels
       .append("text")
       .attr(
         "transform",
-        `translate(${width / 2} ${height + margin.bottom - 1})`
+        `translate(${width / 2} ${height + margin.bottom - 2})`
       )
       .attr("text-anchor", "middle")
-      .text("x");
+      .attr("dominant-baseline", "ideographic")
+      .append("tspan")
+      .attr("font-size", fontSize.label)
+      .text("x")
+      .append("tspan")
+      .attr("font-size", fontSize.index)
+      .attr("dominant-baseline", "initial")
+      .text(index + 1);
 
     groupAxisLabels
       .append("text")
       .attr("text-anchor", "middle")
       .attr("dominant-baseline", "hanging")
       .attr("transform", `translate(${-margin.left} ${height / 2}) rotate(-90)`)
-      .text("y");
+      .append("tspan")
+      .attr("font-size", fontSize.label)
+      .text("y")
+      .append("tspan")
+      .attr("font-size", fontSize.index)
+      .attr("dominant-baseline", "initial")
+      .text(index + 1);
 
     const groupsData = groupData
       .selectAll("circle")
@@ -252,6 +233,13 @@ function chart() {
       .attr("stroke", "currentColor")
       .attr("stroke-width", strokeWidth);
   }
+
+  my.index = function (value) {
+    if (!arguments.length) return index;
+
+    index = value;
+    return my;
+  };
 
   my.width = function (value) {
     if (!arguments.length) return width;
