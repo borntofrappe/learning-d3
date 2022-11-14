@@ -179,26 +179,25 @@ function chart() {
         `translate(${width / 2} ${height + margin.bottom - 2})`
       )
       .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "ideographic")
       .append("tspan")
+      .attr("dominant-baseline", "ideographic")
       .attr("font-size", fontSize.label)
       .text("x")
       .append("tspan")
       .attr("font-size", fontSize.index)
-      .attr("dominant-baseline", "initial")
       .text(index + 1);
 
     groupAxisLabels
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "hanging")
       .attr("transform", `translate(${-margin.left} ${height / 2}) rotate(-90)`)
       .append("tspan")
+      .attr("dominant-baseline", "hanging")
       .attr("font-size", fontSize.label)
       .text("y")
       .append("tspan")
+      .attr("dy", fontSize.index)
       .attr("font-size", fontSize.index)
-      .attr("dominant-baseline", "initial")
       .text(index + 1);
 
     const groupsData = groupData
@@ -214,9 +213,9 @@ function chart() {
       .attr("stroke-width", strokeWidth);
 
     groupData
-      .append("path")
+      .append("polyline")
       .datum(() => {})
-      .attr("d", () => {
+      .attr("points", () => {
         const { length: n } = data;
         const sumX = data.reduce((a, c) => a + c[0], 0);
         const sumY = data.reduce((a, c) => a + c[1], 0);
@@ -226,10 +225,11 @@ function chart() {
         const a = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX ** 2);
         const b = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX ** 2);
 
-        return `M ${[0, width]
+        return [0, width]
           .map((x) => [x, scaleY(a + b * scaleX.invert(x))].join(" "))
-          .join(" ")}`;
+          .join(" ");
       })
+      .attr("fill", "none")
       .attr("stroke", "currentColor")
       .attr("stroke-width", strokeWidth);
   }
