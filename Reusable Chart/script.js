@@ -57,15 +57,22 @@ const width = 650;
 const height = 400;
 const margin = {
   top: 5,
-  bottom: 50,
-  left: 50,
+  bottom: 65,
+  left: 70,
   right: 5,
+};
+const radius = 10;
+const strokeWidth = 1;
+const fontSize = {
+  label: 30,
+  tick: 18,
 };
 
 const gap = {
-  horizontal: 70,
-  vertical: 40,
+  horizontal: 50,
+  vertical: 50,
 };
+
 const totalWidth = (width + margin.left + margin.right) * 2 + gap.horizontal;
 const totalHeight = (height + margin.top + margin.bottom) * 2 + gap.vertical;
 
@@ -73,6 +80,7 @@ const domainX = [
   0,
   d3.max(datasets, (dataset) => d3.max(dataset, (d) => d[0])),
 ];
+
 const domainY = [
   0,
   d3.max(datasets, (dataset) => d3.max(dataset, (d) => d[1])),
@@ -83,9 +91,7 @@ const svg = d3
   .append("svg")
   .attr("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
 
-const group = svg
-  .append("g")
-  .attr("transform", `translate(${margin.left} ${margin.top})`);
+const group = svg.append("g");
 
 group
   .append("g")
@@ -102,7 +108,10 @@ group
 
 group
   .append("g")
-  .attr("transform", `translate(${width + margin.right + gap.horizontal} ${0})`)
+  .attr(
+    "transform",
+    `translate(${width + margin.left + margin.right + gap.horizontal} ${0})`
+  )
   .call(
     chart()
       .width(width)
@@ -115,7 +124,10 @@ group
 
 group
   .append("g")
-  .attr("transform", `translate(${0} ${height + margin.bottom + gap.vertical})`)
+  .attr(
+    "transform",
+    `translate(${0} ${height + margin.top + margin.bottom + gap.vertical})`
+  )
   .call(
     chart()
       .width(width)
@@ -130,8 +142,8 @@ group
   .append("g")
   .attr(
     "transform",
-    `translate(${width + margin.right + gap.horizontal} ${
-      height + margin.bottom + gap.vertical
+    `translate(${width + margin.left + margin.right + gap.horizontal} ${
+      height + margin.top + margin.bottom + gap.vertical
     })`
   )
   .call(
@@ -159,10 +171,13 @@ function chart() {
     const axisX = d3.axisBottom(scaleX).ticks(8).tickSizeOuter(0);
     const axisY = d3.axisLeft(scaleY).ticks(6).tickSizeOuter(0);
 
-    const groupAxis = selection.append("g");
+    const group = selection
+      .append("g")
+      .attr("transform", `translate(${margin.left} ${margin.top})`);
+    const groupAxis = group.append("g");
     const groupAxisLabels = groupAxis.append("g");
 
-    const groupData = selection.append("g");
+    const groupData = group.append("g");
 
     groupAxis
       .append("rect")
@@ -170,7 +185,7 @@ function chart() {
       .attr("height", height)
       .attr("fill", "none")
       .attr("stroke", "currentColor")
-      .attr("stroke-width", "1");
+      .attr("stroke-width", strokeWidth);
 
     groupAxis
       .append("g")
@@ -183,12 +198,11 @@ function chart() {
     groupAxis.selectAll(".axis").select("path").remove();
     groupAxis.selectAll(".axis").select(".tick").remove();
     groupAxis.selectAll(".axis").select(".tick:last-of-type").remove();
-    groupAxis.selectAll("text").attr("font-size", "15");
+    groupAxis.selectAll("text").attr("font-size", fontSize.tick);
 
     groupAxisLabels
       .attr("stroke", "currentColor")
-      .attr("font-size", "18")
-      .style("text-transform", "uppercase");
+      .attr("font-size", fontSize.label);
 
     groupAxisLabels
       .append("text")
@@ -212,11 +226,11 @@ function chart() {
       .enter()
       .append("circle")
       .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
-      .attr("r", "7")
+      .attr("r", radius)
       .attr("fill", "var(--color-data, currentColor)")
       .attr("fill-opacity", "0.3")
       .attr("stroke", "var(--color-data, currentColor)")
-      .attr("stroke-width", "1");
+      .attr("stroke-width", strokeWidth);
 
     groupData
       .append("path")
@@ -236,7 +250,7 @@ function chart() {
           .join(" ")}`;
       })
       .attr("stroke", "currentColor")
-      .attr("stroke-width", "1");
+      .attr("stroke-width", strokeWidth);
   }
 
   my.width = function (value) {
