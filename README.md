@@ -33,6 +33,7 @@ Projects exploring the D3 library.
 | [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)                       | treemap, text           |
 | [EU Gas Storage](https://codepen.io/borntofrappe/pen/JjZNoRB)                 | lineRadial, transition  |
 | [Wind Rose](https://codepen.io/borntofrappe/pen/mdKmYLR)                      | arc, layout             |
+| [Reusable Chart](https://codepen.io/borntofrappe/pen/BaVZdMo)                 | call, function          |
 
 Projects leaning on D3 to create interesting visualizations.
 
