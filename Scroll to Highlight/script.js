@@ -1917,6 +1917,7 @@ const datasets = Object.entries(data).map(([label, values]) => {
 });
 
 const dataset = datasets[0];
+const { label, values, stats } = dataset;
 
 const width = 650;
 const height = 400;
@@ -1925,6 +1926,8 @@ const margin = {
   bottom: 5,
   left: 5,
   right: 5,
+  label: 30,
+  value: 15,
 };
 
 const details = {
@@ -1940,13 +1943,13 @@ const fontSize = {
 
 const scaleX = d3
   .scaleLinear()
-  .domain(d3.extent(dataset.values, (d) => d[0]))
+  .domain(d3.extent(values, ([x]) => x))
   .range([0, width])
   .nice();
 
 const scaleY = d3
   .scaleLinear()
-  .domain(d3.extent(dataset.values, (d) => d[1]))
+  .domain(d3.extent(values, ([, y]) => y))
   .range([height, 0])
   .nice();
 
@@ -1964,11 +1967,11 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const groupData = group.append("g").datum(dataset);
+const groupAxis = group.append("g");
 
-const groupAxis = groupData.append("g");
-const groupValues = groupData.append("g");
-const groupStats = groupData.append("g");
+const groupValues = group.append("g");
+
+const groupStats = group.append("g");
 const groupStatsText = groupStats.append("g");
 const groupStatsTextLabel = groupStatsText.append("g");
 const groupStatsTextValues = groupStatsText.append("g");
@@ -1983,7 +1986,7 @@ groupAxis
 
 const groupsValues = groupValues
   .selectAll("circle")
-  .data((d) => d.values)
+  .data(values)
   .enter()
   .append("circle")
   .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
@@ -2013,21 +2016,25 @@ groupStatsTextLabel
 
 groupStatsTextLabel
   .append("text")
+  .datum(label)
   .attr("y", "10")
-  .text((d) => d.label);
+  .text((d) => d);
 
 groupStatsTextValues
-  .attr("transform", `translate(${details.width / 2} ${fontSize.label + 30})`)
+  .attr(
+    "transform",
+    `translate(${details.width / 2} ${fontSize.label + margin.label})`
+  )
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
   .attr("font-size", fontSize.stats);
 
 const textStatsTextValues = groupStatsTextValues
   .selectAll("text")
-  .data((d) => d.stats)
+  .data(stats)
   .enter()
   .append("text")
-  .attr("y", (_, i) => i * (fontSize.stats + 15));
+  .attr("y", (_, i) => i * (fontSize.stats + margin.value));
 
 textStatsTextValues.append("tspan").text((d) => `${d.label}: `);
 
