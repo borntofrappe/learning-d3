@@ -1874,8 +1874,50 @@ const data = {
   ],
 };
 
-const type = "away";
-const dataset = data[type];
+const datasets = Object.entries(data).map(([label, values]) => {
+  const meanX = d3.mean(values, (d) => d[0]);
+  const meanY = d3.mean(values, (d) => d[1]);
+  const stdDevX = d3.deviation(values, (d) => d[0]);
+  const stdDevY = d3.deviation(values, (d) => d[1]);
+
+  const sumX = values.reduce((a, c) => a + c[0], 0);
+  const sumY = values.reduce((a, c) => a + c[1], 0);
+  const sumXY = values.reduce((a, c) => a + c[0] * c[1], 0);
+  const sumX2 = values.reduce((a, c) => a + c[0] ** 2, 0);
+  const sumY2 = values.reduce((a, c) => a + c[1] ** 2, 0);
+  const { length: n } = values;
+  const corrXY =
+    (n * sumXY - sumX * sumY) /
+    ((n * sumX2 - sumX ** 2) * (n * sumY2 - sumY ** 2)) ** 0.5;
+
+  const stats = Object.entries({
+    "X Mean": meanX,
+    "Y Mean": meanY,
+    "X SD": stdDevX,
+    "Y SD": stdDevY,
+    "Corr.": corrXY,
+  }).map(([label, stat]) => {
+    const [, value, excess] = stat
+      .toString()
+      .slice(0, 10)
+      .padEnd(10, "0")
+      .split(/^(.{0,5})/);
+
+    return {
+      label,
+      value,
+      excess,
+    };
+  });
+
+  return {
+    label,
+    values,
+    stats,
+  };
+});
+
+const dataset = datasets[0];
 
 const width = 650;
 const height = 400;
@@ -1893,18 +1935,19 @@ const details = {
 const radius = 8;
 const strokeWidth = 1;
 const fontSize = {
-  type: 32,
+  label: 32,
   stats: 18,
 };
 
 const scaleX = d3
   .scaleLinear()
-  .domain(d3.extent(dataset, (d) => d[0]))
+  .domain(d3.extent(dataset.values, (d) => d[0]))
   .range([0, width])
   .nice();
+
 const scaleY = d3
   .scaleLinear()
-  .domain(d3.extent(dataset, (d) => d[1]))
+  .domain(d3.extent(dataset.values, (d) => d[1]))
   .range([height, 0])
   .nice();
 
@@ -1922,12 +1965,14 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const groupAxis = group.append("g");
-const groupData = group.append("g");
-const groupDetails = group.append("g");
-const groupDetailsText = groupDetails.append("g");
-const groupDetailsTextType = groupDetailsText.append("g");
-const groupDetailsTextStats = groupDetailsText.append("g");
+const groupData = group.append("g").datum(dataset);
+
+const groupAxis = groupData.append("g");
+const groupValues = groupData.append("g");
+const groupStats = groupData.append("g");
+const groupStatsText = groupStats.append("g");
+const groupStatsTextLabel = groupStatsText.append("g");
+const groupStatsTextValues = groupStatsText.append("g");
 
 groupAxis
   .append("rect")
@@ -1937,9 +1982,9 @@ groupAxis
   .attr("stroke", "currentColor")
   .attr("stroke-width", strokeWidth);
 
-const groupsData = groupData
+const groupsValues = groupValues
   .selectAll("circle")
-  .data(dataset)
+  .data((d) => d.values)
   .enter()
   .append("circle")
   .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
@@ -1949,9 +1994,9 @@ const groupsData = groupData
   .attr("stroke", "var(--color-data, currentColor)")
   .attr("stroke-width", strokeWidth);
 
-groupDetails.attr("transform", `translate(${width} 0)`);
+groupStats.attr("transform", `translate(${width} 0)`);
 
-groupDetails
+groupStats
   .append("rect")
   .attr("width", details.width)
   .attr("height", height)
@@ -1959,69 +2004,37 @@ groupDetails
   .attr("stroke", "currentColor")
   .attr("stroke-width", strokeWidth);
 
-groupDetailsTextType
+groupStatsTextLabel
   .attr("transform", `translate(${details.width / 2} 0)`)
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
   .style("text-transform", "capitalize")
-  .attr("font-size", fontSize.type)
+  .attr("font-size", fontSize.label)
   .attr("font-weight", "700");
 
-groupDetailsTextType.append("text").attr("y", "10").text(type);
+groupStatsTextLabel
+  .append("text")
+  .attr("y", "10")
+  .text((d) => d.label);
 
-groupDetailsTextStats
-  .attr("transform", `translate(${details.width / 2} ${fontSize.type + 30})`)
+groupStatsTextValues
+  .attr("transform", `translate(${details.width / 2} ${fontSize.label + 30})`)
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
   .attr("font-size", fontSize.stats);
 
-const meanX = d3.mean(dataset, (d) => d[0]);
-const meanY = d3.mean(dataset, (d) => d[1]);
-const stdDevX = d3.deviation(dataset, (d) => d[0]);
-const stdDevY = d3.deviation(dataset, (d) => d[1]);
-
-const sumX = dataset.reduce((a, c) => a + c[0], 0);
-const sumY = dataset.reduce((a, c) => a + c[1], 0);
-const sumXY = dataset.reduce((a, c) => a + c[0] * c[1], 0);
-const sumX2 = dataset.reduce((a, c) => a + c[0] ** 2, 0);
-const sumY2 = dataset.reduce((a, c) => a + c[1] ** 2, 0);
-const { length: n } = dataset;
-const corrXY =
-  (n * sumXY - sumX * sumY) /
-  ((n * sumX2 - sumX ** 2) * (n * sumY2 - sumY ** 2)) ** 0.5;
-
-const stats = Object.entries({
-  "Mean X": meanX,
-  "Mean Y": meanY,
-  "Std Dev X": stdDevX,
-  "Std Dev Y": stdDevY,
-  "Corr X Y": corrXY,
-}).map(([label, stat]) => {
-  const [, value, excess] = stat
-    .toString()
-    .slice(0, 10)
-    .padEnd(10, "0")
-    .split(/^(.{0,5})/);
-
-  return {
-    label,
-    value,
-    excess,
-  };
-});
-
-const textDetailsTextStats = groupDetailsTextStats
+const textStatsTextValues = groupStatsTextValues
   .selectAll("text")
-  .data(stats)
+  .data((d) => d.stats)
   .enter()
   .append("text")
   .attr("y", (_, i) => i * (fontSize.stats + 15));
 
-textDetailsTextStats.append("tspan").text((d) => `${d.label}: `);
+textStatsTextValues.append("tspan").text((d) => `${d.label}: `);
 
-textDetailsTextStats.append("tspan").text((d) => d.value);
+textStatsTextValues.append("tspan").text((d) => d.value);
 
-textDetailsTextStats
+textStatsTextValues
   .append("tspan")
   .attr("fill-opacity", "0.25")
   .text((d) => d.excess);
