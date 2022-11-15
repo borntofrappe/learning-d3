@@ -1917,16 +1917,13 @@ const datasets = Object.entries(data).map(([label, values]) => {
   };
 });
 
-const dataset = datasets[0];
-const { label, values, stats } = dataset;
-
-const width = 650;
+const width = 600;
 const height = 400;
 const margin = {
-  top: 5,
-  bottom: 5,
-  left: 5,
-  right: 5,
+  top: 20,
+  bottom: 20,
+  left: 20,
+  right: 20,
   label: 30,
   value: 15,
 };
@@ -1941,18 +1938,6 @@ const fontSize = {
   label: 32,
   stats: 18,
 };
-
-const scaleX = d3
-  .scaleLinear()
-  .domain(d3.extent(values, ([x]) => x))
-  .range([0, width])
-  .nice();
-
-const scaleY = d3
-  .scaleLinear()
-  .domain(d3.extent(values, ([, y]) => y))
-  .range([height, 0])
-  .nice();
 
 const svg = d3
   .select("body")
@@ -1972,42 +1957,10 @@ const groupAxis = group.append("g");
 
 const groupValues = group.append("g");
 
-const groupStats = group.append("g");
+const groupStats = group.append("g").attr("transform", `translate(${width} 0)`);
 const groupStatsText = groupStats.append("g");
-const groupStatsTextLabel = groupStatsText.append("g");
-const groupStatsTextValues = groupStatsText.append("g");
-
-groupAxis
-  .append("rect")
-  .attr("width", width)
-  .attr("height", height)
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", strokeWidth);
-
-const groupsValues = groupValues
-  .selectAll("circle")
-  .data(values)
-  .enter()
-  .append("circle")
-  .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
-  .attr("r", radius)
-  .attr("fill", "var(--color-data, currentColor)")
-  .attr("fill-opacity", "0.3")
-  .attr("stroke", "var(--color-data, currentColor)")
-  .attr("stroke-width", strokeWidth);
-
-groupStats.attr("transform", `translate(${width} 0)`);
-
-groupStats
-  .append("rect")
-  .attr("width", details.width)
-  .attr("height", height)
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", strokeWidth);
-
-groupStatsTextLabel
+const groupStatsTextLabel = groupStatsText
+  .append("g")
   .attr("transform", `translate(${details.width / 2} 0)`)
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
@@ -2015,13 +1968,8 @@ groupStatsTextLabel
   .attr("font-size", fontSize.label)
   .attr("font-weight", "700");
 
-groupStatsTextLabel
-  .append("text")
-  .datum(label)
-  .attr("y", "10")
-  .text((d) => d);
-
-groupStatsTextValues
+const groupStatsTextValues = groupStatsText
+  .append("g")
   .attr(
     "transform",
     `translate(${details.width / 2} ${fontSize.label + margin.label})`
@@ -2031,18 +1979,87 @@ groupStatsTextValues
   .attr("dominant-baseline", "hanging")
   .attr("font-size", fontSize.stats);
 
-const textStatsTextValues = groupStatsTextValues
-  .selectAll("text")
-  .data(stats)
-  .enter()
-  .append("text")
-  .attr("y", (_, i) => i * (fontSize.stats + margin.value));
+const plot = (dataset) => {
+  const { label, values, stats } = dataset;
 
-textStatsTextValues.append("tspan").text((d) => d.label);
+  const scaleX = d3
+    .scaleLinear()
+    .domain(d3.extent(values, ([x]) => x))
+    .range([0, width])
+    .nice();
 
-textStatsTextValues.append("tspan").text((d) => d.value);
+  const scaleY = d3
+    .scaleLinear()
+    .domain(d3.extent(values, ([, y]) => y))
+    .range([height, 0])
+    .nice();
 
-textStatsTextValues
-  .append("tspan")
-  .attr("fill-opacity", "0.25")
-  .text((d) => d.excess);
+  const groupsValues = groupValues
+    .selectAll("circle")
+    .data(values)
+    .join(
+      (enter) => {
+        enter
+          .append("circle")
+          .attr("r", radius)
+          .attr("fill", "var(--color-data, currentColor)")
+          .attr("fill-opacity", "0.3")
+          .attr("stroke", "var(--color-data, currentColor)")
+          .attr("stroke-width", strokeWidth)
+          .attr(
+            "transform",
+            ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
+          );
+      },
+      (update) => {
+        update
+          .transition()
+          .attr(
+            "transform",
+            ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
+          );
+      }
+    );
+
+  groupStatsTextLabel
+    .selectAll("text")
+    .data([label])
+    .join("text")
+    .attr("y", "10")
+    .text((d) => d);
+
+  const textStatsTextValues = groupStatsTextValues
+    .selectAll("text")
+    .data(stats)
+    .join("text")
+    .attr("y", (_, i) => i * (fontSize.stats + margin.value));
+
+  textStatsTextValues
+    .selectAll("tspan.label")
+    .data((d) => [d.label])
+    .join("tspan")
+    .attr("class", "label")
+    .text((d) => d);
+
+  textStatsTextValues
+    .selectAll("tspan.value")
+    .data((d) => [d.value])
+    .join("tspan")
+    .attr("class", "value")
+    .text((d) => d);
+
+  textStatsTextValues
+    .selectAll("tspan.excess")
+    .data((d) => [d.excess])
+    .join("tspan")
+    .attr("fill-opacity", "0.25")
+    .attr("class", "excess")
+    .text((d) => d);
+};
+
+let i = 0;
+plot(datasets[i++]);
+const interval = setInterval(() => {
+  plot(datasets[i++]);
+  i = i % datasets.length;
+}, 2000);
