@@ -1874,7 +1874,8 @@ const data = {
   ],
 };
 
-const dataset = data.dino;
+const type = "bullseye";
+const dataset = data[type];
 
 const width = 650;
 const height = 400;
@@ -1885,8 +1886,18 @@ const margin = {
   right: 5,
 };
 
+const details = {
+  width: 200,
+};
+
 const radius = 8;
 const strokeWidth = 1;
+const fontSize = {
+  type: 32,
+  stats: 18,
+};
+
+const formatStats = d3.format(".1f");
 
 const scaleX = d3
   .scaleLinear()
@@ -1904,7 +1915,7 @@ const svg = d3
   .append("svg")
   .attr(
     "viewBox",
-    `0 0 ${width + margin.left + margin.right} ${
+    `0 0 ${width + margin.left + margin.right + details.width} ${
       height + margin.top + margin.bottom
     }`
   );
@@ -1915,6 +1926,10 @@ const group = svg
 
 const groupAxis = group.append("g");
 const groupData = group.append("g");
+const groupDetails = group.append("g");
+const groupDetailsText = groupDetails.append("g");
+const groupDetailsTextType = groupDetailsText.append("g");
+const groupDetailsTextStats = groupDetailsText.append("g");
 
 groupAxis
   .append("rect")
@@ -1935,3 +1950,48 @@ const groupsData = groupData
   .attr("fill-opacity", "0.3")
   .attr("stroke", "var(--color-data, currentColor)")
   .attr("stroke-width", strokeWidth);
+
+groupDetails.attr("transform", `translate(${width} 0)`);
+
+groupDetails
+  .append("rect")
+  .attr("width", details.width)
+  .attr("height", height)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth);
+
+groupDetailsTextType
+  .attr("transform", `translate(${details.width / 2} 0)`)
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .style("text-transform", "capitalize")
+  .attr("font-size", fontSize.type)
+  .attr("font-weight", "700");
+
+groupDetailsTextType.append("text").attr("y", "10").text(type);
+
+groupDetailsTextStats
+  .attr("transform", `translate(${details.width / 2} ${fontSize.type + 30})`)
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .style("text-transform", "capitalize")
+  .attr("font-size", fontSize.stats);
+
+const stats = {
+  "Mean X": d3.mean(dataset, (d) => d[0]),
+  "Mean Y": d3.mean(dataset, (d) => d[1]),
+  "Std Dev X": d3.deviation(dataset, (d) => d[0]),
+  "Std Dev Y": d3.deviation(dataset, (d) => d[1]),
+};
+
+groupDetailsTextStats
+  .selectAll("text")
+  .data(Object.entries(stats))
+  .enter()
+  .append("text")
+  .attr("y", (_, i) => i * (fontSize.stats + 15))
+  .text((d) => `${d[0]}: `)
+  .append("tspan")
+  .attr("font-weight", "700")
+  .text((d) => formatStats(d[1]));
