@@ -1873,3 +1873,65 @@ const data = {
     [34.58383, 89.58890199],
   ],
 };
+
+const dataset = data.dino;
+
+const width = 650;
+const height = 400;
+const margin = {
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
+};
+
+const radius = 8;
+const strokeWidth = 1;
+
+const scaleX = d3
+  .scaleLinear()
+  .domain(d3.extent(dataset, (d) => d[0]))
+  .range([0, width])
+  .nice();
+const scaleY = d3
+  .scaleLinear()
+  .domain(d3.extent(dataset, (d) => d[1]))
+  .range([height, 0])
+  .nice();
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g");
+const groupData = group.append("g");
+
+groupAxis
+  .append("rect")
+  .attr("width", width)
+  .attr("height", height)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth);
+
+const groupsData = groupData
+  .selectAll("circle")
+  .data(dataset)
+  .enter()
+  .append("circle")
+  .attr("transform", ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`)
+  .attr("r", radius)
+  .attr("fill", "var(--color-data, currentColor)")
+  .attr("fill-opacity", "0.3")
+  .attr("stroke", "var(--color-data, currentColor)")
+  .attr("stroke-width", strokeWidth);
