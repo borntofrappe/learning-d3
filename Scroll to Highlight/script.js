@@ -1895,8 +1895,9 @@ const datasets = Object.entries(data).map(([label, values]) => {
     "X SD": stdDevX,
     "Y SD": stdDevY,
     "Corr.": corrXY,
-  }).map(([label, stat]) => {
-    const [, value, excess] = stat
+  }).map((d) => {
+    const label = `${d[0].padEnd(6, " ")}: `;
+    const [, value, excess] = d[1]
       .toString()
       .slice(0, 10)
       .padEnd(10, "0")
@@ -2025,6 +2026,7 @@ groupStatsTextValues
     "transform",
     `translate(${details.width / 2} ${fontSize.label + margin.label})`
   )
+  .attr("font-family", "monospace")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
   .attr("font-size", fontSize.stats);
@@ -2036,7 +2038,7 @@ const textStatsTextValues = groupStatsTextValues
   .append("text")
   .attr("y", (_, i) => i * (fontSize.stats + margin.value));
 
-textStatsTextValues.append("tspan").text((d) => `${d.label}: `);
+textStatsTextValues.append("tspan").text((d) => d.label);
 
 textStatsTextValues.append("tspan").text((d) => d.value);
 
