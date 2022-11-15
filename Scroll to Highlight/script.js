@@ -1874,7 +1874,7 @@ const data = {
   ],
 };
 
-const type = "bullseye";
+const type = "away";
 const dataset = data[type];
 
 const width = 650;
@@ -1887,7 +1887,7 @@ const margin = {
 };
 
 const details = {
-  width: 200,
+  width: 220,
 };
 
 const radius = 8;
@@ -1896,8 +1896,6 @@ const fontSize = {
   type: 32,
   stats: 18,
 };
-
-const formatStats = d3.format(".1f");
 
 const scaleX = d3
   .scaleLinear()
@@ -1975,23 +1973,55 @@ groupDetailsTextStats
   .attr("transform", `translate(${details.width / 2} ${fontSize.type + 30})`)
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
-  .style("text-transform", "capitalize")
   .attr("font-size", fontSize.stats);
 
-const stats = {
-  "Mean X": d3.mean(dataset, (d) => d[0]),
-  "Mean Y": d3.mean(dataset, (d) => d[1]),
-  "Std Dev X": d3.deviation(dataset, (d) => d[0]),
-  "Std Dev Y": d3.deviation(dataset, (d) => d[1]),
-};
+const meanX = d3.mean(dataset, (d) => d[0]);
+const meanY = d3.mean(dataset, (d) => d[1]);
+const stdDevX = d3.deviation(dataset, (d) => d[0]);
+const stdDevY = d3.deviation(dataset, (d) => d[1]);
 
-groupDetailsTextStats
+const sumX = dataset.reduce((a, c) => a + c[0], 0);
+const sumY = dataset.reduce((a, c) => a + c[1], 0);
+const sumXY = dataset.reduce((a, c) => a + c[0] * c[1], 0);
+const sumX2 = dataset.reduce((a, c) => a + c[0] ** 2, 0);
+const sumY2 = dataset.reduce((a, c) => a + c[1] ** 2, 0);
+const { length: n } = dataset;
+const corrXY =
+  (n * sumXY - sumX * sumY) /
+  ((n * sumX2 - sumX ** 2) * (n * sumY2 - sumY ** 2)) ** 0.5;
+
+const stats = Object.entries({
+  "Mean X": meanX,
+  "Mean Y": meanY,
+  "Std Dev X": stdDevX,
+  "Std Dev Y": stdDevY,
+  "Corr X Y": corrXY,
+}).map(([label, stat]) => {
+  const [, value, excess] = stat
+    .toString()
+    .slice(0, 10)
+    .padEnd(10, "0")
+    .split(/^(.{0,5})/);
+
+  return {
+    label,
+    value,
+    excess,
+  };
+});
+
+const textDetailsTextStats = groupDetailsTextStats
   .selectAll("text")
-  .data(Object.entries(stats))
+  .data(stats)
   .enter()
   .append("text")
-  .attr("y", (_, i) => i * (fontSize.stats + 15))
-  .text((d) => `${d[0]}: `)
+  .attr("y", (_, i) => i * (fontSize.stats + 15));
+
+textDetailsTextStats.append("tspan").text((d) => `${d.label}: `);
+
+textDetailsTextStats.append("tspan").text((d) => d.value);
+
+textDetailsTextStats
   .append("tspan")
-  .attr("font-weight", "700")
-  .text((d) => formatStats(d[1]));
+  .attr("fill-opacity", "0.25")
+  .text((d) => d.excess);
