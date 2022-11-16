@@ -1917,6 +1917,125 @@ const datasets = Object.entries(data).map(([label, values]) => {
   };
 });
 
+const scatterPlot = () => {
+  let width;
+  let height;
+  let data;
+
+  const my = (selection) => {
+    const scaleX = d3
+      .scaleLinear()
+      .domain(d3.extent(data, ([x]) => x))
+      .range([0, width])
+      .nice();
+
+    const scaleY = d3
+      .scaleLinear()
+      .domain(d3.extent(data, ([, y]) => y))
+      .range([height, 0])
+      .nice();
+
+    const scaleDelay = d3
+      .scaleLinear()
+      .domain([0, data.length])
+      .range([0, 250]);
+
+    const transition = d3.transition().duration(1000).ease(d3.easeBackInOut);
+
+    selection
+      .selectAll("circle")
+      .data(data)
+      .join(
+        (enter) => {
+          enter
+            .append("circle")
+            .attr("r", radius)
+            .attr("fill", "var(--color-data, currentColor)")
+            .attr("fill-opacity", "0.3")
+            .attr("stroke", "var(--color-data, currentColor)")
+            .attr("stroke-width", strokeWidth)
+            .attr(
+              "transform",
+              ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
+            );
+        },
+        (update) => {
+          update
+            .transition(transition)
+            .delay((_, i) => scaleDelay(i))
+            .attr(
+              "transform",
+              ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
+            );
+        }
+      );
+  };
+
+  my.width = function (value) {
+    if (!arguments.length) return width;
+
+    width = value;
+    return my;
+  };
+
+  my.height = function (value) {
+    if (!arguments.length) return height;
+
+    height = value;
+    return my;
+  };
+
+  my.data = function (value) {
+    if (!arguments.length) return data;
+
+    data = value;
+    return my;
+  };
+
+  return my;
+};
+
+const detailsPlot = () => {
+  let data;
+
+  const my = (selection) => {
+    selection
+      .selectAll("text")
+      .data(data)
+      .join(
+        (enter, d, i) => {
+          const text = enter
+            .append("text")
+            .attr("y", (_, i) => i * (fontSize + margin.text));
+
+          text.append("tspan").text((d) => d.label);
+          text
+            .append("tspan")
+
+            .text((d) => d.value);
+          text
+            .append("tspan")
+            .attr("fill-opacity", "0.25")
+            .text((d) => d.excess);
+        },
+        (update) => {
+          update.select("tspan:nth-of-type(1)").text((d) => d.label);
+          update.select("tspan:nth-of-type(2)").text((d) => d.value);
+          update.select("tspan:nth-of-type(3)").text((d) => d.excess);
+        }
+      );
+  };
+
+  my.data = function (value) {
+    if (!arguments.length) return data;
+
+    data = value;
+    return my;
+  };
+
+  return my;
+};
+
 const width = 600;
 const height = 400;
 const margin = {
@@ -1924,8 +2043,7 @@ const margin = {
   bottom: 20,
   left: 20,
   right: 20,
-  label: 30,
-  value: 15,
+  text: 30,
 };
 
 const details = {
@@ -1934,10 +2052,7 @@ const details = {
 
 const radius = 8;
 const strokeWidth = 1;
-const fontSize = {
-  label: 32,
-  stats: 18,
-};
+const fontSize = 20;
 
 const svg = d3
   .select("body")
@@ -1957,109 +2072,32 @@ const groupAxis = group.append("g");
 
 const groupValues = group.append("g");
 
-const groupStats = group.append("g").attr("transform", `translate(${width} 0)`);
-const groupStatsText = groupStats.append("g");
-const groupStatsTextLabel = groupStatsText
+const groupStats = group
   .append("g")
-  .attr("transform", `translate(${details.width / 2} 0)`)
+  .attr("transform", `translate(${width + details.width / 2} 0)`)
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
-  .style("text-transform", "capitalize")
-  .attr("font-size", fontSize.label)
-  .attr("font-weight", "700");
-
-const groupStatsTextValues = groupStatsText
-  .append("g")
-  .attr(
-    "transform",
-    `translate(${details.width / 2} ${fontSize.label + margin.label})`
-  )
   .attr("font-family", "monospace")
-  .attr("text-anchor", "middle")
-  .attr("dominant-baseline", "hanging")
-  .attr("font-size", fontSize.stats);
-
-const plot = (dataset) => {
-  const { label, values, stats } = dataset;
-
-  const scaleX = d3
-    .scaleLinear()
-    .domain(d3.extent(values, ([x]) => x))
-    .range([0, width])
-    .nice();
-
-  const scaleY = d3
-    .scaleLinear()
-    .domain(d3.extent(values, ([, y]) => y))
-    .range([height, 0])
-    .nice();
-
-  const groupsValues = groupValues
-    .selectAll("circle")
-    .data(values)
-    .join(
-      (enter) => {
-        enter
-          .append("circle")
-          .attr("r", radius)
-          .attr("fill", "var(--color-data, currentColor)")
-          .attr("fill-opacity", "0.3")
-          .attr("stroke", "var(--color-data, currentColor)")
-          .attr("stroke-width", strokeWidth)
-          .attr(
-            "transform",
-            ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
-          );
-      },
-      (update) => {
-        update
-          .transition()
-          .attr(
-            "transform",
-            ([x, y]) => `translate(${scaleX(x)} ${scaleY(y)})`
-          );
-      }
-    );
-
-  groupStatsTextLabel
-    .selectAll("text")
-    .data([label])
-    .join("text")
-    .attr("y", "10")
-    .text((d) => d);
-
-  const textStatsTextValues = groupStatsTextValues
-    .selectAll("text")
-    .data(stats)
-    .join("text")
-    .attr("y", (_, i) => i * (fontSize.stats + margin.value));
-
-  textStatsTextValues
-    .selectAll("tspan.label")
-    .data((d) => [d.label])
-    .join("tspan")
-    .attr("class", "label")
-    .text((d) => d);
-
-  textStatsTextValues
-    .selectAll("tspan.value")
-    .data((d) => [d.value])
-    .join("tspan")
-    .attr("class", "value")
-    .text((d) => d);
-
-  textStatsTextValues
-    .selectAll("tspan.excess")
-    .data((d) => [d.excess])
-    .join("tspan")
-    .attr("fill-opacity", "0.25")
-    .attr("class", "excess")
-    .text((d) => d);
-};
+  .attr("font-size", fontSize);
 
 let i = 0;
-plot(datasets[i++]);
+
+const { values, stats } = datasets[i++];
+
+const plotValues = scatterPlot().data(values).width(width).height(height);
+const plotStats = detailsPlot().data(stats);
+
+groupValues.call(plotValues);
+groupStats.call(plotStats);
+
 const interval = setInterval(() => {
-  plot(datasets[i++]);
+  const { values, stats } = datasets[i++];
+
+  plotValues.data(values);
+  plotStats.data(stats);
+
+  groupValues.call(plotValues);
+  groupStats.call(plotStats);
+
   i = i % datasets.length;
-}, 2000);
+}, 3000);
