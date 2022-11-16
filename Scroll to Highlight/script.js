@@ -1942,8 +1942,6 @@ const scatterPlot = () => {
       .domain([0, data.length])
       .range([0, 250]);
 
-    const transition = d3.transition().duration(1000).ease(d3.easeBackInOut);
-
     selection
       .selectAll("circle")
       .data(data)
@@ -1962,6 +1960,11 @@ const scatterPlot = () => {
             );
         },
         (update) => {
+          const transition = d3
+            .transition()
+            .duration(1000)
+            .ease(d3.easeBackInOut);
+
           update
             .transition(transition)
             .delay((_, i) => scaleDelay(i))
@@ -2021,7 +2024,10 @@ const detailsPlot = () => {
       .data(data)
       .join(
         (enter, d, i) => {
-          const text = enter.append("text").attr("y", (_, i) => i * gap);
+          const text = enter
+            .append("text")
+            .attr("y", (_, i) => i * gap)
+            .attr("fill", "currentColor");
 
           text.append("tspan").text((d) => d.label);
           text
@@ -2072,7 +2078,7 @@ const gap = 50;
 
 const detailsWidth = 220;
 
-const radius = 8;
+const radius = 10;
 const strokeWidth = 1;
 const fontSize = 20;
 
@@ -2080,16 +2086,7 @@ const body = d3.select("body");
 
 const div = body.append("div").attr("id", "root");
 
-const divs = div.selectAll("div").data(datasets).enter().append("div");
-
-const articles = divs
-  .append("article")
-  .attr("data-label", ({ label }) => label)
-  .attr("data-index", (_, i) => i);
-
-articles.append("h2").text(({ label }) => label);
-
-const svg = body
+const svg = div
   .append("svg")
   .attr(
     "viewBox",
@@ -2129,25 +2126,36 @@ const plotStats = detailsPlot()
 groupValues.call(plotValues);
 groupStats.call(plotStats);
 
-const callback = (entries) => {
-  for (const entry of entries) {
-    if (entry.isIntersecting) {
-      const index = parseInt(entry.target.getAttribute("data-index"));
+if (IntersectionObserver) {
+  const divs = div.selectAll("div").data(datasets).enter().append("div");
 
-      const { values, stats } = datasets[index];
+  const articles = divs
+    .append("article")
+    .attr("data-label", ({ label }) => label)
+    .attr("data-index", (_, i) => i);
 
-      plotValues.data(values);
-      plotStats.data(stats);
+  articles.append("h2").text(({ label }) => label);
 
-      groupValues.call(plotValues);
-      groupStats.call(plotStats);
+  const callback = (entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        const index = parseInt(entry.target.getAttribute("data-index"));
 
-      break;
+        const { values, stats } = datasets[index];
+
+        plotValues.data(values);
+        plotStats.data(stats);
+
+        groupValues.call(plotValues);
+        groupStats.call(plotStats);
+
+        break;
+      }
     }
-  }
-};
+  };
 
-const observer = new IntersectionObserver(callback);
-articles.nodes().forEach((node) => {
-  observer.observe(node);
-});
+  const observer = new IntersectionObserver(callback);
+  articles.nodes().forEach((node) => {
+    observer.observe(node);
+  });
+}

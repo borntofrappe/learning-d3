@@ -5,8 +5,9 @@
 }
 
 body {
-  background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
+  color: hsl(209, 61%, 9%);
+  background: hsl(210, 36%, 96%);
+  --color-data: hsl(182, 85%, 39%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
@@ -18,10 +19,18 @@ body {
   align-items: center;
 }
 
+@supports (display: grid) {
+  #root > div {
+    display: grid;
+    grid-template-rows: 1fr auto 3fr;
+  }
+}
+
 article {
-  padding: 1rem 2rem;
-  background: hsl(0, 0%, 100%);
-  box-shadow: 0 0.1rem 1rem -0.5rem hsl(0, 0, 0%);
+  padding: 0.5rem 1.5rem;
+  background: hsl(0, 0%, 99%);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1rem 0.9rem -0.5rem hsla(209, 61%, 9%, 0.2);
 }
 
 article > * + * {
@@ -30,7 +39,7 @@ article > * + * {
 
 h2 {
   text-transform: capitalize;
-  font-size: 1.8rem;
+  font-size: 1.59rem;
 }
 
 svg {
