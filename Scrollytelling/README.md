@@ -1,4 +1,4 @@
-# [Scroll to Highlight](https://codepen.io/borntofrappe/full/XWYaLZv)
+# [Scrollytelling](https://codepen.io/borntofrappe/full/XWYaLZv)
 
 [The Pudding](https://pudding.cool/) frequently creates jaw-drapping visualizations which are updated as you scroll the page. Here's a first attempt implementing a rudimentary scrolling experience with the intersection observer API.
 
