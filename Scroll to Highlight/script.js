@@ -2076,8 +2076,20 @@ const radius = 8;
 const strokeWidth = 1;
 const fontSize = 20;
 
-const svg = d3
-  .select("body")
+const body = d3.select("body");
+
+const div = body.append("div").attr("id", "root");
+
+const divs = div.selectAll("div").data(datasets).enter().append("div");
+
+const articles = divs
+  .append("article")
+  .attr("data-label", ({ label }) => label)
+  .attr("data-index", (_, i) => i);
+
+articles.append("h2").text(({ label }) => label);
+
+const svg = body
   .append("svg")
   .attr(
     "viewBox",
@@ -2101,9 +2113,7 @@ const groupStats = group
   .attr("font-family", "monospace")
   .attr("font-size", fontSize);
 
-let i = 0;
-
-const { values, stats } = datasets[i++];
+const { values, stats } = datasets[0];
 
 const plotValues = scatterPlot()
   .data(values)
@@ -2119,14 +2129,25 @@ const plotStats = detailsPlot()
 groupValues.call(plotValues);
 groupStats.call(plotStats);
 
-const interval = setInterval(() => {
-  const { values, stats } = datasets[i++];
+const callback = (entries) => {
+  for (const entry of entries) {
+    if (entry.isIntersecting) {
+      const index = parseInt(entry.target.getAttribute("data-index"));
 
-  plotValues.data(values);
-  plotStats.data(stats);
+      const { values, stats } = datasets[index];
 
-  groupValues.call(plotValues);
-  groupStats.call(plotStats);
+      plotValues.data(values);
+      plotStats.data(stats);
 
-  i = i % datasets.length;
-}, 3000);
+      groupValues.call(plotValues);
+      groupStats.call(plotStats);
+
+      break;
+    }
+  }
+};
+
+const observer = new IntersectionObserver(callback);
+articles.nodes().forEach((node) => {
+  observer.observe(node);
+});
