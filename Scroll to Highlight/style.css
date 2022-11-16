@@ -43,13 +43,16 @@ h2 {
 }
 
 svg {
+  margin: auto;
+  width: 100vmin;
+  max-width: 52rem;
+  height: auto;
+}
+
+#root.scroll svg {
   z-index: -1;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  margin: auto;
-  width: 100vmin;
-  max-width: 52rem;
-  height: auto;
 }

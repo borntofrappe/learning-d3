@@ -1873,6 +1873,12 @@ const data = {
   ],
 };
 
+const labels = ["X Mean", "Y Mean", "X SD", "Y SD", "Corr."];
+const labelMaxLength = d3.max(labels, (d) => d.length);
+const valueLenghts = [5, 10];
+const valueSplit = new RegExp(`^(.{0,${valueLenghts[0]}})`);
+const valueEnd = valueLenghts[1];
+
 const datasets = Object.entries(data).map(([label, values]) => {
   const meanX = d3.mean(values, (d) => d[0]);
   const meanY = d3.mean(values, (d) => d[1]);
@@ -1896,12 +1902,12 @@ const datasets = Object.entries(data).map(([label, values]) => {
     "Y SD": stdDevY,
     "Corr.": corrXY,
   }).map((d) => {
-    const label = `${d[0].padEnd(6, " ")}: `;
+    const label = `${d[0].padEnd(labelMaxLength, " ")}: `;
     const [, value, excess] = d[1]
       .toString()
-      .slice(0, 10)
-      .padEnd(10, "0")
-      .split(/^(.{0,5})/);
+      .slice(0, valueEnd)
+      .padEnd(valueEnd, "0")
+      .split(valueSplit);
 
     return {
       label,
@@ -2099,8 +2105,6 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const groupAxis = group.append("g");
-
 const groupValues = group.append("g");
 
 const groupStats = group
@@ -2127,6 +2131,7 @@ groupValues.call(plotValues);
 groupStats.call(plotStats);
 
 if (IntersectionObserver) {
+  div.attr("class", "scroll");
   const divs = div.selectAll("div").data(datasets).enter().append("div");
 
   const articles = divs
