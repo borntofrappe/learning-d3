@@ -1918,9 +1918,11 @@ const datasets = Object.entries(data).map(([label, values]) => {
 });
 
 const scatterPlot = () => {
+  let data;
   let width;
   let height;
-  let data;
+  let radius;
+  let strokeWidth;
 
   const my = (selection) => {
     const scaleX = d3
@@ -1971,6 +1973,13 @@ const scatterPlot = () => {
       );
   };
 
+  my.data = function (value) {
+    if (!arguments.length) return data;
+
+    data = value;
+    return my;
+  };
+
   my.width = function (value) {
     if (!arguments.length) return width;
 
@@ -1985,10 +1994,17 @@ const scatterPlot = () => {
     return my;
   };
 
-  my.data = function (value) {
-    if (!arguments.length) return data;
+  my.radius = function (value) {
+    if (!arguments.length) return radius;
 
-    data = value;
+    radius = value;
+    return my;
+  };
+
+  my.strokeWidth = function (value) {
+    if (!arguments.length) return strokeWidth;
+
+    strokeWidth = value;
     return my;
   };
 
@@ -1997,6 +2013,7 @@ const scatterPlot = () => {
 
 const detailsPlot = () => {
   let data;
+  let gap;
 
   const my = (selection) => {
     selection
@@ -2004,14 +2021,12 @@ const detailsPlot = () => {
       .data(data)
       .join(
         (enter, d, i) => {
-          const text = enter
-            .append("text")
-            .attr("y", (_, i) => i * (fontSize + margin.text));
+          const text = enter.append("text").attr("y", (_, i) => i * gap);
 
           text.append("tspan").text((d) => d.label);
           text
             .append("tspan")
-
+            .attr("font-weight", "700")
             .text((d) => d.value);
           text
             .append("tspan")
@@ -2033,6 +2048,13 @@ const detailsPlot = () => {
     return my;
   };
 
+  my.gap = function (value) {
+    if (!arguments.length) return gap;
+
+    gap = value;
+    return my;
+  };
+
   return my;
 };
 
@@ -2046,9 +2068,9 @@ const margin = {
   text: 30,
 };
 
-const details = {
-  width: 220,
-};
+const gap = 50;
+
+const detailsWidth = 220;
 
 const radius = 8;
 const strokeWidth = 1;
@@ -2059,7 +2081,7 @@ const svg = d3
   .append("svg")
   .attr(
     "viewBox",
-    `0 0 ${width + margin.left + margin.right + details.width} ${
+    `0 0 ${width + margin.left + margin.right + gap + detailsWidth} ${
       height + margin.top + margin.bottom
     }`
   );
@@ -2074,8 +2096,7 @@ const groupValues = group.append("g");
 
 const groupStats = group
   .append("g")
-  .attr("transform", `translate(${width + details.width / 2} 0)`)
-  .attr("text-anchor", "middle")
+  .attr("transform", `translate(${width + gap} 0)`)
   .attr("dominant-baseline", "hanging")
   .attr("font-family", "monospace")
   .attr("font-size", fontSize);
@@ -2084,8 +2105,16 @@ let i = 0;
 
 const { values, stats } = datasets[i++];
 
-const plotValues = scatterPlot().data(values).width(width).height(height);
-const plotStats = detailsPlot().data(stats);
+const plotValues = scatterPlot()
+  .data(values)
+  .width(width)
+  .height(height)
+  .radius(radius)
+  .strokeWidth(strokeWidth);
+
+const plotStats = detailsPlot()
+  .data(stats)
+  .gap(fontSize + margin.text);
 
 groupValues.call(plotValues);
 groupStats.call(plotStats);
