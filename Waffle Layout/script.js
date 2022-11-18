@@ -1,29 +1,34 @@
 const waffle = () => {
   let size = [10, 10];
+  let dimensions = [10, 10];
   let padding = 0;
   let rounding = 0;
-  function waffle(data) {
-    const cellWidth = size[0] / 10;
-    const cellHeight = size[1] / 10;
-    const [px, py] = [cellWidth, cellHeight].map((d) => d * padding);
 
-    const width = cellWidth - px * 2;
-    const height = cellHeight - py * 2;
+  function waffle(data) {
+    const [sx, sy] = size;
+    const [dx, dy] = dimensions;
+    const w = sx / dx;
+    const h = sy / dy;
+
+    const [px, py] = [w, h].map((d) => d * padding);
+
+    const width = w - px * 2;
+    const height = h - py * 2;
 
     const [rx, ry] = [width, height].map((d) => d * rounding);
 
     const length = data.reduce((a, c) => a + c, 0);
     const grid = [
       ...data.sort((a, b) => b - a).map((d) => Array(d).fill(d)),
-      Array(100 - length).fill(null),
+      Array(dx * dy - length).fill(null),
     ]
       .reverse()
       .reduce(
         (a, c) => [
           ...a,
           ...c.map((d, i) => {
-            const x = ((a.length + i) % 10) * cellWidth + px;
-            const y = Math.floor((a.length + i) / 10) * cellHeight + py;
+            const x = ((a.length + i) % dx) * w + px;
+            const y = Math.floor((a.length + i) / dx) * h + py;
             return {
               data: d,
               x,
@@ -47,6 +52,12 @@ const waffle = () => {
     return this;
   };
 
+  waffle.dimensions = function (value) {
+    if (!arguments.length) return dimensions;
+    dimensions = value;
+    return this;
+  };
+
   waffle.padding = function (values) {
     if (!arguments.length) return padding;
     padding = values;
@@ -62,24 +73,35 @@ const waffle = () => {
   return waffle;
 };
 
-const percentages = [32, 17];
-const colors = ["hsl(0, 92%, 68%)", "hsl(234, 81%, 67%)"];
-
-const scaleColor = d3.scaleOrdinal().domain(percentages).range(colors);
-
 const width = 500;
 const height = 500;
 
 const margin = 10;
+
+const values = [32, 17];
+const colors = ["hsl(0, 92%, 68%)", "hsl(234, 81%, 67%)"];
+
+const scaleColor = d3.scaleOrdinal().domain(values).range(colors);
+
+const waffleGenerator = waffle()
+  .size([width, height])
+  .padding(0.1)
+  .rounding(0.1);
+
+const dataWaffle = waffleGenerator(values);
 
 const svg = d3
   .select("body")
   .append("svg")
   .attr("viewBox", `0 0 ${width + margin * 2} ${height + margin * 2}`);
 
-svg
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin} ${margin})`);
+
+group
   .selectAll("rect")
-  .data(waffle().size([width, height]).padding(0.1).rounding(0.1)(percentages))
+  .data(dataWaffle)
   .enter()
   .append("rect")
   .attr("x", (d) => d.x)
