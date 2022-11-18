@@ -1,8 +1,9 @@
 const waffle = () => {
   let size = [10, 10];
   let dimensions = [10, 10];
-  let padding = 0;
-  let rounding = 0;
+  let padding = 0.1;
+  let rounding = 0.1;
+  let reverse = false;
   let flip = false;
 
   function waffle(data) {
@@ -22,31 +23,30 @@ const waffle = () => {
     const grid = [
       ...data.sort((a, b) => b - a).map((d) => Array(d).fill(d)),
       Array(dx * dy - length).fill(null),
-    ]
-      .reverse()
-      .reduce(
-        (a, c) => [
-          ...a,
-          ...c.map((d, i) => {
-            const x = flip
-              ? (dx - 1 - ((a.length + i) % dx)) * w + px
-              : ((a.length + i) % dx) * w + px;
-            const y = Math.floor((a.length + i) / dx) * h + py;
-            return {
-              data: d,
-              x,
-              y,
-              width,
-              height,
-              rx,
-              ry,
-            };
-          }),
-        ],
-        []
-      );
+    ];
 
-    return grid;
+    if (reverse) grid.reverse();
+    return grid.reduce(
+      (a, c) => [
+        ...a,
+        ...c.map((d, i) => {
+          const x = flip
+            ? ((a.length + i) % dx) * w + px
+            : (dx - 1 - ((a.length + i) % dx)) * w + px;
+          const y = Math.floor((a.length + i) / dx) * h + py;
+          return {
+            data: d,
+            x,
+            y,
+            width,
+            height,
+            rx,
+            ry,
+          };
+        }),
+      ],
+      []
+    );
   }
 
   waffle.size = function (value) {
@@ -79,6 +79,12 @@ const waffle = () => {
     return this;
   };
 
+  waffle.reverse = function (bool) {
+    if (!arguments.length) return reverse;
+    reverse = bool;
+    return this;
+  };
+
   return waffle;
 };
 
@@ -87,8 +93,8 @@ const height = 500;
 
 const margin = 10;
 
-const values = [32, 17];
-const colors = ["hsl(0, 92%, 68%)", "hsl(234, 81%, 67%)"];
+const values = [59, 18, 9, 8, 5, 1];
+const colors = d3.schemeSet2;
 
 const scaleColor = d3.scaleOrdinal().domain(values).range(colors);
 
@@ -97,7 +103,7 @@ const waffleGenerator = waffle()
   .padding(0.1)
   .rounding(0.1)
   .flip(true)
-  .dimensions([6, 10]);
+  .dimensions([10, 10]);
 
 const dataWaffle = waffleGenerator(values);
 
