@@ -173,7 +173,8 @@ const data = [
 
   const svg = d3
     .select("body")
-    .append("article")
+    .append("div")
+    .attr("class", "waffle")
     .append("svg")
     .attr(
       "viewBox",
@@ -257,9 +258,9 @@ const data = [
 
   const scaleColor = d3.scaleOrdinal().domain(percentages).range(d3.schemeSet2);
 
-  const article = d3.select("body").append("article");
+  const div = d3.select("body").append("div").attr("class", "waffles");
 
-  const divs = article.selectAll("div").data(dataSorted).enter().append("div");
+  const divs = div.selectAll("div").data(dataSorted).enter().append("div");
 
   divs
     .append("p")

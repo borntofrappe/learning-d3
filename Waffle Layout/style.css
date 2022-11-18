@@ -11,14 +11,43 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-article {
+.waffle {
   min-height: 100vh;
   display: flex;
 }
 
-article > svg {
+.waffle > svg {
   margin: auto;
-  width: 90vmin;
+  display: block;
+  width: 90vw;
   max-width: 42rem;
+  height: auto;
+}
+
+.waffles {
+  margin: 1rem auto;
+  max-width: 60rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.waffles > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.waffles > div p {
+  padding-left: 0.5rem;
+}
+
+.waffles > div p strong {
+  font-size: 2rem;
+}
+
+.waffles > div > svg {
+  display: block;
+  width: 100%;
   height: auto;
 }

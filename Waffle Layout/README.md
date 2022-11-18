@@ -4,4 +4,4 @@ Add a function to create the layout for [a waffle chart](https://en.wikipedia.or
 
 ## Data
 
-World population by continent 2022 [UN](https://population.un.org/wpp/).
+World population by UN region from [the 2022 UN survey](https://population.un.org/wpp/).
