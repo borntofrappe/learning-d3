@@ -3,6 +3,7 @@ const waffle = () => {
   let dimensions = [10, 10];
   let padding = 0;
   let rounding = 0;
+  let flip = false;
 
   function waffle(data) {
     const [sx, sy] = size;
@@ -27,7 +28,9 @@ const waffle = () => {
         (a, c) => [
           ...a,
           ...c.map((d, i) => {
-            const x = ((a.length + i) % dx) * w + px;
+            const x = flip
+              ? (dx - 1 - ((a.length + i) % dx)) * w + px
+              : ((a.length + i) % dx) * w + px;
             const y = Math.floor((a.length + i) / dx) * h + py;
             return {
               data: d,
@@ -70,6 +73,12 @@ const waffle = () => {
     return this;
   };
 
+  waffle.flip = function (bool) {
+    if (!arguments.length) return flip;
+    flip = bool;
+    return this;
+  };
+
   return waffle;
 };
 
@@ -86,7 +95,9 @@ const scaleColor = d3.scaleOrdinal().domain(values).range(colors);
 const waffleGenerator = waffle()
   .size([width, height])
   .padding(0.1)
-  .rounding(0.1);
+  .rounding(0.1)
+  .flip(true)
+  .dimensions([6, 10]);
 
 const dataWaffle = waffleGenerator(values);
 
