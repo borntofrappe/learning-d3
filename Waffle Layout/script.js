@@ -101,16 +101,6 @@ const waffle = () => {
   return waffle;
 };
 
-const width = 500;
-const height = 500;
-
-const margin = {
-  top: 5,
-  bottom: 5,
-  left: 5,
-  right: 280,
-};
-
 const data = [
   {
     region: "Africa",
@@ -144,79 +134,101 @@ const data = [
   },
 ];
 
-const regions = [...data]
-  .sort((a, b) => b.percentage - a.percentage)
-  .map(({ region }) => region);
+(() => {
+  const width = 500;
+  const height = 500;
 
-const scaleColor = d3.scaleOrdinal().domain(regions).range(d3.schemeSet2);
+  const margin = {
+    top: 5,
+    bottom: 5,
+    left: 5,
+    right: 5,
+  };
 
-const scaleLegend = d3
-  .scaleOrdinal()
-  .domain(regions)
-  .range(d3.range(regions.length).map((d) => d * 30));
+  const legend = {
+    width: 300,
+    padding: 10,
+    gap: 40,
+    fontSize: 18,
+  };
 
-const waffleGenerator = waffle()
-  .accessor((d) => d.percentage)
-  .size([width, height])
-  .rounding(0)
-  .flip(true)
-  .dimensions([10, 10]);
+  const waffleGenerator = waffle()
+    .accessor((d) => d.percentage)
+    .size([width, height])
+    .flip(true)
+    .dimensions([10, 10]);
 
-const dataWaffle = waffleGenerator(data);
+  const dataWaffle = waffleGenerator(data);
 
-const svg = d3
-  .select("body")
-  .append("svg")
-  .attr(
-    "viewBox",
-    `0 0 ${width + margin.left + margin.right} ${
-      height + margin.top + margin.bottom
-    }`
+  const regions = dataWaffle
+    .map(({ data }) => data.region)
+    .reduce((a, c) => (a.includes(c) ? [...a] : [...a, c]), []);
+
+  const scaleColor = d3.scaleOrdinal().domain(regions).range(d3.schemeSet2);
+
+  const scaleLegend = d3
+    .scaleOrdinal()
+    .domain(regions)
+    .range(d3.range(regions.length).map((d) => d * legend.gap));
+
+  const svg = d3
+    .select("body")
+    .append("article")
+    .append("svg")
+    .attr(
+      "viewBox",
+      `0 0 ${width + margin.left + margin.right + legend.width} ${
+        height + margin.top + margin.bottom
+      }`
+    );
+
+  const group = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+  const groupWaffle = group.append("g");
+
+  const groupLegend = group.append("g");
+
+  groupWaffle
+    .selectAll("rect")
+    .data(dataWaffle)
+    .enter()
+    .append("rect")
+    .attr("x", (d) => d.x)
+    .attr("y", (d) => d.y)
+    .attr("rx", (d) => d.rx)
+    .attr("ry", (d) => d.ry)
+    .attr("width", (d) => d.width)
+    .attr("height", (d) => d.height)
+    .attr("fill", (d) =>
+      d.data.value ? scaleColor(d.data.region) : "hsl(0, 0%, 90%)"
+    );
+
+  groupLegend.attr(
+    "transform",
+    `translate(${width + legend.padding} ${legend.padding})`
   );
 
-const group = svg
-  .append("g")
-  .attr("transform", `translate(${margin.left} ${margin.top})`);
+  const groupsLegend = groupLegend
+    .selectAll("g")
+    .data(regions)
+    .enter()
+    .append("g")
+    .attr("transform", (d) => `translate(0 ${scaleLegend(d)})`);
 
-const groupWaffle = group.append("g");
+  groupsLegend
+    .append("rect")
+    .attr("width", legend.fontSize)
+    .attr("height", legend.fontSize)
+    .attr("rx", "2")
+    .attr("fill", scaleColor);
 
-const groupLegend = group.append("g");
-
-groupWaffle
-  .selectAll("rect")
-  .data(dataWaffle)
-  .enter()
-  .append("rect")
-  .attr("x", (d) => d.x)
-  .attr("y", (d) => d.y)
-  .attr("rx", (d) => d.rx)
-  .attr("ry", (d) => d.ry)
-  .attr("width", (d) => d.width)
-  .attr("height", (d) => d.height)
-  .attr("fill", (d) =>
-    d.data.value ? scaleColor(d.data.region) : "hsl(0, 0%, 90%)"
-  );
-
-groupLegend.attr("transform", `translate(${width} 5)`);
-
-const groupsLegend = groupLegend
-  .selectAll("g")
-  .data(regions)
-  .enter()
-  .append("g")
-  .attr("transform", (d) => `translate(0 ${scaleLegend(d)})`);
-
-groupsLegend
-  .append("rect")
-  .attr("x", "8")
-  .attr("width", "16")
-  .attr("height", "16")
-  .attr("fill", scaleColor);
-
-groupsLegend
-  .append("text")
-  .attr("x", "30")
-  .attr("y", "8")
-  .attr("font-weight", "700")
-  .attr("dominant-baseline", "middle")
-  .text((d) => d);
+  groupsLegend
+    .append("text")
+    .attr("x", "30")
+    .attr("y", "8")
+    .attr("font-size", legend.fontSize)
+    .attr("dominant-baseline", "middle")
+    .text((d) => d);
+})();
