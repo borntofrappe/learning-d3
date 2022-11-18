@@ -26,12 +26,13 @@ const waffle = () => {
         .sort((a, b) => accessor(b) - accessor(a))
         .map((d) => {
           const value = accessor(d);
-          return Array(value).fill(value);
+          return Array(value).fill(d);
         }),
       Array(dx * dy - length).fill(null),
     ];
 
     if (reverse) grid.reverse();
+
     return grid.reduce(
       (a, c) => [
         ...a,
@@ -107,7 +108,7 @@ const margin = {
   top: 5,
   bottom: 5,
   left: 5,
-  right: 5,
+  right: 280,
 };
 
 const data = [
@@ -143,10 +144,16 @@ const data = [
   },
 ];
 
-const scaleColor = d3
+const regions = [...data]
+  .sort((a, b) => b.percentage - a.percentage)
+  .map(({ region }) => region);
+
+const scaleColor = d3.scaleOrdinal().domain(regions).range(d3.schemeSet2);
+
+const scaleLegend = d3
   .scaleOrdinal()
-  .domain(data.map(({ region }) => region))
-  .range(d3.schemeSet2);
+  .domain(regions)
+  .range(d3.range(regions.length).map((d) => d * 30));
 
 const waffleGenerator = waffle()
   .accessor((d) => d.percentage)
@@ -171,7 +178,11 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-group
+const groupWaffle = group.append("g");
+
+const groupLegend = group.append("g");
+
+groupWaffle
   .selectAll("rect")
   .data(dataWaffle)
   .enter()
@@ -182,4 +193,30 @@ group
   .attr("ry", (d) => d.ry)
   .attr("width", (d) => d.width)
   .attr("height", (d) => d.height)
-  .attr("fill", (d) => (d.data ? scaleColor(d.data) : "hsl(0, 0%, 90%)"));
+  .attr("fill", (d) =>
+    d.data.value ? scaleColor(d.data.region) : "hsl(0, 0%, 90%)"
+  );
+
+groupLegend.attr("transform", `translate(${width} 5)`);
+
+const groupsLegend = groupLegend
+  .selectAll("g")
+  .data(regions)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => `translate(0 ${scaleLegend(d)})`);
+
+groupsLegend
+  .append("rect")
+  .attr("x", "8")
+  .attr("width", "16")
+  .attr("height", "16")
+  .attr("fill", scaleColor);
+
+groupsLegend
+  .append("text")
+  .attr("x", "30")
+  .attr("y", "8")
+  .attr("font-weight", "700")
+  .attr("dominant-baseline", "middle")
+  .text((d) => d);
