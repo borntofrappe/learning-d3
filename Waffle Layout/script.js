@@ -5,6 +5,7 @@ const waffle = () => {
   let rounding = 0.1;
   let reverse = false;
   let flip = false;
+  let accessor = (d) => d;
 
   function waffle(data) {
     const [sx, sy] = size;
@@ -19,9 +20,14 @@ const waffle = () => {
 
     const [rx, ry] = [width, height].map((d) => d * rounding);
 
-    const length = data.reduce((a, c) => a + c, 0);
+    const length = data.reduce((a, c) => a + accessor(c), 0);
     const grid = [
-      ...data.sort((a, b) => b - a).map((d) => Array(d).fill(d)),
+      ...data
+        .sort((a, b) => accessor(b) - accessor(a))
+        .map((d) => {
+          const value = accessor(d);
+          return Array(value).fill(value);
+        }),
       Array(dx * dy - length).fill(null),
     ];
 
@@ -29,13 +35,13 @@ const waffle = () => {
     return grid.reduce(
       (a, c) => [
         ...a,
-        ...c.map((d, i) => {
+        ...c.map((data, i) => {
           const x = flip
             ? ((a.length + i) % dx) * w + px
             : (dx - 1 - ((a.length + i) % dx)) * w + px;
           const y = Math.floor((a.length + i) / dx) * h + py;
           return {
-            data: d,
+            data,
             x,
             y,
             width,
@@ -85,36 +91,85 @@ const waffle = () => {
     return this;
   };
 
+  waffle.accessor = function (fn) {
+    if (!arguments.length) return accessor;
+    accessor = fn;
+    return this;
+  };
+
   return waffle;
 };
 
 const width = 500;
 const height = 500;
 
-const margin = 10;
+const margin = {
+  top: 5,
+  bottom: 5,
+  left: 5,
+  right: 5,
+};
 
-const values = [59, 18, 9, 8, 5, 1];
-const colors = d3.schemeSet2;
+const data = [
+  {
+    region: "Africa",
+    percentage: 18,
+    value: 1427,
+  },
+  {
+    region: "Latin America and the Carribean",
+    percentage: 8,
+    value: 660,
+  },
+  {
+    region: "Northern America",
+    percentage: 5,
+    value: 337,
+  },
+  {
+    region: "Europe",
+    percentage: 9,
+    value: 744,
+  },
+  {
+    region: "Oceania",
+    percentage: 1,
+    value: 45,
+  },
+  {
+    region: "Asia",
+    percentage: 59,
+    value: 4723,
+  },
+];
 
-const scaleColor = d3.scaleOrdinal().domain(values).range(colors);
+const scaleColor = d3
+  .scaleOrdinal()
+  .domain(data.map(({ region }) => region))
+  .range(d3.schemeSet2);
 
 const waffleGenerator = waffle()
+  .accessor((d) => d.percentage)
   .size([width, height])
-  .padding(0.1)
-  .rounding(0.1)
+  .rounding(0)
   .flip(true)
   .dimensions([10, 10]);
 
-const dataWaffle = waffleGenerator(values);
+const dataWaffle = waffleGenerator(data);
 
 const svg = d3
   .select("body")
   .append("svg")
-  .attr("viewBox", `0 0 ${width + margin * 2} ${height + margin * 2}`);
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
 
 const group = svg
   .append("g")
-  .attr("transform", `translate(${margin} ${margin})`);
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 group
   .selectAll("rect")
