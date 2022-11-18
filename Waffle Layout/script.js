@@ -232,3 +232,71 @@ const data = [
     .attr("dominant-baseline", "middle")
     .text((d) => d);
 })();
+
+(() => {
+  const width = 500;
+  const height = 500;
+
+  const margin = {
+    top: 5,
+    bottom: 5,
+    left: 5,
+    right: 5,
+  };
+
+  const waffleGenerator = waffle()
+    .size([width, height])
+    .reverse(true)
+    .dimensions([10, 10]);
+
+  const dataSorted = [...data].sort((a, b) => b.percentage - a.percentage);
+
+  const regions = dataSorted.map(({ region }) => region);
+
+  const percentages = dataSorted.map(({ percentage }) => percentage);
+
+  const scaleColor = d3.scaleOrdinal().domain(percentages).range(d3.schemeSet2);
+
+  const article = d3.select("body").append("article");
+
+  const divs = article.selectAll("div").data(dataSorted).enter().append("div");
+
+  divs
+    .append("p")
+    .text((d) => `${d.region}: `)
+    .append("strong")
+    .style("color", (d) => scaleColor(d.percentage))
+    .text((d) => `${d.percentage}%`);
+
+  const svg = divs
+    .append("svg")
+    .attr(
+      "viewBox",
+      `0 0 ${width + margin.left + margin.right} ${
+        height + margin.top + margin.bottom
+      }`
+    );
+
+  const group = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+  const groupWaffle = group.append("g");
+
+  groupWaffle
+    .selectAll("rect")
+    .data((d) =>
+      waffle().size([width, height]).reverse(true).dimensions([10, 10])([
+        d.percentage,
+      ])
+    )
+    .enter()
+    .append("rect")
+    .attr("x", (d) => d.x)
+    .attr("y", (d) => d.y)
+    .attr("rx", (d) => d.rx)
+    .attr("ry", (d) => d.ry)
+    .attr("width", (d) => d.width)
+    .attr("height", (d) => d.height)
+    .attr("fill", (d) => (d.data ? scaleColor(d.data) : "hsl(0, 0%, 90%)"));
+})();
