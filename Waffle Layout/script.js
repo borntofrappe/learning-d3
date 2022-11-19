@@ -6,6 +6,7 @@ const waffle = () => {
   let reverse = false;
   let flip = false;
   let accessor = (d) => d;
+  let sort = (a, b) => accessor(b) - accessor(a);
 
   function waffle(data) {
     const [sx, sy] = size;
@@ -21,13 +22,18 @@ const waffle = () => {
     const [rx, ry] = [width, height].map((d) => d * rounding);
 
     const length = data.reduce((a, c) => a + accessor(c), 0);
+
+    let dataCopy = [...data];
+
+    if (sort) {
+      dataCopy.sort(sort);
+    }
+
     const grid = [
-      ...data
-        .sort((a, b) => accessor(b) - accessor(a))
-        .map((d) => {
-          const value = accessor(d);
-          return Array(value).fill(d);
-        }),
+      ...dataCopy.map((d) => {
+        const value = accessor(d);
+        return Array(value).fill(d);
+      }),
       Array(dx * dy - length).fill(null),
     ];
 
@@ -95,6 +101,12 @@ const waffle = () => {
   waffle.accessor = function (fn) {
     if (!arguments.length) return accessor;
     accessor = fn;
+    return this;
+  };
+
+  waffle.sort = function (fn) {
+    if (!arguments.length) return sort;
+    sort = fn;
     return this;
   };
 
@@ -188,7 +200,6 @@ const data = [
     .attr("transform", `translate(${margin.left} ${margin.top})`);
 
   const groupWaffle = group.append("g");
-
   const groupLegend = group.append("g");
 
   groupWaffle
@@ -252,8 +263,6 @@ const data = [
 
   const dataSorted = [...data].sort((a, b) => b.percentage - a.percentage);
 
-  const regions = dataSorted.map(({ region }) => region);
-
   const percentages = dataSorted.map(({ percentage }) => percentage);
 
   const scaleColor = d3.scaleOrdinal().domain(percentages).range(d3.schemeSet2);
@@ -286,11 +295,7 @@ const data = [
 
   groupWaffle
     .selectAll("rect")
-    .data((d) =>
-      waffle().size([width, height]).reverse(true).dimensions([10, 10])([
-        d.percentage,
-      ])
-    )
+    .data((d) => waffleGenerator([d.percentage]))
     .enter()
     .append("rect")
     .attr("x", (d) => d.x)

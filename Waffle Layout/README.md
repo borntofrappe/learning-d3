@@ -1,4 +1,4 @@
-# Waffle Layout
+# [Waffle Layout](https://codepen.io/borntofrappe/full/qBKVJgM)
 
 Create a function to create the layout for [a waffle chart](https://en.wikipedia.org/wiki/Pie_chart#Square_chart_/_Waffle_chart).
 
@@ -32,15 +32,16 @@ Each item is an object, the input (or `null`) value is stored in the `data` fiel
 
 The `waffle` function is configurable through several options.
 
-| Option       | Default    | Feature                                     |
-| ------------ | ---------- | ------------------------------------------- |
-| `size`       | `[10, 10]` | width and height                            |
-| `dimensions` | `[10, 10]` | columns and rows                            |
-| `padding`    | `0.1`      | percentage padding relative to cell size    |
-| `rounding`   | `0.1`      | percentage rounding relative to waffle size |
-| `reverse`    | `false`    | add values from the end of the array        |
-| `flip`       | `false`    | add values right to left                    |
-| `accessor`   | `d => d`   | data accessor                               |
+| Option       | Default                                | Feature                                     |
+| ------------ | -------------------------------------- | ------------------------------------------- |
+| `size`       | `[10, 10]`                             | width and height                            |
+| `dimensions` | `[10, 10]`                             | columns and rows                            |
+| `padding`    | `0.1`                                  | percentage padding relative to cell size    |
+| `rounding`   | `0.1`                                  | percentage rounding relative to waffle size |
+| `reverse`    | `false`                                | add values from the end of the array        |
+| `flip`       | `false`                                | add values right to left                    |
+| `accessor`   | `(d) => d`                             | data accessor                               |
+| `sort`       | `(a , b) => accessor(b) - accessor(a)` | sort function                               |
 
 ## Script
 
