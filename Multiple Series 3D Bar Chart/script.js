@@ -57,17 +57,22 @@ const data = [
   },
 ];
 
-const size = 500;
+const width = 600;
+const height = 500;
 const margin = 10;
 
-const h = size / 2;
-const v = h / 2;
-const elavation = size - v * 2;
+const ratio = 3;
+
+const h1 = width / ratio;
+const h2 = width - h1;
+const v1 = h1 / 2;
+const v2 = h2 / 2;
+const elevation = height - ((v1 + v2) / 2) * 2;
 
 const svg = d3
   .select("body")
   .append("svg")
-  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
+  .attr("viewBox", `0 0 ${width + margin * 2} ${height + margin * 2}`);
 
 const group = svg
   .append("g")
@@ -75,7 +80,7 @@ const group = svg
 
 const groupAxis = group
   .append("g")
-  .attr("transform", `translate(0 ${elavation + v})`)
+  .attr("transform", `translate(0 ${elevation + v2})`)
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
@@ -84,7 +89,7 @@ groupAxis
   .append("path")
   .attr(
     "d",
-    `M 0 0 l ${h} ${v} ${h} ${-v} 0 ${-elavation} ${-h} ${-v} ${-h} ${v}z`
+    `M 0 0 l ${h1} ${v1} ${h2} ${-v2} 0 ${-elevation} ${-h1} ${-v1} ${-h2} ${v2}z`
   );
 
 const groupLines = groupAxis.append("g").attr("opacity", "0.25");
@@ -94,7 +99,7 @@ const groupsLinesData = groupLines
   .selectAll("g")
   .data(() => {
     const { length } = data;
-    const gap = h / length;
+    const gap = h1 / length;
     return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
     //
   })
@@ -102,15 +107,17 @@ const groupsLinesData = groupLines
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${y})`);
 
-groupsLinesData.append("path").attr("d", `M 0 0 l ${h} ${-v} 0 ${-elavation}`);
+groupsLinesData
+  .append("path")
+  .attr("d", `M 0 0 l ${h2} ${-v2} 0 ${-elevation}`);
 
 const groupsLinesValues = groupLines
   .append("g")
-  .attr("transform", `translate(0 ${-elavation})`)
+  .attr("transform", `translate(0 ${-elevation})`)
   .selectAll("g")
   .data(() => {
     const { length } = data[0]["Max temperature"];
-    const gap = h / length;
+    const gap = h2 / length;
     return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
     //
   })
@@ -118,4 +125,6 @@ const groupsLinesValues = groupLines
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${-y})`);
 
-groupsLinesValues.append("path").attr("d", `M 0 0 l 0 ${elavation} ${h} ${v}`);
+groupsLinesValues
+  .append("path")
+  .attr("d", `M 0 0 l 0 ${elevation} ${h1} ${v1}`);
