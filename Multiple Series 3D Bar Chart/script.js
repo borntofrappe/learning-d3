@@ -69,6 +69,14 @@ const v1 = h1 / 2;
 const v2 = h2 / 2;
 const elevation = height - ((v1 + v2) / 2) * 2;
 
+const { length: l1 } = data;
+const g1 = h1 / l1;
+const os1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
+
+const { length: l2 } = data[0]["Max temperature"];
+const g2 = h2 / l2;
+const os2 = d3.range(l2).map((d) => [d * g2, (d * g2) / 2]);
+
 const svg = d3
   .select("body")
   .append("svg")
@@ -76,11 +84,12 @@ const svg = d3
 
 const group = svg
   .append("g")
-  .attr("transform", `translate(${margin} ${margin})`);
+  .attr("transform", `translate(${margin} ${margin + elevation + v2})`);
 
-const groupAxis = group
-  .append("g")
-  .attr("transform", `translate(0 ${elevation + v2})`)
+const groupAxis = group.append("g");
+const groupData = group.append("g");
+
+groupAxis
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
@@ -94,37 +103,52 @@ groupAxis
 
 const groupLines = groupAxis.append("g").attr("opacity", "0.25");
 
-const groupsLinesData = groupLines
+const groupsLinesStation = groupLines
   .append("g")
   .selectAll("g")
-  .data(() => {
-    const { length } = data;
-    const gap = h1 / length;
-    return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
-    //
-  })
+  .data(os1)
   .enter()
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${y})`);
 
-groupsLinesData
+groupsLinesStation
   .append("path")
   .attr("d", `M 0 0 l ${h2} ${-v2} 0 ${-elevation}`);
 
-const groupsLinesValues = groupLines
+const groupsLinesTemperatures = groupLines
   .append("g")
   .attr("transform", `translate(0 ${-elevation})`)
   .selectAll("g")
-  .data(() => {
-    const { length } = data[0]["Max temperature"];
-    const gap = h2 / length;
-    return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
-    //
-  })
+  .data(os2)
   .enter()
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${-y})`);
 
-groupsLinesValues
+groupsLinesTemperatures
   .append("path")
   .attr("d", `M 0 0 l 0 ${elevation} ${h1} ${v1}`);
+
+groupData.attr(
+  "transform",
+  `translate(${os1[3][0] + os2[5][0]} ${os1[3][1] - os2[5][1]})`
+);
+
+groupData
+  .append("path")
+  .attr("fill", "red")
+  .attr(
+    "d",
+    `M 0 0 l ${g1} ${g1 / 2} ${g2} ${-g2 / 2} 0 ${-elevation} ${-g1} ${
+      -g1 / 2
+    } ${-g2} ${g2 / 2}`
+  );
+
+groupData
+  .append("path")
+
+  .attr("fill", "black")
+  .attr("opacity", "0.25")
+  .attr(
+    "d",
+    `M ${g1} ${g1 / 2} l ${g2} ${-g2 / 2} 0 ${-elevation} ${-g2} ${g2 / 2} z`
+  );
