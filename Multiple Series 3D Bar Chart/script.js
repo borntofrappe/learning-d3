@@ -89,11 +89,18 @@ const scaleOffset1 = d3
   .range(os1);
 
 const scaleOffset2 = d3.scaleOrdinal().domain(d3.range(l2)).range(os2);
+
+const maxMetric = d3.max(data, (d) => d3.max(d[metric]));
 const scaleElevation = d3
   .scaleLinear()
-  .domain([0, d3.max(data, (d) => d3.max(d[metric]))])
+  .domain([0, maxMetric])
   .range([0, elevation])
   .clamp(true);
+
+const scaleColor = d3
+  .scaleSequential()
+  .domain([0, maxMetric])
+  .interpolator(d3.interpolateReds);
 
 const svg = d3
   .select("body")
@@ -170,7 +177,7 @@ const groupsBar = groupsData
 
 groupsBar
   .append("path")
-  .attr("fill", "red")
+  .attr("fill", (d) => scaleColor(d))
   .attr(
     "d",
     (d) =>
@@ -181,8 +188,7 @@ groupsBar
 
 groupsBar
   .append("path")
-  .attr("fill", "black")
-  .attr("opacity", "0.25")
+  .attr("fill", (d) => d3.color(scaleColor(d)).darker(0.5))
   .attr(
     "d",
     (d) =>
