@@ -57,6 +57,8 @@ const data = [
   },
 ];
 
+const metric = "Max temperature";
+
 const width = 600;
 const height = 500;
 const margin = 10;
@@ -73,13 +75,20 @@ const { length: l1 } = data;
 const g1 = h1 / l1;
 const os1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
 
-const { length: l2 } = data[0]["Max temperature"];
+const { length: l2 } = data[0][metric];
 const g2 = h2 / l2;
 const os2 = d3.range(l2).map((d) => [d * g2, (d * g2) / 2]);
 
 const p = 0.2 * (g1 + g2);
 const gp1 = g1 - p;
 const gp2 = g2 - p;
+
+const scaleOffset1 = d3
+  .scaleOrdinal()
+  .domain(data.map((d) => d.station))
+  .range(os1);
+
+const scaleOffset2 = d3.scaleOrdinal().domain(d3.range(l2)).range(os2);
 
 const svg = d3
   .select("body")
@@ -132,12 +141,29 @@ groupsLinesTemperatures
   .append("path")
   .attr("d", `M 0 0 l 0 ${elevation} ${h1} ${v1}`);
 
-groupData.attr(
-  "transform",
-  `translate(${os1[3][0] + os2[5][0]} ${os1[3][1] - os2[5][1]})`
-);
+const groupsData = groupData
+  .selectAll("g")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("transform", ({ station }) => {
+    const [x, y] = scaleOffset1(station);
 
-groupData
+    return `translate(${x} ${y})`;
+  });
+
+const groupsBar = groupsData
+  .selectAll("g")
+  .data((d) => d[metric])
+  .enter()
+  .append("g")
+  .attr("transform", (_, i) => {
+    const [x, y] = scaleOffset2(i);
+
+    return `translate(${x} ${-y})`;
+  });
+
+groupsBar
   .append("path")
   .attr("fill", "red")
   .attr(
@@ -147,7 +173,7 @@ groupData
     } ${-gp2} ${gp2 / 2}`
   );
 
-groupData
+groupsBar
   .append("path")
   .attr("fill", "black")
   .attr("opacity", "0.25")
