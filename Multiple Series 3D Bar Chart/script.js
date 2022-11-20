@@ -58,14 +58,21 @@ const data = [
 ];
 
 const metric = "Max temperature";
+const timeFormat = d3.timeFormat("%b");
+const months = d3
+  .timeMonths(new Date(2022, 0, 1), new Date(2023, 0, 1))
+  .map((d) => timeFormat(d));
 
 const width = 600;
 const height = 500;
-const margin = 10;
+const margin = {
+  top: 5,
+  bottom: 50,
+  left: 100,
+  right: 30,
+};
 
-const ratio = 3;
-
-const h1 = width / ratio;
+const h1 = width / 3;
 const h2 = width - h1;
 const v1 = h1 / 2;
 const v2 = h2 / 2;
@@ -91,6 +98,7 @@ const scaleOffset1 = d3
 const scaleOffset2 = d3.scaleOrdinal().domain(d3.range(l2)).range(os2);
 
 const maxMetric = d3.max(data, (d) => d3.max(d[metric]));
+
 const scaleElevation = d3
   .scaleLinear()
   .domain([0, maxMetric])
@@ -102,33 +110,67 @@ const scaleColor = d3
   .domain([0, maxMetric])
   .interpolator(d3.interpolateReds);
 
+const ticksElevation = scaleElevation.ticks(4).slice(1);
+
 const svg = d3
   .select("body")
   .append("svg")
-  .attr("viewBox", `0 0 ${width + margin * 2} ${height + margin * 2}`);
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
 
 const group = svg
   .append("g")
-  .attr("transform", `translate(${margin} ${margin + elevation + v2})`);
+  .attr(
+    "transform",
+    `translate(${margin.left} ${margin.top + elevation + v2})`
+  );
 
 const groupAxis = group.append("g");
 const groupData = group.append("g");
 
 groupAxis
+  .append("path")
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "1");
-
-groupAxis
-  .append("path")
+  .attr("stroke-width", "1")
   .attr(
     "d",
     `M 0 0 l ${h1} ${v1} ${h2} ${-v2} 0 ${-elevation} ${-h1} ${-v1} ${-h2} ${v2}z`
   );
 
-const groupLines = groupAxis.append("g").attr("opacity", "0.25");
+const groupTemperatures = groupAxis.append("g");
+const groupStations = groupAxis.append("g");
+const groupElevation = groupAxis.append("g");
 
-const groupsLinesStation = groupLines
+const groupsElevation = groupElevation
+  .append("g")
+  .selectAll("g")
+  .data(ticksElevation)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+
+groupsElevation
+  .append("path")
+  .attr("fill", "none")
+  .attr("opacity", "0.2")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
+
+groupsElevation
+  .append("text")
+  .attr("x", "-5")
+  .attr("text-anchor", "end")
+  .attr("font-size", "18")
+  .attr("font-weight", "500")
+  .text((d) => d);
+
+const groupsStations = groupStations
   .append("g")
   .selectAll("g")
   .data(os1)
@@ -136,22 +178,50 @@ const groupsLinesStation = groupLines
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${y})`);
 
-groupsLinesStation
+groupsStations
   .append("path")
+  .attr("fill", "none")
+  .attr("opacity", "0.2")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
   .attr("d", `M 0 0 l ${h2} ${-v2} 0 ${-elevation}`);
 
-const groupsLinesTemperatures = groupLines
+groupsStations
+  .append("text")
+  .attr("transform", `translate(${g1 / 2} ${g1 / 2 / 2})`)
+  .attr("x", "-10")
+  .attr("y", "12")
+  .attr("text-anchor", "end")
+  .attr("font-size", "18")
+  .attr("font-weight", "500")
+  .text((_, i) => scaleOffset1.domain()[i]);
+
+const groupsTemperatures = groupTemperatures
   .append("g")
-  .attr("transform", `translate(0 ${-elevation})`)
+  .attr("transform", `translate(${h1} ${v1})`)
   .selectAll("g")
   .data(os2)
   .enter()
   .append("g")
   .attr("transform", ([x, y]) => `translate(${x} ${-y})`);
 
-groupsLinesTemperatures
+groupsTemperatures
   .append("path")
-  .attr("d", `M 0 0 l 0 ${elevation} ${h1} ${v1}`);
+  .attr("fill", "none")
+  .attr("opacity", "0.2")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("d", `M 0 0 l ${-h1} ${-v1} 0 ${-elevation}`);
+
+groupsTemperatures
+  .append("text")
+  .attr("transform", `translate(${g2 / 2} ${-g2 / 2 / 2})`)
+  .attr("x", "18")
+  .attr("y", "18")
+  .attr("text-anchor", "middle")
+  .attr("font-size", "18")
+  .attr("font-weight", "500")
+  .text((_, i) => months[i]);
 
 const groupsData = groupData
   .selectAll("g")
