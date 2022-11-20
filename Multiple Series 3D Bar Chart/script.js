@@ -75,7 +75,7 @@ const group = svg
 
 const groupAxis = group
   .append("g")
-  .attr("transform", `translate(${0} ${elavation + v})`)
+  .attr("transform", `translate(0 ${elavation + v})`)
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
@@ -86,3 +86,36 @@ groupAxis
     "d",
     `M 0 0 l ${h} ${v} ${h} ${-v} 0 ${-elavation} ${-h} ${-v} ${-h} ${v}z`
   );
+
+const groupLines = groupAxis.append("g").attr("opacity", "0.25");
+
+const groupsLinesData = groupLines
+  .append("g")
+  .selectAll("g")
+  .data(() => {
+    const { length } = data;
+    const gap = h / length;
+    return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
+    //
+  })
+  .enter()
+  .append("g")
+  .attr("transform", ([x, y]) => `translate(${x} ${y})`);
+
+groupsLinesData.append("path").attr("d", `M 0 0 l ${h} ${-v} 0 ${-elavation}`);
+
+const groupsLinesValues = groupLines
+  .append("g")
+  .attr("transform", `translate(0 ${-elavation})`)
+  .selectAll("g")
+  .data(() => {
+    const { length } = data[0]["Max temperature"];
+    const gap = h / length;
+    return d3.range(length).map((d) => [d * gap, (d * gap) / 2]);
+    //
+  })
+  .enter()
+  .append("g")
+  .attr("transform", ([x, y]) => `translate(${x} ${-y})`);
+
+groupsLinesValues.append("path").attr("d", `M 0 0 l 0 ${elavation} ${h} ${v}`);
