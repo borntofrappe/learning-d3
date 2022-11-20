@@ -159,11 +159,11 @@ const groupsData = groupData
 
 const groupsBar = groupsData
   .selectAll("g")
-  .data((d) => d[metric])
+  .data((d) => [...d[metric].reverse()])
   .enter()
   .append("g")
-  .attr("transform", (d, i) => {
-    const [x, y] = scaleOffset2(i);
+  .attr("transform", (d, i, { length }) => {
+    const [x, y] = scaleOffset2(length - 1 - i);
 
     return `translate(${x} ${-y})`;
   });
