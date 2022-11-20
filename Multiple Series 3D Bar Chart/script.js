@@ -89,6 +89,11 @@ const scaleOffset1 = d3
   .range(os1);
 
 const scaleOffset2 = d3.scaleOrdinal().domain(d3.range(l2)).range(os2);
+const scaleElevation = d3
+  .scaleLinear()
+  .domain([0, d3.max(data, (d) => d3.max(d[metric]))])
+  .range([0, elevation])
+  .clamp(true);
 
 const svg = d3
   .select("body")
@@ -157,7 +162,7 @@ const groupsBar = groupsData
   .data((d) => d[metric])
   .enter()
   .append("g")
-  .attr("transform", (_, i) => {
+  .attr("transform", (d, i) => {
     const [x, y] = scaleOffset2(i);
 
     return `translate(${x} ${-y})`;
@@ -168,9 +173,10 @@ groupsBar
   .attr("fill", "red")
   .attr(
     "d",
-    `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-elevation} ${-gp1} ${
-      -gp1 / 2
-    } ${-gp2} ${gp2 / 2}`
+    (d) =>
+      `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+        d
+      )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
 
 groupsBar
@@ -179,7 +185,8 @@ groupsBar
   .attr("opacity", "0.25")
   .attr(
     "d",
-    `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-elevation} ${-gp2} ${
-      gp2 / 2
-    } z`
+    (d) =>
+      `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+        d
+      )} ${-gp2} ${gp2 / 2} z`
   );
