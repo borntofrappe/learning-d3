@@ -77,6 +77,10 @@ const { length: l2 } = data[0]["Max temperature"];
 const g2 = h2 / l2;
 const os2 = d3.range(l2).map((d) => [d * g2, (d * g2) / 2]);
 
+const p = 0.2 * (g1 + g2);
+const gp1 = g1 - p;
+const gp2 = g2 - p;
+
 const svg = d3
   .select("body")
   .append("svg")
@@ -138,17 +142,18 @@ groupData
   .attr("fill", "red")
   .attr(
     "d",
-    `M 0 0 l ${g1} ${g1 / 2} ${g2} ${-g2 / 2} 0 ${-elevation} ${-g1} ${
-      -g1 / 2
-    } ${-g2} ${g2 / 2}`
+    `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-elevation} ${-gp1} ${
+      -gp1 / 2
+    } ${-gp2} ${gp2 / 2}`
   );
 
 groupData
   .append("path")
-
   .attr("fill", "black")
   .attr("opacity", "0.25")
   .attr(
     "d",
-    `M ${g1} ${g1 / 2} l ${g2} ${-g2 / 2} 0 ${-elevation} ${-g2} ${g2 / 2} z`
+    `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-elevation} ${-gp2} ${
+      gp2 / 2
+    } z`
   );
