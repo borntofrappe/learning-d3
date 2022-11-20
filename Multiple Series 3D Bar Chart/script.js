@@ -56,3 +56,33 @@ const data = [
     ],
   },
 ];
+
+const size = 500;
+const margin = 10;
+
+const h = size / 2;
+const v = h / 2;
+const elavation = size - v * 2;
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin} ${margin})`);
+
+const groupAxis = group
+  .append("g")
+  .attr("transform", `translate(${0} ${elavation + v})`)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
+
+groupAxis
+  .append("path")
+  .attr(
+    "d",
+    `M 0 0 l ${h} ${v} ${h} ${-v} 0 ${-elavation} ${-h} ${-v} ${-h} ${v}z`
+  );
