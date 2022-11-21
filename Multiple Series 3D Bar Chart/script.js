@@ -71,6 +71,7 @@ const margin = {
   left: 100,
   right: 30,
 };
+const strokeWidth = 0;
 
 const h1 = width / 3;
 const h2 = width - h1;
@@ -131,6 +132,9 @@ const group = svg
 
 const groupAxis = group.append("g");
 const groupData = group.append("g");
+
+groupAxis.style("color", "hsl(0, 0%, 35%)");
+groupData.style("color", "hsl(0, 0%, 20%)");
 
 groupAxis
   .append("path")
@@ -274,4 +278,23 @@ groupsBar
       `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
         d
       )} ${-gp2} ${gp2 / 2} z`
+  );
+
+groupsBar
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr(
+    "d",
+    (d) =>
+      `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+        d
+      )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(d)} ${-gp1} ${
+        -gp1 / 2
+      } 0 ${-scaleElevation(d)} ${gp1} ${gp1 / 2} m ${gp2} ${
+        -gp2 / 2
+      } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
