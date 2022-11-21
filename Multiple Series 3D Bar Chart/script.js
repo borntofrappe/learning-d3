@@ -9,6 +9,10 @@ const data = [
     "Min temperature": [
       2.29, 2.25, 3.72, 5.5, 8.3, 11.17, 13.34, 13.35, 11.12, 8.34, 5.04, 2.71,
     ],
+    Rainfall: [
+      69.54, 51.41, 42.82, 49.59, 50.51, 58.45, 50.49, 67.65, 59.08, 78.57,
+      75.71, 68.25,
+    ],
   },
   {
     station: "Greenwich Park",
@@ -21,6 +25,10 @@ const data = [
       3.36, 3.22, 4.66, 6.02, 9.06, 12.04, 13.93, 14.08, 11.57, 8.99, 6.09,
       3.77,
     ],
+    Rainfall: [
+      43.93, 39.85, 36.52, 38.63, 43.99, 49.34, 36.3, 53.02, 52.38, 58.34,
+      59.85, 50.71,
+    ],
   },
   {
     station: "Kew Gardens",
@@ -31,6 +39,10 @@ const data = [
     ],
     "Min temperature": [
       1.96, 2.03, 3.52, 5.1, 8.15, 11.02, 13.19, 12.99, 10.53, 7.78, 4.29, 2.28,
+    ],
+    Rainfall: [
+      59.87, 45.37, 38.96, 43.64, 44.59, 49.66, 45.24, 55.1, 51.93, 67.91,
+      65.96, 59.24,
     ],
   },
   {
@@ -43,6 +55,10 @@ const data = [
     "Min temperature": [
       2.9, 2.76, 4.09, 6.03, 8.97, 12.04, 14.11, 13.99, 11.49, 8.85, 5.56, 3.34,
     ],
+    Rainfall: [
+      57.5, 44.09, 37.5, 40.64, 42.07, 48.92, 43.34, 55.54, 49.92, 65.75, 66.04,
+      57.23,
+    ],
   },
   {
     station: "Northolt",
@@ -53,6 +69,10 @@ const data = [
     ],
     "Min temperature": [
       1.95, 2, 3.48, 5.23, 8.3, 11.27, 13.4, 13.19, 10.64, 7.92, 4.47, 2.34,
+    ],
+    Rainfall: [
+      62.93, 49.09, 42.43, 45.62, 51.83, 50.16, 48.58, 56.61, 51.36, 70.18,
+      71.41, 63.06,
     ],
   },
 ];
@@ -92,6 +112,10 @@ const dataViz = data.map((d) => {
       value,
       month: months[i],
     })),
+    Rainfall: d["Rainfall"].map((value, i) => ({
+      value,
+      month: months[i],
+    })),
   };
 });
 
@@ -100,15 +124,20 @@ const metrics = {
     interpolator: d3.interpolateReds,
     range: [0, elevation],
     max: d3.max(dataViz, (d) =>
-      d3.max(d["Max temperature"], (temperature) => temperature.value)
+      d3.max(d["Max temperature"], ({ value }) => value)
     ),
   },
   "Min temperature": {
     interpolator: d3.interpolateBlues,
     range: [elevation, 0],
     max: d3.max(dataViz, (d) =>
-      d3.max(d["Min temperature"], (temperature) => temperature.value)
+      d3.max(d["Min temperature"], ({ value }) => value)
     ),
+  },
+  Rainfall: {
+    interpolator: d3.interpolatePurples,
+    range: [0, elevation],
+    max: d3.max(dataViz, (d) => d3.max(d["Rainfall"], ({ value }) => value)),
   },
 };
 
@@ -361,7 +390,6 @@ const buttons = controls
       .data(ticksElevation)
       .join(
         (enter) => {
-          console.log(enter);
           const groupEnter = enter
             .append("g")
             .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
