@@ -57,11 +57,29 @@ const data = [
   },
 ];
 
-const metric = "Max temperature";
 const timeFormat = d3.timeFormat("%b");
+
 const months = d3
   .timeMonths(new Date(2022, 0, 1), new Date(2023, 0, 1))
   .map((d) => timeFormat(d));
+
+const stations = data.map(({ station }) => station);
+
+const dataViz = data.map((d) => {
+  return {
+    ...d,
+    "Max temperature": d["Max temperature"].map((value, i) => ({
+      value,
+      month: months[i],
+    })),
+    "Min temperature": d["Min temperature"].map((value, i) => ({
+      value,
+      month: months[i],
+    })),
+  };
+});
+
+const metric = "Max temperature";
 
 const width = 600;
 const height = 520;
@@ -79,26 +97,24 @@ const v1 = h1 / 2;
 const v2 = h2 / 2;
 const elevation = height - ((v1 + v2) / 2) * 2;
 
-const { length: l1 } = data;
+const { length: l1 } = stations;
 const g1 = h1 / l1;
 const os1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
 
-const { length: l2 } = data[0][metric];
+const { length: l2 } = months;
 const g2 = h2 / l2;
-const os2 = d3.range(l2).map((d) => [d * g2, (d * g2) / 2]);
+const os2 = d3.range(l2).map((d) => [d * g2, ((d * g2) / 2) * -1]);
 
 const p = 0.2 * (g1 + g2);
 const gp1 = g1 - p;
 const gp2 = g2 - p;
 
-const scaleOffset1 = d3
-  .scaleOrdinal()
-  .domain(data.map((d) => d.station))
-  .range(os1);
+const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(os1);
+const scaleOffset2 = d3.scaleOrdinal().domain(months).range(os2);
 
-const scaleOffset2 = d3.scaleOrdinal().domain(d3.range(l2)).range(os2);
-
-const maxMetric = d3.max(data, (d) => d3.max(d[metric]));
+const maxMetric = d3.max(dataViz, (d) =>
+  d3.max(d[metric], (temperature) => temperature.value)
+);
 
 const scaleElevation = d3
   .scaleLinear()
@@ -183,10 +199,13 @@ groupsElevation
 const groupsStations = groupStations
   .append("g")
   .selectAll("g")
-  .data(os1)
+  .data(stations)
   .enter()
   .append("g")
-  .attr("transform", ([x, y]) => `translate(${x} ${y})`);
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset1(d);
+    return `translate(${x} ${y})`;
+  });
 
 groupsStations
   .append("path")
@@ -206,16 +225,19 @@ groupsStations
   .attr("fill", "currentColor")
   .attr("font-size", "16")
   .attr("font-weight", "500")
-  .text((_, i) => scaleOffset1.domain()[i]);
+  .text((d) => d);
 
 const groupsTemperatures = groupTemperatures
   .append("g")
   .attr("transform", `translate(${h1} ${v1})`)
   .selectAll("g")
-  .data(os2)
+  .data(months)
   .enter()
   .append("g")
-  .attr("transform", ([x, y]) => `translate(${x} ${-y})`);
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset2(d);
+    return `translate(${x} ${y})`;
+  });
 
 groupsTemperatures
   .append("path")
@@ -234,11 +256,11 @@ groupsTemperatures
   .attr("fill", "currentColor")
   .attr("font-size", "16")
   .attr("font-weight", "500")
-  .text((_, i) => months[i]);
+  .text((d) => d);
 
 const groupsData = groupData
   .selectAll("g")
-  .data(data)
+  .data(dataViz)
   .enter()
   .append("g")
   .attr("transform", ({ station }) => {
@@ -249,34 +271,34 @@ const groupsData = groupData
 
 const groupsBar = groupsData
   .selectAll("g")
-  .data((d) => [...d[metric].reverse()])
+  .data((d) => [...d[metric]].reverse())
   .enter()
   .append("g")
-  .attr("transform", (d, i, { length }) => {
-    const [x, y] = scaleOffset2(length - 1 - i);
+  .attr("transform", ({ month }) => {
+    const [x, y] = scaleOffset2(month);
 
-    return `translate(${x} ${-y})`;
+    return `translate(${x} ${y})`;
   });
 
 groupsBar
   .append("path")
-  .attr("fill", (d) => scaleColor(d))
+  .attr("fill", ({ value }) => scaleColor(value))
   .attr(
     "d",
-    (d) =>
+    ({ value }) =>
       `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        d
+        value
       )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
 
 groupsBar
   .append("path")
-  .attr("fill", (d) => d3.color(scaleColor(d)).darker(0.6))
+  .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
   .attr(
     "d",
-    (d) =>
+    ({ value }) =>
       `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        d
+        value
       )} ${-gp2} ${gp2 / 2} z`
   );
 
@@ -289,12 +311,12 @@ groupsBar
   .attr("stroke-width", strokeWidth)
   .attr(
     "d",
-    (d) =>
+    ({ value }) =>
       `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        d
-      )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(d)} ${-gp1} ${
+        value
+      )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
         -gp1 / 2
-      } 0 ${-scaleElevation(d)} ${gp1} ${gp1 / 2} m ${gp2} ${
+      } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
         -gp2 / 2
       } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
