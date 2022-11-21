@@ -99,17 +99,23 @@ const metrics = {
   "Max temperature": {
     interpolator: d3.interpolateReds,
     range: [0, elevation],
+    max: d3.max(dataViz, (d) =>
+      d3.max(d["Max temperature"], (temperature) => temperature.value)
+    ),
   },
   "Min temperature": {
     interpolator: d3.interpolateBlues,
     range: [elevation, 0],
+    max: d3.max(dataViz, (d) =>
+      d3.max(d["Min temperature"], (temperature) => temperature.value)
+    ),
   },
 };
 
 const keys = Object.keys(metrics);
 
 const [, key] = keys;
-const { interpolator, range } = metrics[key];
+const { interpolator, range, max } = metrics[key];
 
 const { length: l1 } = stations;
 const g1 = h1 / l1;
@@ -126,19 +132,15 @@ const gp2 = g2 - p;
 const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(os1);
 const scaleOffset2 = d3.scaleOrdinal().domain(months).range(os2);
 
-const maxMetric = d3.max(dataViz, (d) =>
-  d3.max(d[key], (temperature) => temperature.value)
-);
-
 const scaleElevation = d3
   .scaleLinear()
-  .domain([0, maxMetric])
+  .domain([0, max])
   .range(range)
   .clamp(true);
 
 const scaleColor = d3
   .scaleSequential()
-  .domain([0, maxMetric])
+  .domain([0, max])
   .interpolator(interpolator);
 
 const ticksElevation = scaleElevation.ticks(4).slice(1);
@@ -334,3 +336,110 @@ groupsBar
         -gp2 / 2
       } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
+
+const controls = d3.select("body").append("div");
+
+const buttons = controls
+  .selectAll("button")
+  .data(keys)
+  .enter()
+  .append("button")
+  .text((d) => d)
+  .on("click", (e, key) => {
+    const { interpolator, range, max } = metrics[key];
+
+    scaleElevation.domain([0, max]).range(range);
+    scaleColor.domain([0, max]).interpolator(interpolator);
+
+    const ticksElevation = scaleElevation.ticks(4).slice(1);
+
+    const transition = d3.transition();
+
+    groupElevation
+      .select("g")
+      .selectAll("g")
+      .data(ticksElevation)
+      .join(
+        (enter) => {
+          console.log(enter);
+          const groupEnter = enter
+            .append("g")
+            .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+
+          groupEnter
+            .attr("opacity", "0")
+            .transition(transition)
+            .attr("opacity", "1");
+
+          groupEnter
+            .append("path")
+            .attr("fill", "none")
+            .attr("opacity", "0.2")
+            .attr("stroke", "currentColor")
+            .attr("stroke-width", "1")
+            .attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
+
+          groupEnter
+            .append("text")
+            .attr("x", "-12")
+            .attr("text-anchor", "end")
+            .attr("fill", "currentColor")
+            .attr("font-size", "18")
+            .attr("font-weight", "500")
+            .text((d) => d);
+        },
+        (update) => {
+          update
+            .transition(transition)
+            .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+
+          update.select("text").text((d) => d);
+        },
+        (exit) => {
+          exit.transition(transition).attr("opacity", "0").remove();
+        }
+      );
+
+    const groupsBar = groupsData
+      .selectAll("g")
+      .data((d) => [...d[key]].reverse());
+
+    groupsBar
+      .select("path:nth-of-type(1)")
+      .transition(transition)
+      .attr("fill", ({ value }) => scaleColor(value))
+      .attr(
+        "d",
+        ({ value }) =>
+          `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+            value
+          )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
+      );
+
+    groupsBar
+      .select("path:nth-of-type(2)")
+      .transition(transition)
+      .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
+      .attr(
+        "d",
+        ({ value }) =>
+          `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+            value
+          )} ${-gp2} ${gp2 / 2} z`
+      );
+
+    groupsBar
+      .select("path:nth-of-type(3)")
+      .transition(transition)
+      .attr(
+        "d",
+        ({ value }) =>
+          `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+            value
+          )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
+            -gp1 / 2
+          } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
+            -gp2 / 2
+          } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
+      );
+  });
