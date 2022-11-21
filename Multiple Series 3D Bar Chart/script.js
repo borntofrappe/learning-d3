@@ -143,7 +143,7 @@ const metrics = {
 
 const keys = Object.keys(metrics);
 
-const [, key] = keys;
+const [key] = keys;
 const { interpolator, range, max } = metrics[key];
 
 const { length: l1 } = stations;
@@ -174,8 +174,9 @@ const scaleColor = d3
 
 const ticksElevation = scaleElevation.ticks(4).slice(1);
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",
@@ -366,108 +367,113 @@ groupsBar
       } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
   );
 
-const controls = d3.select("body").append("div");
+const form = root.append("form").on("submit", (e) => e.preventDefault());
 
-const buttons = controls
-  .selectAll("button")
+const select = form.append("select");
+
+select
+  .selectAll("option")
   .data(keys)
   .enter()
-  .append("button")
-  .text((d) => d)
-  .on("click", (e, key) => {
-    const { interpolator, range, max } = metrics[key];
+  .append("option")
+  .attr("value", (d) => d)
+  .text((d) => d);
 
-    scaleElevation.domain([0, max]).range(range);
-    scaleColor.domain([0, max]).interpolator(interpolator);
+select.property("value", key).on("input", (e) => {
+  const { value: key } = e.target;
+  const { interpolator, range, max } = metrics[key];
 
-    const ticksElevation = scaleElevation.ticks(4).slice(1);
+  scaleElevation.domain([0, max]).range(range);
+  scaleColor.domain([0, max]).interpolator(interpolator);
 
-    const transition = d3.transition();
+  const ticksElevation = scaleElevation.ticks(4).slice(1);
 
-    groupElevation
-      .select("g")
-      .selectAll("g")
-      .data(ticksElevation)
-      .join(
-        (enter) => {
-          const groupEnter = enter
-            .append("g")
-            .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+  const transition = d3.transition();
 
-          groupEnter
-            .attr("opacity", "0")
-            .transition(transition)
-            .attr("opacity", "1");
+  groupElevation
+    .select("g")
+    .selectAll("g")
+    .data(ticksElevation)
+    .join(
+      (enter) => {
+        const groupEnter = enter
+          .append("g")
+          .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
 
-          groupEnter
-            .append("path")
-            .attr("fill", "none")
-            .attr("opacity", "0.2")
-            .attr("stroke", "currentColor")
-            .attr("stroke-width", "1")
-            .attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
+        groupEnter
+          .attr("opacity", "0")
+          .transition(transition)
+          .attr("opacity", "1");
 
-          groupEnter
-            .append("text")
-            .attr("x", "-12")
-            .attr("text-anchor", "end")
-            .attr("fill", "currentColor")
-            .attr("font-size", "18")
-            .attr("font-weight", "500")
-            .text((d) => d);
-        },
-        (update) => {
-          update
-            .transition(transition)
-            .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+        groupEnter
+          .append("path")
+          .attr("fill", "none")
+          .attr("opacity", "0.2")
+          .attr("stroke", "currentColor")
+          .attr("stroke-width", "1")
+          .attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
 
-          update.select("text").text((d) => d);
-        },
-        (exit) => {
-          exit.transition(transition).attr("opacity", "0").remove();
-        }
-      );
+        groupEnter
+          .append("text")
+          .attr("x", "-12")
+          .attr("text-anchor", "end")
+          .attr("fill", "currentColor")
+          .attr("font-size", "18")
+          .attr("font-weight", "500")
+          .text((d) => d);
+      },
+      (update) => {
+        update
+          .transition(transition)
+          .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
 
-    const groupsBar = groupsData
-      .selectAll("g")
-      .data((d) => [...d[key]].reverse());
+        update.select("text").text((d) => d);
+      },
+      (exit) => {
+        exit.transition(transition).attr("opacity", "0").remove();
+      }
+    );
 
-    groupsBar
-      .select("path:nth-of-type(1)")
-      .transition(transition)
-      .attr("fill", ({ value }) => scaleColor(value))
-      .attr(
-        "d",
-        ({ value }) =>
-          `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-            value
-          )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-      );
+  const groupsBar = groupsData
+    .selectAll("g")
+    .data((d) => [...d[key]].reverse());
 
-    groupsBar
-      .select("path:nth-of-type(2)")
-      .transition(transition)
-      .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
-      .attr(
-        "d",
-        ({ value }) =>
-          `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-            value
-          )} ${-gp2} ${gp2 / 2} z`
-      );
+  groupsBar
+    .select("path:nth-of-type(1)")
+    .transition(transition)
+    .attr("fill", ({ value }) => scaleColor(value))
+    .attr(
+      "d",
+      ({ value }) =>
+        `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+          value
+        )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
+    );
 
-    groupsBar
-      .select("path:nth-of-type(3)")
-      .transition(transition)
-      .attr(
-        "d",
-        ({ value }) =>
-          `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-            value
-          )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
-            -gp1 / 2
-          } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
-            -gp2 / 2
-          } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-      );
-  });
+  groupsBar
+    .select("path:nth-of-type(2)")
+    .transition(transition)
+    .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
+    .attr(
+      "d",
+      ({ value }) =>
+        `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+          value
+        )} ${-gp2} ${gp2 / 2} z`
+    );
+
+  groupsBar
+    .select("path:nth-of-type(3)")
+    .transition(transition)
+    .attr(
+      "d",
+      ({ value }) =>
+        `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
+          value
+        )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
+          -gp1 / 2
+        } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
+          -gp2 / 2
+        } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
+    );
+});
