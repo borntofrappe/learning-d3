@@ -2,6 +2,7 @@ const data = [
   {
     station: "Hampstead",
     "Distance from London": 4,
+    "Distance from London": 4,
     "Max temperature": [
       7.46, 8.07, 10.91, 14.13, 17.33, 20.38, 22.73, 22.26, 19.13, 14.83, 10.6,
       7.81,
@@ -175,6 +176,24 @@ const scaleColor = d3
 const ticksElevation = scaleElevation.ticks(4).slice(1);
 
 const root = d3.select("body").append("div").attr("id", "root");
+
+const header = root.append("header");
+
+header.append("h1").text("Greater London climate averages");
+header
+  .append("p")
+  .text(`There are ${dataViz.length} stations near London: `)
+  .append("ul")
+  .selectAll("li")
+  .data(dataViz)
+  .enter()
+  .append("li")
+  .html(
+    (d) =>
+      `<em>${d["station"]}</em> <span>(${d["Distance from London"]} miles)</span>`
+  );
+
+header.append("p").text("How different are the recorded averages?");
 
 const svg = root
   .append("svg")
