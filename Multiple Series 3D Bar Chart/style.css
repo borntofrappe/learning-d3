@@ -14,9 +14,9 @@ body {
 }
 
 svg {
+  color: hsl(0, 0%, 32%);
   margin: auto;
   width: 90vmin;
-  max-width: 32rem;
+  max-width: 42rem;
   height: auto;
-  outline: 1px solid;
 }

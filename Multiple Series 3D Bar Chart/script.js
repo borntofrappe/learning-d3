@@ -64,7 +64,7 @@ const months = d3
   .map((d) => timeFormat(d));
 
 const width = 600;
-const height = 500;
+const height = 520;
 const margin = {
   top: 5,
   bottom: 50,
@@ -137,10 +137,15 @@ groupAxis
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1")
-  .attr(
-    "d",
-    `M 0 0 l ${h1} ${v1} ${h2} ${-v2} 0 ${-elevation} ${-h1} ${-v1} ${-h2} ${v2}z`
-  );
+  .attr("d", `M 0 ${-elevation} l 0 ${elevation} ${h1} ${v1}`);
+
+groupAxis
+  .append("path")
+  .attr("opacity", "0.2")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("d", `M ${h1 + h2} ${v1 - v2} l 0 ${-elevation}`);
 
 const groupTemperatures = groupAxis.append("g");
 const groupStations = groupAxis.append("g");
@@ -164,8 +169,9 @@ groupsElevation
 
 groupsElevation
   .append("text")
-  .attr("x", "-5")
+  .attr("x", "-12")
   .attr("text-anchor", "end")
+  .attr("fill", "currentColor")
   .attr("font-size", "18")
   .attr("font-weight", "500")
   .text((d) => d);
@@ -189,10 +195,12 @@ groupsStations
 groupsStations
   .append("text")
   .attr("transform", `translate(${g1 / 2} ${g1 / 2 / 2})`)
-  .attr("x", "-10")
-  .attr("y", "12")
+  .attr("x", "-8")
+  .attr("y", "8")
   .attr("text-anchor", "end")
-  .attr("font-size", "18")
+  .attr("dominant-baseline", "middle")
+  .attr("fill", "currentColor")
+  .attr("font-size", "16")
   .attr("font-weight", "500")
   .text((_, i) => scaleOffset1.domain()[i]);
 
@@ -219,7 +227,8 @@ groupsTemperatures
   .attr("x", "18")
   .attr("y", "18")
   .attr("text-anchor", "middle")
-  .attr("font-size", "18")
+  .attr("fill", "currentColor")
+  .attr("font-size", "16")
   .attr("font-weight", "500")
   .text((_, i) => months[i]);
 
@@ -258,7 +267,7 @@ groupsBar
 
 groupsBar
   .append("path")
-  .attr("fill", (d) => d3.color(scaleColor(d)).darker(0.5))
+  .attr("fill", (d) => d3.color(scaleColor(d)).darker(0.6))
   .attr(
     "d",
     (d) =>
