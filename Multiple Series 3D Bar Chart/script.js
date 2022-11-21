@@ -1,7 +1,6 @@
 const data = [
   {
-    station: "Hampstead",
-    "Distance from London": 4,
+    Station: "Hampstead",
     "Distance from London": 4,
     "Max temperature": [
       7.46, 8.07, 10.91, 14.13, 17.33, 20.38, 22.73, 22.26, 19.13, 14.83, 10.6,
@@ -16,7 +15,7 @@ const data = [
     ],
   },
   {
-    station: "Greenwich Park",
+    Station: "Greenwich Park",
     "Distance from London": 6,
     "Max temperature": [
       8.47, 9.21, 12.07, 15.35, 18.59, 21.37, 23.75, 23.31, 20.29, 15.83, 11.55,
@@ -32,7 +31,7 @@ const data = [
     ],
   },
   {
-    station: "Kew Gardens",
+    Station: "Kew Gardens",
     "Distance from London": 7,
     "Max temperature": [
       8.56, 9.2, 11.91, 15.13, 18.39, 21.43, 23.78, 23.37, 20.29, 15.97, 11.61,
@@ -47,7 +46,7 @@ const data = [
     ],
   },
   {
-    station: "Hampton W Wks",
+    Station: "Hampton W Wks",
     "Distance from London": 13,
     "Max temperature": [
       8.46, 8.93, 11.52, 14.72, 17.98, 20.95, 23.2, 22.81, 19.82, 15.66, 11.55,
@@ -62,7 +61,7 @@ const data = [
     ],
   },
   {
-    station: "Northolt",
+    Station: "Northolt",
     "Distance from London": 13,
     "Max temperature": [
       8.23, 8.82, 11.63, 14.84, 18.09, 21.19, 23.49, 23.1, 20, 15.62, 11.3,
@@ -86,6 +85,7 @@ const margin = {
   left: 100,
   right: 30,
 };
+
 const strokeWidth = 0;
 
 const h1 = width / 3;
@@ -100,52 +100,45 @@ const months = d3
   .timeMonths(new Date(2022, 0, 1), new Date(2023, 0, 1))
   .map((d) => timeFormat(d));
 
-const stations = data.map(({ station }) => station);
-
-const dataViz = data.map((d) => {
-  return {
-    ...d,
-    "Max temperature": d["Max temperature"].map((value, i) => ({
-      value,
-      month: months[i],
-    })),
-    "Min temperature": d["Min temperature"].map((value, i) => ({
-      value,
-      month: months[i],
-    })),
-    Rainfall: d["Rainfall"].map((value, i) => ({
-      value,
-      month: months[i],
-    })),
-  };
-});
+const stations = data.map((d) => d["Station"]);
 
 const metrics = {
   "Max temperature": {
     interpolator: d3.interpolateReds,
+    domain: [0, d3.max(data, (d) => d3.max(d["Max temperature"]))],
     range: [0, elevation],
-    max: d3.max(dataViz, (d) =>
-      d3.max(d["Max temperature"], ({ value }) => value)
-    ),
   },
   "Min temperature": {
     interpolator: d3.interpolateBlues,
+    domain: [0, d3.max(data, (d) => d3.max(d["Min temperature"]))],
     range: [elevation, 0],
-    max: d3.max(dataViz, (d) =>
-      d3.max(d["Min temperature"], ({ value }) => value)
-    ),
   },
   Rainfall: {
     interpolator: d3.interpolatePurples,
+    domain: [0, d3.max(data, (d) => d3.max(d["Rainfall"]))],
     range: [0, elevation],
-    max: d3.max(dataViz, (d) => d3.max(d["Rainfall"], ({ value }) => value)),
   },
 };
 
 const keys = Object.keys(metrics);
 
+const dataViz = data.map((d) => {
+  const o = keys.reduce((acc, curr) => {
+    acc[curr] = d[curr].map((value, i) => ({
+      value,
+      month: months[i],
+    }));
+    return acc;
+  }, {});
+
+  return {
+    ...d,
+    ...o,
+  };
+});
+
 const [key] = keys;
-const { interpolator, range, max } = metrics[key];
+const { domain, range, interpolator } = metrics[key];
 
 const { length: l1 } = stations;
 const g1 = h1 / l1;
@@ -162,15 +155,11 @@ const gp2 = g2 - p;
 const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(os1);
 const scaleOffset2 = d3.scaleOrdinal().domain(months).range(os2);
 
-const scaleElevation = d3
-  .scaleLinear()
-  .domain([0, max])
-  .range(range)
-  .clamp(true);
+const scaleElevation = d3.scaleLinear().domain(domain).range(range).clamp(true);
 
 const scaleColor = d3
   .scaleSequential()
-  .domain([0, max])
+  .domain(domain)
   .interpolator(interpolator);
 
 const ticksElevation = scaleElevation.ticks(4).slice(1);
@@ -190,7 +179,7 @@ header
   .append("li")
   .html(
     (d) =>
-      `<em>${d["station"]}</em> <span>(${d["Distance from London"]} miles)</span>`
+      `<em>${d["Station"]}</em> <span>(${d["Distance from London"]} miles)</span>`
   );
 
 header.append("p").text("How different are the recorded averages?");
@@ -232,34 +221,9 @@ groupAxis
   .attr("stroke-width", "1")
   .attr("d", `M ${h1 + h2} ${v1 - v2} l 0 ${-elevation}`);
 
-const groupTemperatures = groupAxis.append("g");
+const groupMonths = groupAxis.append("g");
 const groupStations = groupAxis.append("g");
 const groupElevation = groupAxis.append("g");
-
-const groupsElevation = groupElevation
-  .append("g")
-  .selectAll("g")
-  .data(ticksElevation)
-  .enter()
-  .append("g")
-  .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
-
-groupsElevation
-  .append("path")
-  .attr("fill", "none")
-  .attr("opacity", "0.2")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "1")
-  .attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
-
-groupsElevation
-  .append("text")
-  .attr("x", "-12")
-  .attr("text-anchor", "end")
-  .attr("fill", "currentColor")
-  .attr("font-size", "18")
-  .attr("font-weight", "500")
-  .text((d) => d);
 
 const groupsStations = groupStations
   .append("g")
@@ -272,13 +236,7 @@ const groupsStations = groupStations
     return `translate(${x} ${y})`;
   });
 
-groupsStations
-  .append("path")
-  .attr("fill", "none")
-  .attr("opacity", "0.2")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "1")
-  .attr("d", `M 0 0 l ${h2} ${-v2} 0 ${-elevation}`);
+groupsStations.append("path").attr("d", `M 0 0 l ${h2} ${-v2} 0 ${-elevation}`);
 
 groupsStations
   .append("text")
@@ -287,12 +245,10 @@ groupsStations
   .attr("y", "8")
   .attr("text-anchor", "end")
   .attr("dominant-baseline", "middle")
-  .attr("fill", "currentColor")
   .attr("font-size", "16")
-  .attr("font-weight", "500")
   .text((d) => d);
 
-const groupsTemperatures = groupTemperatures
+const groupsMonths = groupMonths
   .append("g")
   .attr("transform", `translate(${h1} ${v1})`)
   .selectAll("g")
@@ -304,32 +260,50 @@ const groupsTemperatures = groupTemperatures
     return `translate(${x} ${y})`;
   });
 
-groupsTemperatures
-  .append("path")
-  .attr("fill", "none")
-  .attr("opacity", "0.2")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", "1")
-  .attr("d", `M 0 0 l ${-h1} ${-v1} 0 ${-elevation}`);
+groupsMonths.append("path").attr("d", `M 0 0 l ${-h1} ${-v1} 0 ${-elevation}`);
 
-groupsTemperatures
+groupsMonths
   .append("text")
   .attr("transform", `translate(${g2 / 2} ${-g2 / 2 / 2})`)
   .attr("x", "18")
   .attr("y", "18")
   .attr("text-anchor", "middle")
-  .attr("fill", "currentColor")
   .attr("font-size", "16")
-  .attr("font-weight", "500")
   .text((d) => d);
+
+const groupsElevation = groupElevation
+  .selectAll("g")
+  .data(ticksElevation)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => `translate(0 ${-scaleElevation(d)})`);
+
+groupsElevation.append("path").attr("d", `M 0 0 l ${h2} ${-v2} ${h1} ${v1}`);
+
+groupsElevation
+  .append("text")
+  .attr("x", "-12")
+  .attr("text-anchor", "end")
+  .attr("font-size", "18")
+  .text((d) => d);
+
+groupAxis.selectAll("g").selectAll("text").attr("fill", "currentColor");
+
+groupAxis
+  .selectAll("g")
+  .selectAll("path")
+  .attr("opacity", "0.2")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
 
 const groupsData = groupData
   .selectAll("g")
   .data(dataViz)
   .enter()
   .append("g")
-  .attr("transform", ({ station }) => {
-    const [x, y] = scaleOffset1(station);
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset1(d["Station"]);
 
     return `translate(${x} ${y})`;
   });
@@ -348,24 +322,29 @@ const groupsBar = groupsData
 groupsBar
   .append("path")
   .attr("fill", ({ value }) => scaleColor(value))
-  .attr(
-    "d",
-    ({ value }) =>
-      `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        value
-      )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-  );
+  .attr("d", ({ value }) => {
+    const h1 = gp1;
+    const v1 = h1 / 2;
+
+    const h2 = gp2;
+    const v2 = h2 / 2;
+    const elevation = scaleElevation(value);
+    return `M ${p} 0 l ${h1} ${v1} ${h2} ${-v2} 0 ${-elevation} ${-h1} ${-v1} ${-h2} ${v2}`;
+  });
 
 groupsBar
   .append("path")
   .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
-  .attr(
-    "d",
-    ({ value }) =>
-      `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        value
-      )} ${-gp2} ${gp2 / 2} z`
-  );
+  .attr("d", ({ value }) => {
+    const h1 = gp1;
+    const v1 = h1 / 2;
+
+    const h2 = gp2;
+    const v2 = h2 / 2;
+    const elevation = scaleElevation(value);
+
+    return `M ${h1 + p} ${v1} l ${h2} ${-v2} 0 ${-elevation} ${-h2} ${v2} z`;
+  });
 
 groupsBar
   .append("path")
@@ -374,17 +353,20 @@ groupsBar
   .attr("stroke-linejoin", "round")
   .attr("stroke", "currentColor")
   .attr("stroke-width", strokeWidth)
-  .attr(
-    "d",
-    ({ value }) =>
-      `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-        value
-      )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
-        -gp1 / 2
-      } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
-        -gp2 / 2
-      } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-  );
+  .attr("d", ({ value }) => {
+    const h1 = gp1;
+    const v1 = h1 / 2;
+
+    const h2 = gp2;
+    const v2 = h2 / 2;
+    const elevation = scaleElevation(value);
+
+    return `M ${
+      h1 + p
+    } ${v1} l ${h2} ${-v2} 0 ${-elevation} ${-h2} ${v2} 0 ${scaleElevation(
+      value
+    )} ${-h1} ${-v1} 0 ${-elevation} ${h1} ${v1} m ${h2} ${-v2} l ${-h1} ${-v1} ${-h2} ${v2}`;
+  });
 
 const form = root.append("form").on("submit", (e) => e.preventDefault());
 
@@ -400,17 +382,16 @@ select
 
 select.property("value", key).on("input", (e) => {
   const { value: key } = e.target;
-  const { interpolator, range, max } = metrics[key];
+  const { domain, range, interpolator } = metrics[key];
 
-  scaleElevation.domain([0, max]).range(range);
-  scaleColor.domain([0, max]).interpolator(interpolator);
+  scaleElevation.domain(domain).range(range);
+  scaleColor.domain(domain).interpolator(interpolator);
 
   const ticksElevation = scaleElevation.ticks(4).slice(1);
 
   const transition = d3.transition();
 
   groupElevation
-    .select("g")
     .selectAll("g")
     .data(ticksElevation)
     .join(
@@ -461,38 +442,46 @@ select.property("value", key).on("input", (e) => {
     .select("path:nth-of-type(1)")
     .transition(transition)
     .attr("fill", ({ value }) => scaleColor(value))
-    .attr(
-      "d",
-      ({ value }) =>
-        `M ${p} 0 l ${gp1} ${gp1 / 2} ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-          value
-        )} ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-    );
+    .attr("d", ({ value }) => {
+      const h1 = gp1;
+      const v1 = h1 / 2;
+
+      const h2 = gp2;
+      const v2 = h2 / 2;
+      const elevation = scaleElevation(value);
+      return `M ${p} 0 l ${h1} ${v1} ${h2} ${-v2} 0 ${-elevation} ${-h1} ${-v1} ${-h2} ${v2}`;
+    });
 
   groupsBar
     .select("path:nth-of-type(2)")
     .transition(transition)
     .attr("fill", ({ value }) => d3.color(scaleColor(value)).darker(0.6))
-    .attr(
-      "d",
-      ({ value }) =>
-        `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-          value
-        )} ${-gp2} ${gp2 / 2} z`
-    );
+    .attr("d", ({ value }) => {
+      const h1 = gp1;
+      const v1 = h1 / 2;
+
+      const h2 = gp2;
+      const v2 = h2 / 2;
+      const elevation = scaleElevation(value);
+
+      return `M ${h1 + p} ${v1} l ${h2} ${-v2} 0 ${-elevation} ${-h2} ${v2} z`;
+    });
 
   groupsBar
     .select("path:nth-of-type(3)")
     .transition(transition)
-    .attr(
-      "d",
-      ({ value }) =>
-        `M ${gp1 + p} ${gp1 / 2} l ${gp2} ${-gp2 / 2} 0 ${-scaleElevation(
-          value
-        )} ${-gp2} ${gp2 / 2} 0 ${scaleElevation(value)} ${-gp1} ${
-          -gp1 / 2
-        } 0 ${-scaleElevation(value)} ${gp1} ${gp1 / 2} m ${gp2} ${
-          -gp2 / 2
-        } l ${-gp1} ${-gp1 / 2} ${-gp2} ${gp2 / 2}`
-    );
+    .attr("d", ({ value }) => {
+      const h1 = gp1;
+      const v1 = h1 / 2;
+
+      const h2 = gp2;
+      const v2 = h2 / 2;
+      const elevation = scaleElevation(value);
+
+      return `M ${
+        h1 + p
+      } ${v1} l ${h2} ${-v2} 0 ${-elevation} ${-h2} ${v2} 0 ${scaleElevation(
+        value
+      )} ${-h1} ${-v1} 0 ${-elevation} ${h1} ${v1} m ${h2} ${-v2} l ${-h1} ${-v1} ${-h2} ${v2}`;
+    });
 });
