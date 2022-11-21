@@ -66,6 +66,7 @@ Projects leaning on D3 to create interesting visualizations.
 | [Tournament Trees](https://codepen.io/borntofrappe/pen/oNyzrBJ)               | hierarchy, tree            |
 | [The Names of the Future](https://codepen.io/borntofrappe/pen/MWXpeve)        | stack, streamgraph         |
 | [Scrollytelling](https://codepen.io/borntofrappe/pen/XWYaLZv)                 | call, observer             |
+| [Multiple Series 3D Bar Chart](https://codepen.io/borntofrappe/pen/jOKZbqM)   | bar, perspective           |
 
 ## script
 

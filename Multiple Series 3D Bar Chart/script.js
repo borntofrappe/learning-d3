@@ -142,20 +142,21 @@ const { domain, range, interpolator } = metrics[key];
 
 const { length: l1 } = stations;
 const g1 = h1 / l1;
-const os1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
 
 const { length: l2 } = months;
 const g2 = h2 / l2;
-const os2 = d3.range(l2).map((d) => [d * g2, ((d * g2) / 2) * -1]);
 
 const p = 0.2 * (g1 + g2);
 const gp1 = g1 - p;
 const gp2 = g2 - p;
 
-const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(os1);
-const scaleOffset2 = d3.scaleOrdinal().domain(months).range(os2);
+const offsets1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
+const offsets2 = d3.range(l2).map((d) => [d * g2, ((d * g2) / 2) * -1]);
 
-const scaleElevation = d3.scaleLinear().domain(domain).range(range).clamp(true);
+const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(offsets1);
+const scaleOffset2 = d3.scaleOrdinal().domain(months).range(offsets2);
+
+const scaleElevation = d3.scaleLinear().domain(domain).range(range);
 
 const scaleColor = d3
   .scaleSequential()
