@@ -57,6 +57,22 @@ const data = [
   },
 ];
 
+const width = 600;
+const height = 520;
+const margin = {
+  top: 5,
+  bottom: 50,
+  left: 100,
+  right: 30,
+};
+const strokeWidth = 0;
+
+const h1 = width / 3;
+const h2 = width - h1;
+const v1 = h1 / 2;
+const v2 = h2 / 2;
+const elevation = height - ((v1 + v2) / 2) * 2;
+
 const timeFormat = d3.timeFormat("%b");
 
 const months = d3
@@ -79,23 +95,21 @@ const dataViz = data.map((d) => {
   };
 });
 
-const metric = "Max temperature";
-
-const width = 600;
-const height = 520;
-const margin = {
-  top: 5,
-  bottom: 50,
-  left: 100,
-  right: 30,
+const metrics = {
+  "Max temperature": {
+    interpolator: d3.interpolateReds,
+    range: [0, elevation],
+  },
+  "Min temperature": {
+    interpolator: d3.interpolateBlues,
+    range: [elevation, 0],
+  },
 };
-const strokeWidth = 0;
 
-const h1 = width / 3;
-const h2 = width - h1;
-const v1 = h1 / 2;
-const v2 = h2 / 2;
-const elevation = height - ((v1 + v2) / 2) * 2;
+const keys = Object.keys(metrics);
+
+const [, key] = keys;
+const { interpolator, range } = metrics[key];
 
 const { length: l1 } = stations;
 const g1 = h1 / l1;
@@ -113,19 +127,19 @@ const scaleOffset1 = d3.scaleOrdinal().domain(stations).range(os1);
 const scaleOffset2 = d3.scaleOrdinal().domain(months).range(os2);
 
 const maxMetric = d3.max(dataViz, (d) =>
-  d3.max(d[metric], (temperature) => temperature.value)
+  d3.max(d[key], (temperature) => temperature.value)
 );
 
 const scaleElevation = d3
   .scaleLinear()
   .domain([0, maxMetric])
-  .range([0, elevation])
+  .range(range)
   .clamp(true);
 
 const scaleColor = d3
   .scaleSequential()
   .domain([0, maxMetric])
-  .interpolator(d3.interpolateReds);
+  .interpolator(interpolator);
 
 const ticksElevation = scaleElevation.ticks(4).slice(1);
 
@@ -271,7 +285,7 @@ const groupsData = groupData
 
 const groupsBar = groupsData
   .selectAll("g")
-  .data((d) => [...d[metric]].reverse())
+  .data((d) => [...d[key]].reverse())
   .enter()
   .append("g")
   .attr("transform", ({ month }) => {
