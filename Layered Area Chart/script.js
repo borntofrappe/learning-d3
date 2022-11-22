@@ -309,6 +309,28 @@ const ticksDates = [
   dates[dates.length - 1],
 ];
 
+const scaleElevation = d3
+  .scaleLinear()
+  .domain([0, d3.max(data[0]["Search Interest"], (d) => d.value)])
+  .range([0, -elevation]);
+
+const line = d3
+  .line()
+  .x((d) => {
+    const { date } = d;
+
+    const [x] = scaleOffset2(timeParse(date));
+
+    return x;
+  })
+  .y((d) => {
+    const { date, value } = d;
+
+    const [, y] = scaleOffset2(timeParse(date));
+    const elevation = scaleElevation(value);
+    return y + elevation;
+  });
+
 const svg = d3
   .select("body")
   .append("svg")
@@ -380,3 +402,18 @@ groupsDates
   .attr("transform", `translate(${h1} ${v1})`)
   .attr("fill", "currentColor")
   .text((d) => timeFormat(d));
+
+const groupsData = groupData
+  .selectAll("g")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset1(d["World Cup"]);
+    return `translate(${x} ${y})`;
+  });
+
+groupsData
+  .append("path")
+  .datum((d) => d["Search Interest"])
+  .attr("d", line);
