@@ -269,13 +269,14 @@ const data = [
   },
 ];
 
-const width = 500;
-const height = 400;
+const width = 600;
+const height = width / 2;
+const elevation = 100;
 const margin = {
   top: 5,
   bottom: 20,
-  left: 80,
-  right: 50,
+  left: 90,
+  right: 60,
 };
 
 const timeParse = d3.timeParse("%Y-%m-%d");
@@ -283,11 +284,10 @@ const timeFormat = d3.timeFormat("%B %-d");
 
 const ticks = 4;
 
-const h1 = width / 2;
+const h1 = width / 3;
 const h2 = width - h1;
 const v1 = h1 / 2;
 const v2 = h2 / 2;
-const elevation = height - ((v1 + v2) / 2) * 2;
 
 const editions = data.map((d) => d["World Cup"]);
 const dates = data[0]["Search Interest"].map(({ date }) => timeParse(date));
@@ -337,7 +337,7 @@ const svg = d3
   .attr(
     "viewBox",
     `0 0 ${width + margin.left + margin.right} ${
-      height + margin.top + margin.bottom
+      height + margin.top + margin.bottom + elevation
     }`
   );
 
