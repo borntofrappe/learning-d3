@@ -282,8 +282,6 @@ const margin = {
 const timeParse = d3.timeParse("%Y-%m-%d");
 const timeFormat = d3.timeFormat("%B %e");
 
-const ticks = 4;
-
 const h1 = width / 3;
 const h2 = width - h1;
 const v1 = h1 / 2;
@@ -291,6 +289,8 @@ const v2 = h2 / 2;
 
 const editions = data.map((d) => d["Edition"]);
 const dates = data[0]["Search Interest"].map(({ date }) => timeParse(date));
+
+const ticks = 4;
 
 const ticksDates = [
   ...d3.range(ticks).map((d) => dates[Math.floor((dates.length / ticks) * d)]),
@@ -348,8 +348,8 @@ header.append("h1").text("World cup search interest");
 
 header
   .append("p")
-  .html(
-    "There world cup is <em>usually</em> held between the months of June and July, leading to a spike in Google searches."
+  .text(
+    "The FIFA World Cup took place frequenty between the months of June and July, leading to a spike in Google searches."
   );
 
 header.append("p").text("Is it possible to compare past editions?");
