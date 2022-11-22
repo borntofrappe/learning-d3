@@ -292,6 +292,11 @@ const v2 = h2 / 2;
 const editions = data.map((d) => d["World Cup"]);
 const dates = data[0]["Search Interest"].map(({ date }) => timeParse(date));
 
+const ticksDates = [
+  ...d3.range(ticks).map((d) => dates[Math.floor((dates.length / ticks) * d)]),
+  dates[dates.length - 1],
+];
+
 const { length: l1 } = editions;
 const g1 = h1 / l1;
 
@@ -304,18 +309,15 @@ const offsets2 = d3.range(l2).map((d) => [d * g2, ((d * g2) / 2) * -1]);
 const scaleOffset1 = d3.scaleOrdinal().domain(editions).range(offsets1);
 const scaleOffset2 = d3.scaleOrdinal().domain(dates).range(offsets2);
 
-const ticksDates = [
-  ...d3.range(ticks).map((d) => dates[Math.floor((dates.length / ticks) * d)]),
-  dates[dates.length - 1],
-];
+const scaleColor = d3.scaleOrdinal().domain(editions).range(d3.schemeSet2);
 
 const scaleElevation = d3
   .scaleLinear()
   .domain([0, d3.max(data[0]["Search Interest"], (d) => d.value)])
   .range([0, -elevation]);
 
-const line = d3
-  .line()
+const area = d3
+  .area()
   .x((d) => {
     const { date } = d;
 
@@ -323,13 +325,20 @@ const line = d3
 
     return x;
   })
-  .y((d) => {
+  .y1((d) => {
     const { date, value } = d;
 
     const [, y] = scaleOffset2(timeParse(date));
     const elevation = scaleElevation(value);
     return y + elevation;
-  });
+  })
+  .y0((d) => {
+    const { date } = d;
+
+    const [, y] = scaleOffset2(timeParse(date));
+    return y;
+  })
+  .curve(d3.curveCatmullRom);
 
 const svg = d3
   .select("body")
@@ -367,7 +376,6 @@ const groupsEditions = groupEditions
     return `translate(${x} ${y})`;
   });
 
-// groupsEditions.append("path").attr("d", `M 0 0 l ${h2} ${-v2}`);
 groupsEditions
   .append("text")
   .text((d) => d)
@@ -411,9 +419,11 @@ const groupsData = groupData
   .attr("transform", (d) => {
     const [x, y] = scaleOffset1(d["World Cup"]);
     return `translate(${x} ${y})`;
-  });
+  })
+  .attr("color", (d) => scaleColor(d["World Cup"]));
 
 groupsData
   .append("path")
   .datum((d) => d["Search Interest"])
-  .attr("d", line);
+  .attr("d", area)
+  .attr("fill", "currentColor");
