@@ -1,6 +1,6 @@
 const data = [
   {
-    "World Cup": "Germany",
+    Edition: "Germany",
     Dates: "9 June - 9 July",
     "Search Interest": [
       { date: "2006-06-01", value: 13 },
@@ -67,7 +67,7 @@ const data = [
     ],
   },
   {
-    "World Cup": "South Africa",
+    Edition: "South Africa",
     Dates: "11 June - 11 July",
     "Search Interest": [
       { date: "2010-06-01", value: 13 },
@@ -134,7 +134,7 @@ const data = [
     ],
   },
   {
-    "World Cup": "Brazil",
+    Edition: "Brazil",
     Dates: "12 June - 13 July",
     "Search Interest": [
       { date: "2014-06-01", value: 12 },
@@ -201,7 +201,7 @@ const data = [
     ],
   },
   {
-    "World Cup": "Russia",
+    Edition: "Russia",
     Dates: "14 June - 15 July",
     "Search Interest": [
       { date: "2018-06-01", value: 5 },
@@ -280,7 +280,7 @@ const margin = {
 };
 
 const timeParse = d3.timeParse("%Y-%m-%d");
-const timeFormat = d3.timeFormat("%B %-d");
+const timeFormat = d3.timeFormat("%B %e");
 
 const ticks = 4;
 
@@ -289,7 +289,7 @@ const h2 = width - h1;
 const v1 = h1 / 2;
 const v2 = h2 / 2;
 
-const editions = data.map((d) => d["World Cup"]);
+const editions = data.map((d) => d["Edition"]);
 const dates = data[0]["Search Interest"].map(({ date }) => timeParse(date));
 
 const ticksDates = [
@@ -340,8 +340,21 @@ const area = d3
   })
   .curve(d3.curveCatmullRom);
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+const header = root.append("header");
+
+header.append("h1").text("World cup search interest");
+
+header
+  .append("p")
+  .html(
+    "There world cup is <em>usually</em> held between the months of June and July, leading to a spike in Google searches."
+  );
+
+header.append("p").text("Is it possible to compare past editions?");
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",
@@ -379,8 +392,7 @@ const groupsEditions = groupEditions
 groupsEditions
   .append("text")
   .text((d) => d)
-  .attr("x", "-8")
-  .attr("y", "8")
+  .attr("x", "-6")
   .attr("font-weight", "700")
   .attr("text-anchor", "end")
   .attr("dominant-baseline", "hanging");
@@ -400,7 +412,7 @@ groupsDates
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1")
-  .attr("opacity", "0.5")
+  .attr("opacity", "0.25")
   .attr("d", `M 0 0 l ${h1} ${v1}`);
 
 groupsDates
@@ -417,10 +429,10 @@ const groupsData = groupData
   .enter()
   .append("g")
   .attr("transform", (d) => {
-    const [x, y] = scaleOffset1(d["World Cup"]);
+    const [x, y] = scaleOffset1(d["Edition"]);
     return `translate(${x} ${y})`;
   })
-  .attr("color", (d) => scaleColor(d["World Cup"]));
+  .attr("color", (d) => scaleColor(d["Edition"]));
 
 groupsData
   .append("path")
