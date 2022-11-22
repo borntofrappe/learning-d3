@@ -268,3 +268,115 @@ const data = [
     ],
   },
 ];
+
+const width = 500;
+const height = 400;
+const margin = {
+  top: 5,
+  bottom: 20,
+  left: 80,
+  right: 50,
+};
+
+const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%B %-d");
+
+const ticks = 4;
+
+const h1 = width / 2;
+const h2 = width - h1;
+const v1 = h1 / 2;
+const v2 = h2 / 2;
+const elevation = height - ((v1 + v2) / 2) * 2;
+
+const editions = data.map((d) => d["World Cup"]);
+const dates = data[0]["Search Interest"].map(({ date }) => timeParse(date));
+
+const { length: l1 } = editions;
+const g1 = h1 / l1;
+
+const { length: l2 } = dates;
+const g2 = h2 / l2;
+
+const offsets1 = d3.range(l1).map((d) => [d * g1, (d * g1) / 2]);
+const offsets2 = d3.range(l2).map((d) => [d * g2, ((d * g2) / 2) * -1]);
+
+const scaleOffset1 = d3.scaleOrdinal().domain(editions).range(offsets1);
+const scaleOffset2 = d3.scaleOrdinal().domain(dates).range(offsets2);
+
+const ticksDates = [
+  ...d3.range(ticks).map((d) => dates[Math.floor((dates.length / ticks) * d)]),
+  dates[dates.length - 1],
+];
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr(
+    "transform",
+    `translate(${margin.left} ${margin.top + elevation + v2})`
+  );
+
+const groupAxis = group.append("g");
+const groupData = group.append("g");
+
+groupAxis.style("color", "hsl(0, 0%, 35%)");
+groupData.style("color", "hsl(0, 0%, 20%)");
+
+const groupEditions = groupAxis.append("g");
+const groupDates = groupAxis.append("g");
+
+const groupsEditions = groupEditions
+  .selectAll("g")
+  .data(editions)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset1(d);
+    return `translate(${x} ${y})`;
+  });
+
+// groupsEditions.append("path").attr("d", `M 0 0 l ${h2} ${-v2}`);
+groupsEditions
+  .append("text")
+  .text((d) => d)
+  .attr("x", "-8")
+  .attr("y", "8")
+  .attr("font-weight", "700")
+  .attr("text-anchor", "end")
+  .attr("dominant-baseline", "hanging");
+
+const groupsDates = groupDates
+  .selectAll("g")
+  .data(ticksDates)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => {
+    const [x, y] = scaleOffset2(d);
+    return `translate(${x} ${y})`;
+  });
+
+groupsDates
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("opacity", "0.5")
+  .attr("d", `M 0 0 l ${h1} ${v1}`);
+
+groupsDates
+  .append("text")
+  .attr("x", "8")
+  .attr("y", "8")
+  .attr("transform", `translate(${h1} ${v1})`)
+  .attr("fill", "currentColor")
+  .text((d) => timeFormat(d));
