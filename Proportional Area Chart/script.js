@@ -54,6 +54,7 @@ const polarAreaChart = () => {
   let accessor = (d) => d;
   let size = 200;
   let gap = 0;
+  let innerRadius = 0;
   let margin = 0;
   let colors = ["#cb362f", "#f6f6f6"];
 
@@ -71,11 +72,14 @@ const polarAreaChart = () => {
 
     const pieData = pie(data);
 
-    const arc = d3.arc().outerRadius((d) => scaleRadius(accessor(d.data)));
+    const arc = d3
+      .arc()
+      .innerRadius(innerRadius)
+      .outerRadius((d) => scaleRadius(accessor(d.data)));
 
     const svg = selection
       .append("svg")
-      .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2 + gap}`)
+      .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`)
       .attr("width", size)
       .attr("height", size);
 
@@ -85,26 +89,39 @@ const polarAreaChart = () => {
 
     const groupCenter = group
       .append("g")
-      .attr(
-        "transform",
-        `translate(${size / 2} ${size / 2 + gap / 2}) rotate(-90)`
-      );
+      .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
 
     groupCenter
       .selectAll("path")
       .data(pieData)
       .enter()
       .append("path")
-      .attr("transform", (d) => {
-        const { startAngle, endAngle } = d;
-        const angle = (((endAngle + startAngle) / 2) * 180) / Math.PI;
-        return `rotate(${angle}) translate(0 ${-gap / 2}) rotate(${
-          angle * -1
-        })`;
-      })
       .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
       .attr("d", arc)
       .attr("fill", "currentColor");
+
+    groupCenter
+      .append("rect")
+      .attr("transform", `rotate(90)`)
+      .attr("x", -radius)
+      .attr("y", -gap / 2)
+      .attr("width", radius * 2)
+      .attr("height", gap)
+      .attr("fill", "#363636");
+
+    groupCenter
+      .append("circle")
+      .attr("r", innerRadius)
+      .attr("fill", "#f6f6f6")
+      .attr("stroke", "#363636")
+      .attr("stroke-width", gap / 2);
+
+    groupCenter
+      .append("circle")
+      .attr("r", innerRadius * 0.4)
+      .attr("fill", "#f6f6f6")
+      .attr("stroke", "#363636")
+      .attr("stroke-width", gap / 6);
   };
 
   polarAreaChart.data = function (value) {
@@ -132,6 +149,13 @@ const polarAreaChart = () => {
     if (!arguments.length) return gap;
 
     gap = value;
+    return this;
+  };
+
+  polarAreaChart.innerRadius = function (value) {
+    if (!arguments.length) return innerRadius;
+
+    innerRadius = value;
     return this;
   };
 
@@ -172,6 +196,7 @@ articles.each(function (d) {
       .accessor((d) => d.sales)
       .size(size)
       .margin(margin)
-      .gap(10)
+      .gap(15)
+      .innerRadius(20)
   );
 });
