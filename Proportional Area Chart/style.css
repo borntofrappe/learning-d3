@@ -12,3 +12,28 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
+
+#root {
+  max-width: 60rem;
+  margin-inline: auto;
+  margin-block: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.75rem;
+}
+
+article > * + * {
+  margin-top: 0.5em;
+}
+
+article {
+  text-align: center;
+}
+
+article > svg {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin-inline: auto;
+  height: auto;
+}
