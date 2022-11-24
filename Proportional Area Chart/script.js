@@ -49,7 +49,91 @@ const data = [
   },
 ];
 
+const polarAreaChart = () => {
+  let data = [];
+  let accessor = (d) => d;
+  let size = 200;
+  let margin = 0;
+  let colors = ["#cb362f", "#f6f6f6"];
+
+  const polarAreaChart = (selection) => {
+    const radius = (size - margin) / 2;
+
+    const max = d3.max(data, accessor);
+
+    const scaleRadius = d3.scaleLinear().domain([0, max]).range([0, radius]);
+
+    const pie = d3.pie().value(accessor).sort(null);
+
+    const pieData = pie(data);
+
+    const arc = d3.arc().outerRadius((d) => scaleRadius(d.value));
+
+    const svg = selection
+      .append("svg")
+      .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`)
+      .attr("width", size)
+      .attr("height", size);
+
+    const group = svg
+      .append("g")
+      .attr("transform", `translate(${margin} ${margin})`);
+
+    const groupCenter = group
+      .append("g")
+      .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
+
+    groupCenter
+      .selectAll("path")
+      .data(pieData)
+      .enter()
+      .append("path")
+      .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
+      .attr("d", arc)
+      .attr("fill", "currentColor");
+  };
+
+  polarAreaChart.data = function (value) {
+    if (!arguments.length) return data;
+
+    data = value;
+    return this;
+  };
+
+  polarAreaChart.accessor = function (fn) {
+    if (!arguments.length) return accessor;
+
+    accessor = fn;
+    return this;
+  };
+
+  polarAreaChart.size = function (value) {
+    if (!arguments.length) return size;
+
+    size = value;
+    return this;
+  };
+
+  polarAreaChart.margin = function (value) {
+    if (!arguments.length) return margin;
+
+    margin = value;
+    return this;
+  };
+
+  polarAreaChart.colors = function (value) {
+    if (!arguments.length) return colors;
+
+    colors = value;
+    return this;
+  };
+
+  return polarAreaChart;
+};
+
 const format = d3.format(",");
+const size = 200;
+const margin = 10;
 
 const [test] = data;
 const { title, sales, breakdown } = test;
@@ -61,42 +145,10 @@ const article = root.append("article");
 article.append("h2").text(title);
 article.append("p").html(`Total sales <strong>${format(sales)}</strong>`);
 
-const size = 200;
-const margin = 10;
-const radius = (size - margin) / 2;
-
-const max = d3.max(breakdown, (d) => d.sales);
-
-const scaleRadius = d3.scaleLinear().domain([0, max]).range([0, radius]);
-const colors = ["#cb362f", "#f6f6f6"];
-
-const svg = article
-  .append("svg")
-  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`)
-  .attr("width", size)
-  .attr("height", size);
-
-const group = svg
-  .append("g")
-  .attr("transform", `translate(${margin} ${margin})`);
-
-const groupCenter = group
-  .append("g")
-  .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
-
-const pie = d3
-  .pie()
-  .value((d) => d.sales)
-  .sort(null);
-const pieData = pie(breakdown);
-
-const arc = d3.arc().outerRadius((d) => scaleRadius(d.value));
-
-groupCenter
-  .selectAll("path")
-  .data(pieData)
-  .enter()
-  .append("path")
-  .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
-  .attr("d", arc)
-  .attr("fill", "currentColor");
+article.call(
+  polarAreaChart()
+    .data(breakdown)
+    .accessor((d) => d.sales)
+    .size(size)
+    .margin(margin)
+);
