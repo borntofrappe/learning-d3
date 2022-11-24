@@ -53,6 +53,7 @@ const polarAreaChart = () => {
   let data = [];
   let accessor = (d) => d;
   let size = 200;
+  let gap = 0;
   let margin = 0;
   let colors = ["#cb362f", "#f6f6f6"];
 
@@ -74,7 +75,7 @@ const polarAreaChart = () => {
 
     const svg = selection
       .append("svg")
-      .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`)
+      .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2 + gap}`)
       .attr("width", size)
       .attr("height", size);
 
@@ -84,13 +85,23 @@ const polarAreaChart = () => {
 
     const groupCenter = group
       .append("g")
-      .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
+      .attr(
+        "transform",
+        `translate(${size / 2} ${size / 2 + gap / 2}) rotate(-90)`
+      );
 
     groupCenter
       .selectAll("path")
       .data(pieData)
       .enter()
       .append("path")
+      .attr("transform", (d) => {
+        const { startAngle, endAngle } = d;
+        const angle = (((endAngle + startAngle) / 2) * 180) / Math.PI;
+        return `rotate(${angle}) translate(0 ${-gap / 2}) rotate(${
+          angle * -1
+        })`;
+      })
       .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
       .attr("d", arc)
       .attr("fill", "currentColor");
@@ -114,6 +125,13 @@ const polarAreaChart = () => {
     if (!arguments.length) return size;
 
     size = value;
+    return this;
+  };
+
+  polarAreaChart.gap = function (value) {
+    if (!arguments.length) return gap;
+
+    gap = value;
     return this;
   };
 
@@ -154,5 +172,6 @@ articles.each(function (d) {
       .accessor((d) => d.sales)
       .size(size)
       .margin(margin)
+      .gap(10)
   );
 });
