@@ -140,15 +140,19 @@ const { title, sales, breakdown } = test;
 
 const root = d3.select("body").append("div").attr("id", "root");
 
-const article = root.append("article");
+const articles = root.selectAll("article").data(data).enter().append("article");
 
-article.append("h2").text(title);
-article.append("p").html(`Total sales <strong>${format(sales)}</strong>`);
+articles.append("h2").text((d) => d.title);
+articles
+  .append("p")
+  .html((d) => `Total sales <strong>${format(d.sales)}</strong>`);
 
-article.call(
-  polarAreaChart()
-    .data(breakdown)
-    .accessor((d) => d.sales)
-    .size(size)
-    .margin(margin)
-);
+articles.each(function (d) {
+  d3.select(this).call(
+    polarAreaChart()
+      .data(d.breakdown)
+      .accessor((d) => d.sales)
+      .size(size)
+      .margin(margin)
+  );
+});
