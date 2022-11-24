@@ -63,11 +63,14 @@ const polarAreaChart = () => {
 
     const scaleRadius = d3.scaleLinear().domain([0, max]).range([0, radius]);
 
-    const pie = d3.pie().value(accessor).sort(null);
+    const pie = d3
+      .pie()
+      .value((d) => 1)
+      .sort(null);
 
     const pieData = pie(data);
 
-    const arc = d3.arc().outerRadius((d) => scaleRadius(d.value));
+    const arc = d3.arc().outerRadius((d) => scaleRadius(accessor(d.data)));
 
     const svg = selection
       .append("svg")
@@ -134,9 +137,6 @@ const polarAreaChart = () => {
 const format = d3.format(",");
 const size = 200;
 const margin = 10;
-
-const [test] = data;
-const { title, sales, breakdown } = test;
 
 const root = d3.select("body").append("div").attr("id", "root");
 
