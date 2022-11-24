@@ -48,3 +48,55 @@ const data = [
     ],
   },
 ];
+
+const format = d3.format(",");
+
+const [test] = data;
+const { title, sales, breakdown } = test;
+
+const root = d3.select("body").append("div").attr("id", "root");
+
+const article = root.append("article");
+
+article.append("h2").text(title);
+article.append("p").html(`Total sales <strong>${format(sales)}</strong>`);
+
+const size = 200;
+const margin = 10;
+const radius = (size - margin) / 2;
+
+const max = d3.max(breakdown, (d) => d.sales);
+
+const scaleRadius = d3.scaleLinear().domain([0, max]).range([0, radius]);
+const colors = ["#cb362f", "#f6f6f6"];
+
+const svg = article
+  .append("svg")
+  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`)
+  .attr("width", size)
+  .attr("height", size);
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin} ${margin})`);
+
+const groupCenter = group
+  .append("g")
+  .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
+
+const pie = d3
+  .pie()
+  .value((d) => d.sales)
+  .sort(null);
+const pieData = pie(breakdown);
+
+const arc = d3.arc().outerRadius((d) => scaleRadius(d.value));
+
+groupCenter
+  .selectAll("path")
+  .data(pieData)
+  .enter()
+  .append("path")
+  .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
+  .attr("d", arc)
+  .attr("fill", "currentColor");
