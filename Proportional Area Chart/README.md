@@ -1,10 +1,10 @@
-# Proportional Area Chart
+# [Proportional Area Chart](https://codepen.io/borntofrappe/full/JjZvpMG)
 
 Recreate one of the examples from [datavizproject](https://datavizproject.com/data-type/proportional-area-chart-half-circle/) for a _Proportional Area Chart (Half Circle)_.
 
 ## Data
 
-The script includes sales figures from bulbapedia. To have some kind of comparison between values I focused on figures for the units sold in Japan and the first week. Each data point includes units sold and _sell-through_ rate, meaning the percentage sold by retailers out of units shipped.
+The script includes sales figures from [bulbapedia](https://bulbapedia.bulbagarden.net). To have some kind of comparison between values I focused on values describing the units sold in Japan after one first week.
 
 - [Ruby and Sapphire](https://bulbapedia.bulbagarden.net/wiki/Pok%C3%A9mon_Ruby_and_Sapphire_Versions#Sales)
 

@@ -10,6 +10,8 @@ body {
 }
 
 body {
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   color: hsl(0, 0%, 21%);
   background: repeating-linear-gradient(
     -50deg,
@@ -20,19 +22,20 @@ body {
   );
   --color-1: hsl(344, 92%, 50%);
   --color-2: hsl(0, 0%, 96%);
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
-    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-h1 {
-  max-width: 40ch;
+::selection {
+  background: hsl(0, 0%, 21%, 0.18);
 }
 
-p {
-}
-
-p > span {
-  font-size: 0.9rem;
+#root {
+  max-width: 65rem;
+  width: 95vw;
+  margin-inline: auto;
+  margin-block: 1rem;
+  padding: 1rem 1.25rem;
+  background: hsl(0, 0%, 91%);
+  box-shadow: 0 0.25rem 1rem -0.5rem hsla(0, 0%, 21%, 0.35);
 }
 
 #root > * + * {
@@ -43,13 +46,13 @@ header > * + * {
   margin-top: 0.5em;
 }
 
-#root {
-  max-width: 65rem;
-  margin-inline: auto;
-  margin-block: 1rem;
-  padding: 1rem 1.25rem;
-  background: hsl(0, 0%, 91%);
-  box-shadow: 0 0.25rem 1rem -0.5rem hsla(0, 0%, 21%, 0.35);
+header h1 {
+  font-size: 1.67rem;
+  text-transform: capitalize;
+}
+
+header p > span {
+  font-size: 0.9rem;
 }
 
 .grid {
@@ -58,12 +61,12 @@ header > * + * {
   gap: 2rem 1.5rem;
 }
 
-article > * + * {
-  margin-top: 0.5em;
-}
-
 article {
   padding: 1rem;
+}
+
+article > * + * {
+  margin-top: 0.5em;
 }
 
 article h2 {
