@@ -54,10 +54,10 @@ const polarAreaChart = () => {
   let accessor = (d) => d;
   let size = 200;
   let margin = 0;
-  let colors = ["#cb362f", "#f6f6f6"];
   let innerRadius = 0;
   let innerFill = "#363636";
   let strokeWidth = 0;
+  let colors = ["#cb362f", "#f6f6f6"];
 
   const polarAreaChart = (selection) => {
     const radius = (size - margin) / 2;
@@ -131,6 +131,13 @@ const polarAreaChart = () => {
     return this;
   };
 
+  polarAreaChart.margin = function (value) {
+    if (!arguments.length) return margin;
+
+    margin = value;
+    return this;
+  };
+
   polarAreaChart.innerRadius = function (value) {
     if (!arguments.length) return innerRadius;
 
@@ -149,13 +156,6 @@ const polarAreaChart = () => {
     if (!arguments.length) return strokeWidth;
 
     strokeWidth = value;
-    return this;
-  };
-
-  polarAreaChart.margin = function (value) {
-    if (!arguments.length) return margin;
-
-    margin = value;
     return this;
   };
 
