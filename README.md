@@ -68,6 +68,7 @@ Projects leaning on D3 to create interesting visualizations.
 | [Scrollytelling](https://codepen.io/borntofrappe/pen/XWYaLZv)                 | call, observer             |
 | [Multiple Series 3D Bar Chart](https://codepen.io/borntofrappe/pen/jOKZbqM)   | bar, perspective           |
 | [Layered Area Chart](https://codepen.io/borntofrappe/pen/xxzYmzx)             | area, perspective          |
+| [Proportional Area Chart](https://codepen.io/borntofrappe/pen/JjZvpMG)        | call, pie                  |
 
 ## script
 

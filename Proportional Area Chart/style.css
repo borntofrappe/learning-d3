@@ -1,0 +1,92 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  color: hsl(0, 0%, 21%);
+  background: repeating-linear-gradient(
+    -50deg,
+    hsl(0, 0%, 89%) 0px,
+    hsl(0, 0%, 89%) 50px,
+    hsl(0, 0%, 84%) 50px,
+    hsl(0, 0%, 84%) 60px
+  );
+  --color-1: hsl(344, 92%, 50%);
+  --color-2: hsl(0, 0%, 96%);
+}
+
+::selection {
+  background: hsl(0, 0%, 21%, 0.18);
+}
+
+#root {
+  max-width: 65rem;
+  width: 95vw;
+  margin-inline: auto;
+  margin-block: 1rem;
+  padding: 1rem 1.25rem;
+  background: hsl(0, 0%, 91%);
+  box-shadow: 0 0.25rem 1rem -0.5rem hsla(0, 0%, 21%, 0.35);
+}
+
+#root > * + * {
+  margin-top: 0.75em;
+}
+
+header > * + * {
+  margin-top: 0.5em;
+}
+
+header h1 {
+  font-size: 1.67rem;
+  text-transform: capitalize;
+}
+
+header p > span {
+  font-size: 0.9rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem 1.5rem;
+}
+
+article {
+  padding: 1rem;
+}
+
+article > * + * {
+  margin-top: 0.5em;
+}
+
+article h2 {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+article h2,
+article p {
+  display: inline;
+}
+
+article p::before {
+  content: ": ";
+}
+
+article > svg {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin-inline: auto;
+  height: auto;
+}
