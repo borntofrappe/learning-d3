@@ -182,12 +182,37 @@ const margin = 10;
 
 const root = d3.select("body").append("div").attr("id", "root");
 
-const articles = root.selectAll("article").data(data).enter().append("article");
+const header = root.append("header");
+
+header.append("h1").text("Poké split");
+
+header
+  .append("p")
+  .html(
+    "Pokemon games have historically <span>(and usually)</span> released in pairs. Are there large differences in the sales of the different versions?"
+  );
+
+header
+  .append("p")
+  .text("Let's see how many copies were sold in Japan, just after one week.");
+
+const articles = root
+  .append("div")
+  .attr("class", "grid")
+  .selectAll("article")
+  .data(data)
+  .enter()
+  .append("article");
 
 articles.append("h2").text((d) => d.title);
 articles
   .append("p")
-  .html((d) => `Total sales <strong>${format(d.sales)}</strong>`);
+  .html(
+    (d) =>
+      `${d.breakdown
+        .map((d) => `<strong>${format(d.sales)}</strong>`)
+        .join(" and ")}.`
+  );
 
 articles.each(function (d) {
   d3.select(this).call(
