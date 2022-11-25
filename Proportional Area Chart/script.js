@@ -56,6 +56,8 @@ const polarAreaChart = () => {
   let margin = 0;
   let colors = ["#cb362f", "#f6f6f6"];
   let innerRadius = 0;
+  let innerFill = "#363636";
+  let strokeWidth = 0;
 
   const polarAreaChart = (selection) => {
     const radius = (size - margin) / 2;
@@ -88,16 +90,24 @@ const polarAreaChart = () => {
 
     const groupCenter = group
       .append("g")
-      .attr("transform", `translate(${size / 2} ${size / 2}) rotate(-90)`);
+      .attr("transform", `translate(${size / 2} ${size / 2})`);
 
-    groupCenter
+    const groupSlices = groupCenter
+      .append("g")
+      .attr("transform", "rotate(-90)");
+
+    groupSlices
       .selectAll("path")
       .data(pieData)
       .enter()
       .append("path")
       .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
       .attr("d", arc)
-      .attr("fill", "currentColor");
+      .attr("fill", "currentColor")
+      .attr("stroke", "#363636")
+      .attr("stroke-width", strokeWidth);
+
+    groupCenter.append("circle").attr("r", innerRadius).attr("fill", innerFill);
   };
 
   polarAreaChart.data = function (value) {
@@ -121,17 +131,24 @@ const polarAreaChart = () => {
     return this;
   };
 
-  polarAreaChart.gap = function (value) {
-    if (!arguments.length) return gap;
-
-    gap = value;
-    return this;
-  };
-
   polarAreaChart.innerRadius = function (value) {
     if (!arguments.length) return innerRadius;
 
     innerRadius = value;
+    return this;
+  };
+
+  polarAreaChart.innerFill = function (value) {
+    if (!arguments.length) return innerFill;
+
+    innerFill = value;
+    return this;
+  };
+
+  polarAreaChart.strokeWidth = function (value) {
+    if (!arguments.length) return strokeWidth;
+
+    strokeWidth = value;
     return this;
   };
 
@@ -197,6 +214,8 @@ articles.each(function (d) {
       .accessor((d) => d.sales)
       .size(size)
       .margin(margin)
-      .innerRadius(0)
+      .innerRadius(20)
+      .innerFill("url(#chart-center)")
+      .strokeWidth(5)
   );
 });
