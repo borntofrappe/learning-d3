@@ -53,10 +53,9 @@ const polarAreaChart = () => {
   let data = [];
   let accessor = (d) => d;
   let size = 200;
-  let gap = 0;
-  let innerRadius = 0;
   let margin = 0;
   let colors = ["#cb362f", "#f6f6f6"];
+  let innerRadius = 0;
 
   const polarAreaChart = (selection) => {
     const radius = (size - margin) / 2;
@@ -99,29 +98,6 @@ const polarAreaChart = () => {
       .style("color", (_, i) => `var(--color-${i + 1}, ${colors[i]})`)
       .attr("d", arc)
       .attr("fill", "currentColor");
-
-    groupCenter
-      .append("rect")
-      .attr("transform", `rotate(90)`)
-      .attr("x", -radius)
-      .attr("y", -gap / 2)
-      .attr("width", radius * 2)
-      .attr("height", gap)
-      .attr("fill", "#363636");
-
-    groupCenter
-      .append("circle")
-      .attr("r", innerRadius)
-      .attr("fill", "#f6f6f6")
-      .attr("stroke", "#363636")
-      .attr("stroke-width", gap / 2);
-
-    groupCenter
-      .append("circle")
-      .attr("r", innerRadius * 0.4)
-      .attr("fill", "#f6f6f6")
-      .attr("stroke", "#363636")
-      .attr("stroke-width", gap / 6);
   };
 
   polarAreaChart.data = function (value) {
@@ -221,7 +197,6 @@ articles.each(function (d) {
       .accessor((d) => d.sales)
       .size(size)
       .margin(margin)
-      .gap(15)
-      .innerRadius(20)
+      .innerRadius(0)
   );
 });
