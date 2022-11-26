@@ -30,6 +30,17 @@ const tallyChart = () => {
       .append("svg")
       .attr("viewBox", `0 0 ${5 * marks.length} 5`);
 
+    const defs = svg.append("defs");
+
+    defs.append("path").attr("id", `mark-${datum}-0`).attr("d", "M 0 0 v 3");
+    defs.append("path").attr("id", `mark-${datum}-1`).attr("d", "M 1 0 v 3");
+    defs.append("path").attr("id", `mark-${datum}-2`).attr("d", "M 2 0 v 3");
+    defs.append("path").attr("id", `mark-${datum}-3`).attr("d", "M 3 0 v 3");
+    defs
+      .append("path")
+      .attr("id", `mark-${datum}-4`)
+      .attr("d", "M -0.5 2.4 l 4 -1.8");
+
     const group = svg.append("g").attr("transform", "translate(1 1)");
 
     const groupMarks = group
@@ -51,7 +62,7 @@ const tallyChart = () => {
       .data((d) => d)
       .enter()
       .append("use")
-      .attr("href", (_, i) => `#mark-${i}`);
+      .attr("href", (_, i) => `#mark-${datum}-${i}`);
   };
 
   tallyChart.datum = function (value) {
@@ -64,19 +75,20 @@ const tallyChart = () => {
   return tallyChart;
 };
 
-const defs = d3
-  .select("body")
-  .append("svg")
-  .style("display", "none")
-  .append("defs");
+const table = d3.select("body").append("table");
+const tableKeys = table.append("thead").append("tr");
+tableKeys.append("th").text("Month");
+tableKeys.append("th").text("Value");
 
-defs.append("path").attr("id", "mark-0").attr("d", "M 0 0 v 3");
-defs.append("path").attr("id", "mark-1").attr("d", "M 1 0 v 3");
-defs.append("path").attr("id", "mark-2").attr("d", "M 2 0 v 3");
-defs.append("path").attr("id", "mark-3").attr("d", "M 3 0 v 3");
-defs.append("path").attr("id", "mark-4").attr("d", "M -0.5 2.4 l 4 -1.8");
+const tableData = table
+  .append("tbody")
+  .selectAll("tr")
+  .data(data)
+  .enter()
+  .append("tr");
 
-const [, test] = data;
-const { value } = test;
+tableData.append("td").text((d) => d.month);
 
-d3.select("body").call(tallyChart().datum(value));
+tableData.each(function (d) {
+  d3.select(this).call(tallyChart().datum(d.value));
+});
