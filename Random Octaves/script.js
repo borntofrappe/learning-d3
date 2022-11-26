@@ -13,8 +13,8 @@ const margin = {
 const lines = Array(numberOctaves)
   .fill()
   .map((_, i) => {
-    const numberPoints = numberInitialPoints * (i + 1);
-    const heightLine = 1 / (i + 1);
+    const numberPoints = numberInitialPoints * 2 ** i;
+    const heightLine = 1 / 2 ** i;
 
     return Array(numberPoints)
       .fill()
