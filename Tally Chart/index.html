@@ -9,6 +9,30 @@
     <link rel="icon" href="../icon.png" />
   </head>
   <body>
+    <svg viewBox="0 0 5 5">
+      <defs>
+        <path id="mark-0" d="M 0 0 v 3" />
+        <path id="mark-1" d="M 1 0 v 3" />
+        <path id="mark-2" d="M 2 0 v 3" />
+        <path id="mark-3" d="M 3 0 v 3" />
+        <path d="M 3 0 v 3" />
+        <path id="mark-4" d="M -0.5 2.4 l 4 -1.8" />
+      </defs>
+      <g
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="square"
+        stroke-width="0.5"
+      >
+        <g transform="translate(1 1)">
+          <use href="#mark-0" />
+          <use href="#mark-1" />
+          <use href="#mark-2" />
+          <use href="#mark-3" />
+          <use href="#mark-4" />
+        </g>
+      </g>
+    </svg>
     <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
     <script src="script.js"></script>
   </body>
