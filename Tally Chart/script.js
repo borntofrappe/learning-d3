@@ -16,7 +16,13 @@ const data = [
 const tallyChart = () => {
   let datum = 5;
   let strokeWidth = 0.5;
+
   const tallyChart = (selection) => {
+    const id = Math.random().toString().slice(-3);
+    const baseFrequency = Math.random() ** 2;
+    const numOctaves = Math.floor(Math.random() * 3) + 2;
+    const scale = Math.random() ** 0.5;
+
     const marks = Array(datum)
       .fill()
       .map((_, i) => i)
@@ -31,45 +37,47 @@ const tallyChart = () => {
       .append("svg")
       .attr("viewBox", `0 0 ${5 * marks.length} 5`);
 
+    svg
+      .attr("tabindex", "0")
+      .attr("role", "figure")
+      .append("title")
+      .text((d) => datum);
+
     const defs = svg.append("defs");
 
     const filter = defs
       .append("filter")
-      .attr("id", `filter-tally-${datum}`)
+      .attr("id", `filter-tally-${id}`)
       .attr("filterUnits", "userSpaceOnUse");
-
-    const baseFrequency = Math.random() ** 2;
-    const numOctaves = Math.floor(Math.random() * 3) + 1;
-    const scale = Math.random() ** 0.5;
 
     filter
       .append("feTurbulence")
       .attr("type", "turbulence")
       .attr("baseFrequency", "0.2")
       .attr("numOctaves", numOctaves)
-      .attr("result", `turbulence-tally-${datum}`);
+      .attr("result", `turbulence-tally-${id}`);
 
     filter
       .append("feDisplacementMap")
       .attr("in", "SourceGraphic")
-      .attr("in2", `turbulence-tally-${datum}`)
+      .attr("in2", `turbulence-tally-${id}`)
       .attr("scale", scale)
       .attr("xChannelSelector", "R")
       .attr("yChannelSelector", "G");
 
-    defs.append("path").attr("id", `mark-${datum}-0`).attr("d", "M 0 0 v 3");
-    defs.append("path").attr("id", `mark-${datum}-1`).attr("d", "M 1 0 v 3");
-    defs.append("path").attr("id", `mark-${datum}-2`).attr("d", "M 2 0 v 3");
-    defs.append("path").attr("id", `mark-${datum}-3`).attr("d", "M 3 0 v 3");
+    defs.append("path").attr("id", `mark-tally-${id}-0`).attr("d", "M 0 0 v 3");
+    defs.append("path").attr("id", `mark-tally-${id}-1`).attr("d", "M 1 0 v 3");
+    defs.append("path").attr("id", `mark-tally-${id}-2`).attr("d", "M 2 0 v 3");
+    defs.append("path").attr("id", `mark-tally-${id}-3`).attr("d", "M 3 0 v 3");
     defs
       .append("path")
-      .attr("id", `mark-${datum}-4`)
+      .attr("id", `mark-tally-${id}-4`)
       .attr("d", "M -0.5 2.4 l 4 -1.8");
 
     const group = svg
       .append("g")
       .attr("transform", "translate(1 1)")
-      .attr("filter", `url(#filter-tally-${datum})`);
+      .attr("filter", `url(#filter-tally-${id})`);
 
     const groupMarks = group
       .append("g")
@@ -91,7 +99,7 @@ const tallyChart = () => {
       .data((d) => d)
       .enter()
       .append("use")
-      .attr("href", (_, i) => `#mark-${datum}-${i}`);
+      .attr("href", (_, i) => `#mark-tally-${id}-${i}`);
   };
 
   tallyChart.datum = function (value) {
@@ -123,5 +131,5 @@ const tableData = table
 tableData.append("td").text((d) => d.month);
 
 tableData.append("td").each(function (d) {
-  d3.select(this).call(tallyChart().datum(d.value).strokeWidth(0.3));
+  d3.select(this).call(tallyChart().datum(d.value).strokeWidth(0.35));
 });

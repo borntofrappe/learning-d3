@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400&display=swap");
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -6,14 +8,13 @@
 
 body {
   color: hsl(210, 24%, 16%);
-  background: hsl(221, 68%, 93%);
-  --color-mark: hsl(182, 85%, 39%);
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
-    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  background: hsl(221, 67%, 98%);
+  --color-mark: hsl(168, 78%, 41%);
+  font-family: "Balsamiq Sans", cursive;
 }
 
 ::selection {
-  background: hsla(174, 96%, 78%, 0.9);
+  background: hsla(164, 70%, 63%, 0.9);
 }
 
 table {
@@ -23,10 +24,18 @@ table {
   font-size: 1.2rem;
 }
 
-table svg {
+td svg {
   height: 2em;
   width: auto;
   display: block;
+}
+
+svg:focus {
+  outline: 0.1rem solid currentColor;
+}
+
+svg:focus:not(:focus-visible) {
+  outline: none;
 }
 
 td {
@@ -35,9 +44,9 @@ td {
 
 tr td:first-of-type {
   border-right: 0.1rem solid currentColor;
-  font-weight: 700;
   text-align: right;
 }
+
 tr:not(:first-of-type) td {
   border-top: 0.1rem solid currentColor;
 }
