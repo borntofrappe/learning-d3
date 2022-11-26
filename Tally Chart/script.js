@@ -45,6 +45,7 @@ const tallyChart = () => {
 
     const groupMarks = group
       .append("g")
+      .style("color", "var(--color-mark, currentColor)")
       .attr("fill", "none")
       .attr("stroke", "currentColor")
       .attr("stroke-width", "0.5")
@@ -76,9 +77,6 @@ const tallyChart = () => {
 };
 
 const table = d3.select("body").append("table");
-const tableKeys = table.append("thead").append("tr");
-tableKeys.append("th").text("Month");
-tableKeys.append("th").text("Value");
 
 const tableData = table
   .append("tbody")
@@ -89,6 +87,6 @@ const tableData = table
 
 tableData.append("td").text((d) => d.month);
 
-tableData.each(function (d) {
+tableData.append("td").each(function (d) {
   d3.select(this).call(tallyChart().datum(d.value));
 });
