@@ -1,14 +1,22 @@
-const n = 5;
+const numberInitialPoints = 5;
+const numberOctaves = 4;
 const width = 500;
 const height = 100;
 
-const points = Array(5)
+const lines = Array(numberOctaves)
   .fill()
-  .map((_, i, { length }) => {
-    const x = (width / (length - 1)) * i;
-    const y = Math.random() * height;
+  .map((_, i) => {
+    const numberPoints = numberInitialPoints * (i + 1);
+    const heightLine = height / (i + 1);
 
-    return { x, y };
+    return Array(numberPoints)
+      .fill()
+      .map((_, i, { length }) => {
+        const x = (width / (length - 1)) * i;
+        const y = Math.random() * heightLine;
+
+        return { x, y };
+      });
   });
 
 const line = d3
@@ -22,10 +30,15 @@ const svg = d3
   .append("svg")
   .attr("viewBox", `0 0 ${width} ${height}`);
 
-const groupLine = svg
+const group = svg
   .append("g")
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "2");
+  .attr("stroke-width", "1");
 
-groupLine.append("path").datum(points).attr("d", line);
+const groupLines = group.selectAll("g").data(lines).enter().append("g");
+
+groupLines
+  .append("path")
+  .datum((d) => d)
+  .attr("d", line);
