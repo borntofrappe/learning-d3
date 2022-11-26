@@ -81,7 +81,6 @@ const tallyChart = () => {
 
     const groupMarks = group
       .append("g")
-      .style("color", "var(--color-mark, currentColor)")
       .attr("fill", "none")
       .attr("stroke", "currentColor")
       .attr("stroke-width", strokeWidth)

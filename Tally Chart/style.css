@@ -7,14 +7,13 @@
 }
 
 body {
-  color: hsl(210, 24%, 16%);
-  background: hsl(221, 67%, 98%);
-  --color-mark: hsl(168, 78%, 41%);
+  color: hsl(221, 67%, 98%);
+  background: hsl(210, 24%, 12%);
   font-family: "Balsamiq Sans", cursive;
 }
 
 ::selection {
-  background: hsla(164, 70%, 63%, 0.9);
+  background: hsl(221, 67%, 70%, 0.6);
 }
 
 table {
