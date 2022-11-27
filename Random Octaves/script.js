@@ -10,7 +10,7 @@ const margin = {
   left: 10,
 };
 
-const lines = Array(numberOctaves)
+const noise = Array(numberOctaves)
   .fill()
   .map((_, i) => {
     const numberPoints = numberInitialPoints * 2 ** i;
@@ -58,7 +58,9 @@ const group = svg
   .attr("transform", `translate(${margin.left} ${margin.right})`);
 
 const groupAxis = group.append("g");
-const groupData = group.append("g");
+const groupClip = group.append("g");
+const groupNoise = groupClip.append("g");
+const groupLine = groupClip.append("g");
 
 groupAxis
   .append("path")
@@ -67,15 +69,73 @@ groupAxis
   .attr("stroke-width", "1")
   .attr("d", `M 0 0 h ${width} v ${height} h ${-width}z`);
 
-groupData
-  .attr("clip-path", "url(#clip-lines)")
+groupClip.attr("clip-path", "url(#clip-lines)");
+
+groupNoise
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1");
 
-const groupLines = groupData.selectAll("g").data(lines).enter().append("g");
+const groupsNoise = groupNoise.selectAll("g").data(noise).enter().append("g");
 
-groupLines
+groupsNoise
   .append("path")
   .datum((d) => d)
   .attr("d", line);
+
+groupLine.attr("fill", "none").attr("stroke", "red").attr("stroke-width", "1");
+
+d3.select("body")
+  .append("button")
+  .text("Add up")
+  .on(
+    "click",
+    () => {
+      const numberPoints = 100;
+      const lines = groupNoise.selectAll("path").nodes();
+
+      const pathLength = lines[0].getTotalLength();
+      const points = Array(width + 1)
+        .fill()
+        .map((_, i) => {
+          const x = i;
+          const y0 = scaleY.invert(lines[0].getPointAtLength(x).y);
+          const y1 = lines.reduce(
+            (acc, curr) => acc + scaleY.invert(curr.getPointAtLength(x).y),
+            0
+          );
+
+          return { x, y0, y1 };
+        });
+
+      const max = d3.max(points, (d) => d.y1);
+      scaleY.domain([0, max]).nice();
+
+      const d0 = points.reduce(
+        (acc, curr) => `${acc} ${curr.x} ${scaleY(curr.y0)}`,
+        "M"
+      );
+      const d1 = points.reduce(
+        (acc, curr) => `${acc} ${curr.x} ${scaleY(curr.y1)}`,
+        "M"
+      );
+
+      groupLine.append("path").attr("d", d0);
+
+      const transition = d3.transition();
+
+      groupsNoise.select("path").transition(transition).attr("d", line);
+      groupLine.select("path").datum(d1).transition(transition).attr("d", d1);
+
+      transition.on("end", () =>
+        groupNoise
+          .attr("opacity", "1")
+          .transition(d3.transition())
+          .attr("opacity", "0")
+          .remove()
+      );
+    },
+    {
+      once: true,
+    }
+  );
