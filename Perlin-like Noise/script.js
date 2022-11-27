@@ -166,7 +166,7 @@ controls
                     .style("opacity", "0")
                     .style("visibility", "hidden");
 
-                  const octaves = Array(numberOctaves - 1)
+                  const pointsOctaves = Array(numberOctaves - 1)
                     .fill()
                     .map((_, i) => {
                       const numberPoints = numberInitialPoints * 2 ** (i + 1);
@@ -186,7 +186,7 @@ controls
 
                   groupOctaves
                     .selectAll("path.octaves")
-                    .data(octaves)
+                    .data(pointsOctaves)
                     .enter()
                     .append("path")
                     .attr("class", "octaves")
@@ -206,94 +206,122 @@ controls
                       .delay(250)
                       .style("opacity", "1")
                       .style("visibility", "visible");
+
+                    const octaves = groupOctaves.selectAll("path").nodes();
+                    const pathLength = octaves[0].getTotalLength();
+                    const pointsNoise = Array(width + 1)
+                      .fill()
+                      .map((_, i, { length }) => {
+                        const x = i;
+                        const y0 = scaleY.invert(
+                          octaves[0].getPointAtLength(x).y
+                        );
+                        const y1 = octaves.reduce(
+                          (acc, curr) =>
+                            acc + scaleY.invert(curr.getPointAtLength(x).y),
+                          0
+                        );
+
+                        return { x, y0, y1 };
+                      });
+
+                    controls.select("button").on(
+                      "click",
+                      () => {
+                        controls
+                          .transition()
+                          .style("opacity", "0")
+                          .style("visibility", "hidden");
+
+                        const max = d3.max(pointsNoise, (d) => d.y1);
+                        scaleY.domain([0, max]);
+
+                        const transition = d3.transition().duration(700);
+                        groupOctaves
+                          .selectAll("path")
+                          .transition(transition)
+                          .attr("d", line);
+
+                        transition.on("end", () => {
+                          const groupNoise = groupPadding
+                            .append("g")
+                            .style("color", "red");
+
+                          groupNoise
+                            .append("path")
+                            .attr("fill", "none")
+                            .attr("stroke", "currentColor")
+                            .attr("stroke-width", "1");
+
+                          groupNoise
+                            .append("circle")
+                            .attr("r", "4")
+                            .attr("fill", "currentColor");
+
+                          const transition = d3
+                            .transition()
+                            .duration(2000)
+                            .ease(d3.easeCubicInOut);
+
+                          const noise = pointsNoise.map(({ x, y1 }) => ({
+                            x,
+                            y: scaleY(y1),
+                          }));
+
+                          const pointsPaths = [points, ...pointsOctaves];
+
+                          console.log(pointsPaths);
+                          transition.tween("noise", () => {
+                            const i = d3.interpolateNumber(0, 1);
+                            return (t) => {
+                              const index = Math.floor(
+                                i(t) * (noise.length - 1)
+                              );
+
+                              groupNoise.select("path").attr(
+                                "d",
+                                noise
+                                  .slice(0, index)
+                                  .reduce(
+                                    (acc, curr) => `${acc} ${curr.x} ${curr.y}`,
+                                    "M "
+                                  )
+                              );
+
+                              const { x, y } = noise[index];
+
+                              groupNoise
+                                .select("circle")
+                                .attr("transform", `translate(${x} ${y})`);
+
+                              groupOctaves
+                                .selectAll("path")
+                                .attr("stroke-dashoffset", -i(t));
+                            };
+                          });
+
+                          transition.on("end", () => {
+                            groupNoise
+                              .select("circle")
+                              .transition()
+                              .attr("r", "0")
+                              .remove();
+
+                            groupOctaves.remove();
+                          });
+                        });
+                      },
+                      { once: true }
+                    );
                   });
                 },
-                {
-                  once: true,
-                }
+                { once: true }
               );
             });
           },
-          {
-            once: true,
-          }
+          { once: true }
         );
       });
     },
-    {
-      once: true,
-    }
+    { once: true }
   );
-
-/*
-
-groupLine.attr("fill", "none").attr("stroke", "red").attr("stroke-width", "1");
-groupArea.attr("fill", "red").attr("opacity", "0.2");
-
-d3.select("body")
-  .append("button")
-  .text("Add up")
-  .on(
-    "click",
-    () => {
-      const numberPoints = 100;
-      const lines = groupNoise.selectAll("path").nodes();
-
-      const pathLength = lines[0].getTotalLength();
-      const points = Array(width + 1)
-        .fill()
-        .map((_, i) => {
-          const x = i;
-          const y0 = scaleY.invert(lines[0].getPointAtLength(x).y);
-          const y1 = lines.reduce(
-            (acc, curr) => acc + scaleY.invert(curr.getPointAtLength(x).y),
-            0
-          );
-
-          return { x, y0, y1 };
-        });
-
-      const max = d3.max(points, (d) => d.y1);
-      scaleY.domain([0, max]).nice();
-
-      const d0 = points.reduce(
-        (acc, curr) => `${acc} ${curr.x} ${scaleY(curr.y0)}`,
-        "M"
-      );
-      const d1 = points.reduce(
-        (acc, curr) => `${acc} ${curr.x} ${scaleY(curr.y1)}`,
-        "M"
-      );
-
-      groupLine.append("path").attr("d", d0);
-
-      const transition = d3.transition();
-
-      groupsNoise.select("path").transition(transition).attr("d", line);
-      groupLine.select("path").datum(d1).transition(transition).attr("d", d1);
-
-      transition.on("end", () => {
-        const transition = d3.transition();
-
-        groupNoise
-          .attr("opacity", "1")
-          .transition(transition)
-          .attr("opacity", "0")
-          .remove();
-
-        groupArea
-          .append("path")
-          .attr(
-            "d",
-            `${d1} L ${width} ${height + padding.y} 0 ${height + padding.y}`
-          )
-          .attr("opacity", "0")
-          .transition(transition)
-          .attr("opacity", "1");
-      });
-    },
-    {
-      once: true,
-    }
-  );
-*/
