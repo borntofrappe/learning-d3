@@ -5,9 +5,14 @@ const height = 100;
 
 const margin = {
   top: 5,
-  right: 10,
+  right: 5,
   bottom: 5,
-  left: 10,
+  left: 5,
+};
+
+const padding = {
+  x: 0,
+  y: 20,
 };
 
 const noise = Array(numberOctaves)
@@ -40,36 +45,35 @@ const svg = d3
   .append("svg")
   .attr(
     "viewBox",
-    `0 0 ${width + margin.left + margin.right} ${
-      height + margin.top + margin.bottom
+    `0 0 ${width + margin.left + margin.right + padding.x * 2} ${
+      height + margin.top + margin.bottom + padding.y * 2
     }`
   );
-
-const defs = svg.append("defs");
-defs
-  .append("clipPath")
-  .attr("id", "clip-lines")
-  .append("rect")
-  .attr("width", width)
-  .attr("height", height);
 
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.right})`);
 
 const groupAxis = group.append("g");
-const groupClip = group.append("g");
-const groupNoise = groupClip.append("g");
-const groupLine = groupClip.append("g");
+const groupPadding = group.append("g");
+const groupNoise = groupPadding.append("g");
+const groupLine = groupPadding.append("g");
+const groupArea = groupPadding.append("g");
 
 groupAxis
   .append("path")
   .attr("fill", "none")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "1")
-  .attr("d", `M 0 0 h ${width} v ${height} h ${-width}z`);
+  .attr(
+    "d",
+    `M 0 0 h ${width + padding.x * 2} v ${height + padding.y * 2} h ${-(
+      width +
+      padding.x * 2
+    )}z`
+  );
 
-groupClip.attr("clip-path", "url(#clip-lines)");
+groupPadding.attr("transform", `translate(${padding.x} ${padding.y})`);
 
 groupNoise
   .attr("fill", "none")
@@ -84,6 +88,7 @@ groupsNoise
   .attr("d", line);
 
 groupLine.attr("fill", "none").attr("stroke", "red").attr("stroke-width", "1");
+groupArea.attr("fill", "red").attr("opacity", "0.2");
 
 d3.select("body")
   .append("button")
@@ -127,13 +132,25 @@ d3.select("body")
       groupsNoise.select("path").transition(transition).attr("d", line);
       groupLine.select("path").datum(d1).transition(transition).attr("d", d1);
 
-      transition.on("end", () =>
+      transition.on("end", () => {
+        const transition = d3.transition();
+
         groupNoise
           .attr("opacity", "1")
-          .transition(d3.transition())
+          .transition(transition)
           .attr("opacity", "0")
-          .remove()
-      );
+          .remove();
+
+        groupArea
+          .append("path")
+          .attr(
+            "d",
+            `${d1} L ${width} ${height + padding.y} 0 ${height + padding.y}`
+          )
+          .attr("opacity", "0")
+          .transition(transition)
+          .attr("opacity", "1");
+      });
     },
     {
       once: true,
