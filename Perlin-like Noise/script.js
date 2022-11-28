@@ -261,7 +261,10 @@ button.on(
                           transition.on("end", () => {
                             const groupNoise = groupPadding
                               .append("g")
-                              .style("color", "red");
+                              .style(
+                                "color",
+                                "var(--color-noise, hsl(201, 79%, 46%))"
+                              );
 
                             groupNoise
                               .append("path")
