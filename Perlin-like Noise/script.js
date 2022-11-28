@@ -6,7 +6,7 @@ header.append("h1").text("Perlin-like noise");
 header
   .append("p")
   .html(
-    "One way to create Perlin like noise is through a series of <em>octaves</em>, functions interpolating the position of random values."
+    "One way to create Perlin-like noise is through a series of <em>octaves</em>, functions interpolating the position of random values."
   );
 
 const width = 500;
@@ -69,7 +69,12 @@ button
   .attr("width", "2em")
   .attr("height", "2em")
   .append("path")
-  .attr("d", "M -2 -3 l 4.5 3 -4.5 3");
+  .attr("fill", "currentColor")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1")
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round")
+  .attr("d", "M -1.8 -2.8 l 4 2.8 -4 2.8z");
 
 button.on(
   "click",
@@ -136,7 +141,11 @@ button.on(
             .style("opacity", "0")
             .style("visibility", "hidden");
 
-          const transition = d3.transition().duration(500);
+          const transition = d3
+            .transition()
+            .duration(1000)
+            .ease(d3.easeQuadInOut);
+
           const groupOctaves = groupPadding
             .append("g")
             .attr("fill", "none")
@@ -196,7 +205,10 @@ button.on(
                       });
                   });
 
-                const transition = d3.transition().duration(500);
+                const transition = d3
+                  .transition()
+                  .duration(1500)
+                  .ease(d3.easeQuadInOut);
 
                 groupOctaves
                   .selectAll("path.octaves")
@@ -227,7 +239,7 @@ button.on(
                       const pathLength = octaves[0].getTotalLength();
                       const pointsNoise = Array(width + 1)
                         .fill()
-                        .map((_, i, { length }) => {
+                        .map((_, i) => {
                           const x = i;
                           const y0 = scaleY.invert(
                             octaves[0].getPointAtLength(x).y
@@ -252,13 +264,33 @@ button.on(
                           const max = d3.max(pointsNoise, (d) => d.y1);
                           scaleY.domain([0, max]);
 
-                          const transition = d3.transition().duration(700);
+                          const transition = d3
+                            .transition()
+                            .duration(700)
+                            .ease(d3.easeQuadInOut);
+
                           groupOctaves
                             .selectAll("path")
                             .transition(transition)
                             .attr("d", line);
 
                           transition.on("end", () => {
+                            const pointsPaths = [points, ...pointsOctaves];
+
+                            const groupTranslucent = groupPadding
+                              .append("g")
+                              .attr("fill", "none")
+                              .attr("stroke", "currentColor")
+                              .attr("stroke-width", "1")
+                              .attr("stroke-opacity", "0.2");
+
+                            groupTranslucent
+                              .selectAll("path")
+                              .data(pointsPaths)
+                              .enter()
+                              .append("path")
+                              .attr("d", line);
+
                             const groupNoise = groupPadding
                               .append("g")
                               .style(
@@ -279,15 +311,13 @@ button.on(
 
                             const transition = d3
                               .transition()
-                              .duration(2000)
-                              .ease(d3.easeCubicInOut);
+                              .duration(3000)
+                              .ease(d3.easeQuadInOut);
 
                             const noise = pointsNoise.map(({ x, y1 }) => ({
                               x,
                               y: scaleY(y1),
                             }));
-
-                            const pointsPaths = [points, ...pointsOctaves];
 
                             transition.tween("noise", () => {
                               const i = d3.interpolateNumber(0, 1);
@@ -320,13 +350,21 @@ button.on(
                             });
 
                             transition.on("end", () => {
+                              const transition = d3.transition().delay(1000);
+
                               groupNoise
                                 .select("circle")
-                                .transition()
+                                .transition(transition)
                                 .attr("r", "0")
                                 .remove();
 
-                              groupOctaves.remove();
+                              groupTranslucent
+                                .attr("opacity", "1")
+                                .transition(transition)
+                                .attr("opacity", "0")
+                                .remove();
+
+                              groupOctaves.transition(transition).remove();
 
                               groupNoise
                                 .append("path")
@@ -342,21 +380,22 @@ button.on(
                                   }`
                                 )
                                 .attr("opacity", "0")
-                                .transition()
+                                .transition(transition)
                                 .attr("opacity", "1");
 
                               groupFrame
                                 .style("color", "currentColor")
-                                .transition()
+                                .transition(transition)
                                 .style("color", groupNoise.style("color"));
 
                               heading.text("There you have it");
                               paragraph.text(
-                                "You find a curve with the general shape of the first octave, with small peaks and valleys in between the first few points."
+                                "You find a curve with the general shape of the first octave, with peaks and valleys in between the first few points."
                               );
                               button.remove();
 
                               stepper
+                                .transition(transition)
                                 .transition()
                                 .style("opacity", "1")
                                 .style("visibility", "visible");
