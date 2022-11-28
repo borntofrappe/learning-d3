@@ -1,3 +1,14 @@
+const root = d3.select("body").append("div").attr("id", "root");
+
+const header = root.append("header");
+header.append("h1").text("Perlin-like noise");
+
+header
+  .append("p")
+  .html(
+    "One way to create Perlin like noise is through a series of <em>octaves</em>, functions interpolating the position of random values."
+  );
+
 const width = 500;
 const height = 100;
 
@@ -12,17 +23,6 @@ const padding = {
   x: 0,
   y: 20,
 };
-
-const root = d3.select("body").append("div").attr("id", "root");
-
-const header = root.append("header");
-header.append("h1").text("Perlin-like noise");
-
-header
-  .append("p")
-  .html(
-    "One way to create Perlin like noise is through a series of <em>octaves</em>, functions interpolating the position of random values."
-  );
 
 const svg = root
   .append("svg")
@@ -53,301 +53,325 @@ groupFrame
     )}z`
   );
 
-const controls = root.append("div");
-controls.append("h2").text("Step 1");
-controls
-  .append("button")
-  .text("Compute random values")
-  .on(
-    "click",
-    () => {
-      controls.transition().style("opacity", "0").style("visibility", "hidden");
+const stepper = root.append("div");
+const heading = stepper.append("h2").text("Step 1");
+const paragraph = stepper
+  .append("p")
+  .text("Starting with a blank canvas, add a few random values.");
 
-      const numberInitialPoints = 5;
-      const numberOctaves = 5;
+const button = stepper.append("button");
 
-      const scaleX = d3.scaleLinear().range([0, width]);
-      const scaleY = d3.scaleLinear().range([height, 0]);
+button.append("span").attr("class", "visually-hidden").text("Step through");
 
-      const line = d3
-        .line()
-        .x(({ x }) => scaleX(x))
-        .y(({ y }) => scaleY(y))
-        .curve(d3.curveCatmullRom);
+button
+  .append("svg")
+  .attr("viewBox", "-5 -5 10 10")
+  .attr("width", "2em")
+  .attr("height", "2em")
+  .append("path")
+  .attr("d", "M -2 -3 l 4.5 3 -4.5 3");
 
-      const points = Array(numberInitialPoints)
-        .fill()
-        .map((_, i, { length }) => {
-          const x = (1 / (length - 1)) * i;
-          const y = Math.random();
+button.on(
+  "click",
+  () => {
+    stepper.transition().style("opacity", "0").style("visibility", "hidden");
 
-          return { x, y };
-        });
+    const numberInitialPoints = 5;
+    const numberOctaves = 5;
 
-      const transition = d3.transition().duration(500);
+    const scaleX = d3.scaleLinear().range([0, width]);
+    const scaleY = d3.scaleLinear().range([height, 0]);
 
-      const groupPadding = groupMargin
-        .append("g")
-        .attr("transform", `translate(${padding.x} ${padding.y})`);
+    const line = d3
+      .line()
+      .x(({ x }) => scaleX(x))
+      .y(({ y }) => scaleY(y))
+      .curve(d3.curveCatmullRom);
 
-      const groupPoints = groupPadding.append("g").attr("fill", "currentColor");
+    const points = Array(numberInitialPoints)
+      .fill()
+      .map((_, i, { length }) => {
+        const x = (1 / (length - 1)) * i;
+        const y = Math.random();
 
-      groupPoints
-        .selectAll("circle")
-        .data(points)
-        .enter()
-        .append("circle")
-        .attr("transform", ({ x, y }) => `translate(${scaleX(x)} ${scaleY(y)})`)
-        .attr("r", "0")
-        .transition(transition)
-        .delay((_, i) => 50 * i)
-        .attr("r", "4");
+        return { x, y };
+      });
 
-      transition.on("end", () => {
-        controls.select("h2").text("Step 2");
-        controls.select("button").text("Interpolate between the points");
+    const transition = d3.transition().duration(500);
 
-        controls
-          .transition()
-          .delay(250)
-          .style("opacity", "1")
-          .style("visibility", "visible");
+    const groupPadding = groupMargin
+      .append("g")
+      .attr("transform", `translate(${padding.x} ${padding.y})`);
 
-        controls.select("button").on(
-          "click",
-          () => {
-            controls
+    const groupPoints = groupPadding.append("g").attr("fill", "currentColor");
+
+    groupPoints
+      .selectAll("circle")
+      .data(points)
+      .enter()
+      .append("circle")
+      .attr("transform", ({ x, y }) => `translate(${scaleX(x)} ${scaleY(y)})`)
+      .attr("r", "0")
+      .transition(transition)
+      .delay((_, i) => 50 * i)
+      .attr("r", "4");
+
+    transition.on("end", () => {
+      heading.text("Step 2");
+      paragraph.text(
+        "Interpolate between the points, for instance with a smooth curve."
+      );
+
+      stepper
+        .transition()
+        .delay(250)
+        .style("opacity", "1")
+        .style("visibility", "visible");
+
+      stepper.select("button").on(
+        "click",
+        () => {
+          stepper
+            .transition()
+            .style("opacity", "0")
+            .style("visibility", "hidden");
+
+          const transition = d3.transition().duration(500);
+          const groupOctaves = groupPadding
+            .append("g")
+            .attr("fill", "none")
+            .attr("stroke", "currentColor")
+            .attr("stroke-width", "1");
+
+          groupOctaves
+            .append("path")
+            .datum(points)
+            .attr("class", "octave")
+            .attr("d", line)
+            .attr("pathLength", "1")
+            .attr("stroke-dasharray", "1")
+            .attr("stroke-dashoffset", "1")
+            .transition(transition)
+            .attr("stroke-dashoffset", "0");
+
+          transition.on("end", () => {
+            heading.text("Step 3");
+            paragraph.html(
+              "Repeat, each time with <strong>more</strong> points, each time with <strong>smaller</strong> random values."
+            );
+
+            groupPoints
+              .attr("opacity", "1")
               .transition()
-              .style("opacity", "0")
-              .style("visibility", "hidden");
+              .attr("opacity", "0")
+              .remove();
 
-            const transition = d3.transition().duration(500);
-            const groupOctaves = groupPadding
-              .append("g")
-              .attr("fill", "none")
-              .attr("stroke", "currentColor")
-              .attr("stroke-width", "1");
+            stepper
+              .transition()
+              .delay(250)
+              .style("opacity", "1")
+              .style("visibility", "visible");
 
-            groupOctaves
-              .append("path")
-              .datum(points)
-              .attr("class", "octave")
-              .attr("d", line)
-              .attr("pathLength", "1")
-              .attr("stroke-dasharray", "1")
-              .attr("stroke-dashoffset", "1")
-              .transition(transition)
-              .attr("stroke-dashoffset", "0");
+            stepper.select("button").on(
+              "click",
+              () => {
+                stepper
+                  .transition()
+                  .style("opacity", "0")
+                  .style("visibility", "hidden");
 
-            transition.on("end", () => {
-              controls.select("h2").text("Step 3");
-              controls
-                .select("button")
-                .text(
-                  "Repeat the process with more points and smaller random values"
-                );
+                const pointsOctaves = Array(numberOctaves - 1)
+                  .fill()
+                  .map((_, i) => {
+                    const numberPoints = numberInitialPoints * 2 ** (i + 1);
+                    const heightLine = 1 / 2 ** (i + 1);
 
-              groupPoints
-                .attr("opacity", "1")
-                .transition()
-                .attr("opacity", "0")
-                .remove();
+                    return Array(numberPoints)
+                      .fill()
+                      .map((_, i, { length }) => {
+                        const x = (1 / (length - 1)) * i;
+                        const y = Math.random() * heightLine;
 
-              controls
-                .transition()
-                .delay(250)
-                .style("opacity", "1")
-                .style("visibility", "visible");
+                        return { x, y };
+                      });
+                  });
 
-              controls.select("button").on(
-                "click",
-                () => {
-                  controls
+                const transition = d3.transition().duration(500);
+
+                groupOctaves
+                  .selectAll("path.octaves")
+                  .data(pointsOctaves)
+                  .enter()
+                  .append("path")
+                  .attr("class", "octaves")
+                  .attr("d", line)
+                  .attr("pathLength", "1")
+                  .attr("stroke-dasharray", "1")
+                  .attr("stroke-dashoffset", "1")
+                  .transition(transition)
+                  .attr("stroke-dashoffset", "0");
+
+                transition.on("end", () => {
+                  heading.text("Step 4");
+                  paragraph.html(
+                    "Create a new line, adding up <em>all</em> the points of the different octaves."
+                  );
+
+                  stepper
                     .transition()
-                    .style("opacity", "0")
-                    .style("visibility", "hidden");
-
-                  const pointsOctaves = Array(numberOctaves - 1)
-                    .fill()
-                    .map((_, i) => {
-                      const numberPoints = numberInitialPoints * 2 ** (i + 1);
-                      const heightLine = 1 / 2 ** (i + 1);
-
-                      return Array(numberPoints)
+                    .delay(250)
+                    .style("opacity", "1")
+                    .style("visibility", "visible")
+                    .on("end", () => {
+                      const octaves = groupOctaves.selectAll("path").nodes();
+                      const pathLength = octaves[0].getTotalLength();
+                      const pointsNoise = Array(width + 1)
                         .fill()
                         .map((_, i, { length }) => {
-                          const x = (1 / (length - 1)) * i;
-                          const y = Math.random() * heightLine;
+                          const x = i;
+                          const y0 = scaleY.invert(
+                            octaves[0].getPointAtLength(x).y
+                          );
+                          const y1 = octaves.reduce(
+                            (acc, curr) =>
+                              acc + scaleY.invert(curr.getPointAtLength(x).y),
+                            0
+                          );
 
-                          return { x, y };
+                          return { x, y0, y1 };
                         });
-                    });
 
-                  const transition = d3.transition().duration(500);
+                      stepper.select("button").on(
+                        "click",
+                        () => {
+                          stepper
+                            .transition()
+                            .style("opacity", "0")
+                            .style("visibility", "hidden");
 
-                  groupOctaves
-                    .selectAll("path.octaves")
-                    .data(pointsOctaves)
-                    .enter()
-                    .append("path")
-                    .attr("class", "octaves")
-                    .attr("d", line)
-                    .attr("pathLength", "1")
-                    .attr("stroke-dasharray", "1")
-                    .attr("stroke-dashoffset", "1")
-                    .transition(transition)
-                    .attr("stroke-dashoffset", "0");
+                          const max = d3.max(pointsNoise, (d) => d.y1);
+                          scaleY.domain([0, max]);
 
-                  transition.on("end", () => {
-                    controls.select("h2").text("Step 4");
-                    controls.select("button").text("Add up lines");
+                          const transition = d3.transition().duration(700);
+                          groupOctaves
+                            .selectAll("path")
+                            .transition(transition)
+                            .attr("d", line);
 
-                    controls
-                      .transition()
-                      .delay(250)
-                      .style("opacity", "1")
-                      .style("visibility", "visible")
-                      .on("end", () => {
-                        const octaves = groupOctaves.selectAll("path").nodes();
-                        const pathLength = octaves[0].getTotalLength();
-                        const pointsNoise = Array(width + 1)
-                          .fill()
-                          .map((_, i, { length }) => {
-                            const x = i;
-                            const y0 = scaleY.invert(
-                              octaves[0].getPointAtLength(x).y
-                            );
-                            const y1 = octaves.reduce(
-                              (acc, curr) =>
-                                acc + scaleY.invert(curr.getPointAtLength(x).y),
-                              0
-                            );
+                          transition.on("end", () => {
+                            const groupNoise = groupPadding
+                              .append("g")
+                              .style("color", "red");
 
-                            return { x, y0, y1 };
-                          });
+                            groupNoise
+                              .append("path")
+                              .attr("fill", "none")
+                              .attr("stroke", "currentColor")
+                              .attr("stroke-width", "1");
 
-                        controls.select("button").on(
-                          "click",
-                          () => {
-                            controls
+                            groupNoise
+                              .append("circle")
+                              .attr("r", "4")
+                              .attr("fill", "currentColor");
+
+                            const transition = d3
                               .transition()
-                              .style("opacity", "0")
-                              .style("visibility", "hidden");
+                              .duration(2000)
+                              .ease(d3.easeCubicInOut);
 
-                            const max = d3.max(pointsNoise, (d) => d.y1);
-                            scaleY.domain([0, max]);
+                            const noise = pointsNoise.map(({ x, y1 }) => ({
+                              x,
+                              y: scaleY(y1),
+                            }));
 
-                            const transition = d3.transition().duration(700);
-                            groupOctaves
-                              .selectAll("path")
-                              .transition(transition)
-                              .attr("d", line);
+                            const pointsPaths = [points, ...pointsOctaves];
 
-                            transition.on("end", () => {
-                              const groupNoise = groupPadding
-                                .append("g")
-                                .style("color", "red");
+                            transition.tween("noise", () => {
+                              const i = d3.interpolateNumber(0, 1);
+                              return (t) => {
+                                const index = Math.floor(
+                                  i(t) * (noise.length - 1)
+                                );
 
-                              groupNoise
-                                .append("path")
-                                .attr("fill", "none")
-                                .attr("stroke", "currentColor")
-                                .attr("stroke-width", "1");
-
-                              groupNoise
-                                .append("circle")
-                                .attr("r", "4")
-                                .attr("fill", "currentColor");
-
-                              const transition = d3
-                                .transition()
-                                .duration(2000)
-                                .ease(d3.easeCubicInOut);
-
-                              const noise = pointsNoise.map(({ x, y1 }) => ({
-                                x,
-                                y: scaleY(y1),
-                              }));
-
-                              const pointsPaths = [points, ...pointsOctaves];
-
-                              console.log(pointsPaths);
-                              transition.tween("noise", () => {
-                                const i = d3.interpolateNumber(0, 1);
-                                return (t) => {
-                                  const index = Math.floor(
-                                    i(t) * (noise.length - 1)
-                                  );
-
-                                  groupNoise.select("path").attr(
-                                    "d",
-                                    noise
-                                      .slice(0, index)
-                                      .reduce(
-                                        (acc, curr) =>
-                                          `${acc} ${curr.x} ${curr.y}`,
-                                        "M "
-                                      )
-                                  );
-
-                                  const { x, y } = noise[index];
-
-                                  groupNoise
-                                    .select("circle")
-                                    .attr("transform", `translate(${x} ${y})`);
-
-                                  groupOctaves
-                                    .selectAll("path")
-                                    .attr("stroke-dashoffset", -i(t));
-                                };
-                              });
-
-                              transition.on("end", () => {
-                                groupNoise
-                                  .select("circle")
-                                  .transition()
-                                  .attr("r", "0")
-                                  .remove();
-
-                                groupOctaves.remove();
-
-                                groupNoise
-                                  .append("path")
-                                  .attr("fill-opacity", "0.25")
-                                  .attr("fill", "currentColor")
-                                  .attr(
-                                    "d",
-                                    `${noise.reduce(
+                                groupNoise.select("path").attr(
+                                  "d",
+                                  noise
+                                    .slice(0, index)
+                                    .reduce(
                                       (acc, curr) =>
                                         `${acc} ${curr.x} ${curr.y}`,
                                       "M "
-                                    )} ${width} ${height + padding.y} ${0} ${
-                                      height + padding.y
-                                    }`
-                                  )
-                                  .attr("opacity", "0")
-                                  .transition()
-                                  .attr("opacity", "1");
+                                    )
+                                );
 
-                                groupFrame
-                                  .style("color", "currentColor")
-                                  .transition()
-                                  .style("color", groupNoise.style("color"));
-                              });
+                                const { x, y } = noise[index];
+
+                                groupNoise
+                                  .select("circle")
+                                  .attr("transform", `translate(${x} ${y})`);
+
+                                groupOctaves
+                                  .selectAll("path")
+                                  .attr("stroke-dashoffset", -i(t));
+                              };
                             });
-                          },
-                          { once: true }
-                        );
-                      });
-                  });
-                },
-                { once: true }
-              );
-            });
-          },
-          { once: true }
-        );
-      });
-    },
-    { once: true }
-  );
+
+                            transition.on("end", () => {
+                              groupNoise
+                                .select("circle")
+                                .transition()
+                                .attr("r", "0")
+                                .remove();
+
+                              groupOctaves.remove();
+
+                              groupNoise
+                                .append("path")
+                                .attr("fill-opacity", "0.25")
+                                .attr("fill", "currentColor")
+                                .attr(
+                                  "d",
+                                  `${noise.reduce(
+                                    (acc, curr) => `${acc} ${curr.x} ${curr.y}`,
+                                    "M "
+                                  )} ${width} ${height + padding.y} ${0} ${
+                                    height + padding.y
+                                  }`
+                                )
+                                .attr("opacity", "0")
+                                .transition()
+                                .attr("opacity", "1");
+
+                              groupFrame
+                                .style("color", "currentColor")
+                                .transition()
+                                .style("color", groupNoise.style("color"));
+
+                              heading.text("There you have it");
+                              paragraph.text(
+                                "You find a curve with the general shape of the first octave, with small peaks and valleys in between the first few points."
+                              );
+                              button.remove();
+
+                              stepper
+                                .transition()
+                                .style("opacity", "1")
+                                .style("visibility", "visible");
+                            });
+                          });
+                        },
+                        { once: true }
+                      );
+                    });
+                });
+              },
+              { once: true }
+            );
+          });
+        },
+        { once: true }
+      );
+    });
+  },
+  { once: true }
+);
