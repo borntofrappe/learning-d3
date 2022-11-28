@@ -226,7 +226,7 @@ button.on(
                 transition.on("end", () => {
                   heading.text("Step 4");
                   paragraph.html(
-                    "Create a new line, adding up <em>all</em> the points of the different octaves."
+                    "Create a new line, adding up <strong>all</strong> the points of the different octaves."
                   );
 
                   stepper
@@ -239,18 +239,15 @@ button.on(
                       const pathLength = octaves[0].getTotalLength();
                       const pointsNoise = Array(width + 1)
                         .fill()
-                        .map((_, i) => {
-                          const x = i;
-                          const y0 = scaleY.invert(
-                            octaves[0].getPointAtLength(x).y
-                          );
-                          const y1 = octaves.reduce(
+                        .map((_, i, { length }) => {
+                          const x = (1 / (length - 1)) * i;
+                          const y = octaves.reduce(
                             (acc, curr) =>
-                              acc + scaleY.invert(curr.getPointAtLength(x).y),
+                              acc + scaleY.invert(curr.getPointAtLength(i).y),
                             0
                           );
 
-                          return { x, y0, y1 };
+                          return { x, y };
                         });
 
                       stepper.select("button").on(
@@ -261,7 +258,7 @@ button.on(
                             .style("opacity", "0")
                             .style("visibility", "hidden");
 
-                          const max = d3.max(pointsNoise, (d) => d.y1);
+                          const max = d3.max(pointsNoise, (d) => d.y);
                           scaleY.domain([0, max]);
 
                           const transition = d3
@@ -314,9 +311,9 @@ button.on(
                               .duration(3000)
                               .ease(d3.easeQuadInOut);
 
-                            const noise = pointsNoise.map(({ x, y1 }) => ({
-                              x,
-                              y: scaleY(y1),
+                            const noise = pointsNoise.map(({ x, y }) => ({
+                              x: scaleX(x),
+                              y: scaleY(y),
                             }));
 
                             transition.tween("noise", () => {

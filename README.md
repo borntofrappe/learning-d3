@@ -35,6 +35,7 @@ Projects exploring the D3 library.
 | [Wind Rose](https://codepen.io/borntofrappe/pen/mdKmYLR)                      | arc, layout             |
 | [Reusable Chart](https://codepen.io/borntofrappe/pen/BaVZdMo)                 | call, function          |
 | [Waffle Layout](https://codepen.io/borntofrappe/pen/qBKVJgM)                  | layout, function        |
+| [Perlin-like Noise](https://codepen.io/borntofrappe/pen/PoaBoQd)              | scale, transition       |
 
 Projects leaning on D3 to create interesting visualizations.
 
