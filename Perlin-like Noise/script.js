@@ -40,6 +40,7 @@ const groupMargin = svg
 const groupFrame = groupMargin.append("g");
 
 groupFrame
+  .style("color", "currentColor")
   .append("path")
   .attr("fill", "none")
   .attr("stroke", "currentColor")
@@ -205,114 +206,139 @@ controls
                       .transition()
                       .delay(250)
                       .style("opacity", "1")
-                      .style("visibility", "visible");
+                      .style("visibility", "visible")
+                      .on("end", () => {
+                        const octaves = groupOctaves.selectAll("path").nodes();
+                        const pathLength = octaves[0].getTotalLength();
+                        const pointsNoise = Array(width + 1)
+                          .fill()
+                          .map((_, i, { length }) => {
+                            const x = i;
+                            const y0 = scaleY.invert(
+                              octaves[0].getPointAtLength(x).y
+                            );
+                            const y1 = octaves.reduce(
+                              (acc, curr) =>
+                                acc + scaleY.invert(curr.getPointAtLength(x).y),
+                              0
+                            );
 
-                    const octaves = groupOctaves.selectAll("path").nodes();
-                    const pathLength = octaves[0].getTotalLength();
-                    const pointsNoise = Array(width + 1)
-                      .fill()
-                      .map((_, i, { length }) => {
-                        const x = i;
-                        const y0 = scaleY.invert(
-                          octaves[0].getPointAtLength(x).y
-                        );
-                        const y1 = octaves.reduce(
-                          (acc, curr) =>
-                            acc + scaleY.invert(curr.getPointAtLength(x).y),
-                          0
-                        );
+                            return { x, y0, y1 };
+                          });
 
-                        return { x, y0, y1 };
-                      });
+                        controls.select("button").on(
+                          "click",
+                          () => {
+                            controls
+                              .transition()
+                              .style("opacity", "0")
+                              .style("visibility", "hidden");
 
-                    controls.select("button").on(
-                      "click",
-                      () => {
-                        controls
-                          .transition()
-                          .style("opacity", "0")
-                          .style("visibility", "hidden");
+                            const max = d3.max(pointsNoise, (d) => d.y1);
+                            scaleY.domain([0, max]);
 
-                        const max = d3.max(pointsNoise, (d) => d.y1);
-                        scaleY.domain([0, max]);
+                            const transition = d3.transition().duration(700);
+                            groupOctaves
+                              .selectAll("path")
+                              .transition(transition)
+                              .attr("d", line);
 
-                        const transition = d3.transition().duration(700);
-                        groupOctaves
-                          .selectAll("path")
-                          .transition(transition)
-                          .attr("d", line);
-
-                        transition.on("end", () => {
-                          const groupNoise = groupPadding
-                            .append("g")
-                            .style("color", "red");
-
-                          groupNoise
-                            .append("path")
-                            .attr("fill", "none")
-                            .attr("stroke", "currentColor")
-                            .attr("stroke-width", "1");
-
-                          groupNoise
-                            .append("circle")
-                            .attr("r", "4")
-                            .attr("fill", "currentColor");
-
-                          const transition = d3
-                            .transition()
-                            .duration(2000)
-                            .ease(d3.easeCubicInOut);
-
-                          const noise = pointsNoise.map(({ x, y1 }) => ({
-                            x,
-                            y: scaleY(y1),
-                          }));
-
-                          const pointsPaths = [points, ...pointsOctaves];
-
-                          console.log(pointsPaths);
-                          transition.tween("noise", () => {
-                            const i = d3.interpolateNumber(0, 1);
-                            return (t) => {
-                              const index = Math.floor(
-                                i(t) * (noise.length - 1)
-                              );
-
-                              groupNoise.select("path").attr(
-                                "d",
-                                noise
-                                  .slice(0, index)
-                                  .reduce(
-                                    (acc, curr) => `${acc} ${curr.x} ${curr.y}`,
-                                    "M "
-                                  )
-                              );
-
-                              const { x, y } = noise[index];
+                            transition.on("end", () => {
+                              const groupNoise = groupPadding
+                                .append("g")
+                                .style("color", "red");
 
                               groupNoise
-                                .select("circle")
-                                .attr("transform", `translate(${x} ${y})`);
+                                .append("path")
+                                .attr("fill", "none")
+                                .attr("stroke", "currentColor")
+                                .attr("stroke-width", "1");
 
-                              groupOctaves
-                                .selectAll("path")
-                                .attr("stroke-dashoffset", -i(t));
-                            };
-                          });
+                              groupNoise
+                                .append("circle")
+                                .attr("r", "4")
+                                .attr("fill", "currentColor");
 
-                          transition.on("end", () => {
-                            groupNoise
-                              .select("circle")
-                              .transition()
-                              .attr("r", "0")
-                              .remove();
+                              const transition = d3
+                                .transition()
+                                .duration(2000)
+                                .ease(d3.easeCubicInOut);
 
-                            groupOctaves.remove();
-                          });
-                        });
-                      },
-                      { once: true }
-                    );
+                              const noise = pointsNoise.map(({ x, y1 }) => ({
+                                x,
+                                y: scaleY(y1),
+                              }));
+
+                              const pointsPaths = [points, ...pointsOctaves];
+
+                              console.log(pointsPaths);
+                              transition.tween("noise", () => {
+                                const i = d3.interpolateNumber(0, 1);
+                                return (t) => {
+                                  const index = Math.floor(
+                                    i(t) * (noise.length - 1)
+                                  );
+
+                                  groupNoise.select("path").attr(
+                                    "d",
+                                    noise
+                                      .slice(0, index)
+                                      .reduce(
+                                        (acc, curr) =>
+                                          `${acc} ${curr.x} ${curr.y}`,
+                                        "M "
+                                      )
+                                  );
+
+                                  const { x, y } = noise[index];
+
+                                  groupNoise
+                                    .select("circle")
+                                    .attr("transform", `translate(${x} ${y})`);
+
+                                  groupOctaves
+                                    .selectAll("path")
+                                    .attr("stroke-dashoffset", -i(t));
+                                };
+                              });
+
+                              transition.on("end", () => {
+                                groupNoise
+                                  .select("circle")
+                                  .transition()
+                                  .attr("r", "0")
+                                  .remove();
+
+                                groupOctaves.remove();
+
+                                groupNoise
+                                  .append("path")
+                                  .attr("fill-opacity", "0.25")
+                                  .attr("fill", "currentColor")
+                                  .attr(
+                                    "d",
+                                    `${noise.reduce(
+                                      (acc, curr) =>
+                                        `${acc} ${curr.x} ${curr.y}`,
+                                      "M "
+                                    )} ${width} ${height + padding.y} ${0} ${
+                                      height + padding.y
+                                    }`
+                                  )
+                                  .attr("opacity", "0")
+                                  .transition()
+                                  .attr("opacity", "1");
+
+                                groupFrame
+                                  .style("color", "currentColor")
+                                  .transition()
+                                  .style("color", groupNoise.style("color"));
+                              });
+                            });
+                          },
+                          { once: true }
+                        );
+                      });
                   });
                 },
                 { once: true }
