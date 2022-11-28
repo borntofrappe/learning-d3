@@ -24,8 +24,9 @@ p {
 #root {
   padding: 1rem 2rem;
   color: hsl(210, 24%, 16%);
-  background: hsl(216, 33%, 97%);
+  background: hsl(216, 33%, 98%);
   max-width: 48rem;
+  width: 95vw;
   margin-inline: auto;
   margin-block: 1rem;
   border-radius: 1rem;
@@ -37,6 +38,52 @@ p {
 }
 
 header > * + *,
-div > * + * {
+.stepper > * + * {
   margin-top: 0.5em;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas: "heading button" "paragraph button";
+  gap: 0 0.5rem;
+}
+
+.stepper h2 {
+  grid-area: heading;
+}
+
+.stepper p {
+  grid-area: paragraph;
+}
+
+.stepper button {
+  grid-area: button;
+  align-self: center;
+}
+
+button {
+  color: hsl(216, 33%, 97%);
+  background: hsl(210, 24%, 16%);
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0.1rem solid currentColor;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+button > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.visually-hidden:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

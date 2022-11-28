@@ -53,7 +53,7 @@ groupFrame
     )}z`
   );
 
-const stepper = root.append("div");
+const stepper = root.append("div").attr("class", "stepper");
 const heading = stepper.append("h2").text("Step 1");
 const paragraph = stepper
   .append("p")
