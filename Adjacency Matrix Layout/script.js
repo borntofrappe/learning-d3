@@ -39,3 +39,98 @@ const edges = [
   { source: 5, target: 3, weight: 85862 },
   { source: 5, target: 4, weight: 105608 },
 ];
+
+const size = 300;
+const margin = {
+  top: 30,
+  bottom: 20,
+  left: 70,
+  right: 20,
+};
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .style("max-width", "30rem")
+  .attr(
+    "viewBox",
+    `0 0 ${size + margin.left + margin.right} ${
+      size + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const scaleNodes = d3
+  .scaleBand()
+  .domain(nodes.map((d) => d.node))
+  .range([0, size]);
+
+const groupNodes = group.append("g").attr("font-size", "12");
+const groupFrame = group
+  .append("g")
+  .attr("stroke", "currentColor")
+  .attr("fill", "none");
+
+groupNodes
+  .append("g")
+  .selectAll("text")
+  .data(nodes)
+  .enter()
+  .append("text")
+  .attr("dominant-baseline", "middle")
+  .attr("text-anchor", "end")
+  .attr(
+    "transform",
+    (d) => `translate(-10 ${scaleNodes(d.node) + scaleNodes.bandwidth() / 2})`
+  )
+  .text((d) => d.node);
+
+groupNodes
+  .append("g")
+  .selectAll("text")
+  .data(nodes)
+  .enter()
+  .append("text")
+  .attr("dominant-baseline", "baseline")
+  .attr("text-anchor", "middle")
+  .attr(
+    "transform",
+    (d) => `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} -10)`
+  )
+  .text((d) => d.node);
+
+groupFrame.append("rect").attr("width", size).attr("height", size);
+// const groupCenter = group
+//   .append("g")
+//   .attr("transform", `translate(${size / 2} ${size / 2})`);
+
+// const groupsCenter = groupCenter.selectAll("g").data(nodes).enter().append("g");
+
+// groupsCenter.append("circle").attr("r", "5");
+// groupsCenter
+//   .append("text")
+//   .text((d) => d.node)
+//   .attr("font-size", "12")
+//   .attr("text-anchor", "middle")
+//   .attr("y", "-10");
+
+// const scaleWeight = d3
+//   .scaleLinear()
+//   .domain([0, d3.max(edges, (d) => d.weight)])
+//   .range([50, 300]);
+
+// const simulation = d3
+//   .forceSimulation(nodes)
+//   .force("charge", d3.forceManyBody())
+//   .force(
+//     "link",
+//     d3.forceLink(edges).distance(({ weight }) => scaleWeight(weight))
+//   )
+//   .force("center", d3.forceCenter());
+
+// simulation.on("tick", () => {
+//   groupsCenter.attr("transform", ({ x, y }) => `translate(${x} ${y})`);
+// });
