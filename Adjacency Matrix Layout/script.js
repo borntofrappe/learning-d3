@@ -40,6 +40,11 @@ const edges = [
   { source: 5, target: 4, weight: 105608 },
 ];
 
+const scaleColor = d3
+  .scaleLinear()
+  .domain([0, d3.max(edges, (d) => d.weight)])
+  .range(["hsl(0, 0%, 100%)", "hsl(0, 0%, 50%)"]);
+
 const size = 300;
 const margin = {
   top: 30,
@@ -61,12 +66,13 @@ const svg = d3
 
 const defs = svg.append("defs");
 
-const sizePattern = 1 / nodes.length;
+const sizeCell = size / nodes.length;
 
 const pattern = defs
   .append("pattern")
-  .attr("width", sizePattern)
-  .attr("height", sizePattern)
+  .attr("patternUnits", "userSpaceOnUse")
+  .attr("width", sizeCell)
+  .attr("height", sizeCell)
   .attr("id", "matrix-grid")
   .attr("viewBox", "0 0 100 100");
 
@@ -87,6 +93,7 @@ const scaleNodes = d3
   .range([0, size]);
 
 const groupNodes = group.append("g").attr("font-size", "12");
+const groupEdges = group.append("g");
 const groupFrame = group.append("g");
 
 groupNodes
@@ -124,34 +131,19 @@ groupFrame
   .attr("stroke", "currentColor")
   .attr("fill", "url(#matrix-grid)");
 
-// const groupCenter = group
-//   .append("g")
-//   .attr("transform", `translate(${size / 2} ${size / 2})`);
+const groupsEdges = groupEdges
+  .selectAll("g")
+  .data(edges)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => {
+    const y = scaleNodes(nodes.find(({ id }) => id === d.source).node);
+    const x = scaleNodes(nodes.find(({ id }) => id === d.target).node);
+    return `translate(${x} ${y})`;
+  });
 
-// const groupsCenter = groupCenter.selectAll("g").data(nodes).enter().append("g");
-
-// groupsCenter.append("circle").attr("r", "5");
-// groupsCenter
-//   .append("text")
-//   .text((d) => d.node)
-//   .attr("font-size", "12")
-//   .attr("text-anchor", "middle")
-//   .attr("y", "-10");
-
-// const scaleWeight = d3
-//   .scaleLinear()
-//   .domain([0, d3.max(edges, (d) => d.weight)])
-//   .range([50, 300]);
-
-// const simulation = d3
-//   .forceSimulation(nodes)
-//   .force("charge", d3.forceManyBody())
-//   .force(
-//     "link",
-//     d3.forceLink(edges).distance(({ weight }) => scaleWeight(weight))
-//   )
-//   .force("center", d3.forceCenter());
-
-// simulation.on("tick", () => {
-//   groupsCenter.attr("transform", ({ x, y }) => `translate(${x} ${y})`);
-// });
+groupsEdges
+  .append("rect")
+  .attr("width", sizeCell)
+  .attr("height", sizeCell)
+  .attr("fill", (d) => scaleColor(d.weight));
