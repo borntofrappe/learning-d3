@@ -59,6 +59,24 @@ const svg = d3
     }`
   );
 
+const defs = svg.append("defs");
+
+const sizePattern = 1 / nodes.length;
+
+const pattern = defs
+  .append("pattern")
+  .attr("width", sizePattern)
+  .attr("height", sizePattern)
+  .attr("id", "matrix-grid")
+  .attr("viewBox", "0 0 100 100");
+
+pattern
+  .append("rect")
+  .attr("width", "100")
+  .attr("height", "100")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor");
+
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
@@ -69,10 +87,7 @@ const scaleNodes = d3
   .range([0, size]);
 
 const groupNodes = group.append("g").attr("font-size", "12");
-const groupFrame = group
-  .append("g")
-  .attr("stroke", "currentColor")
-  .attr("fill", "none");
+const groupFrame = group.append("g");
 
 groupNodes
   .append("g")
@@ -102,7 +117,13 @@ groupNodes
   )
   .text((d) => d.node);
 
-groupFrame.append("rect").attr("width", size).attr("height", size);
+groupFrame
+  .append("rect")
+  .attr("width", size)
+  .attr("height", size)
+  .attr("stroke", "currentColor")
+  .attr("fill", "url(#matrix-grid)");
+
 // const groupCenter = group
 //   .append("g")
 //   .attr("transform", `translate(${size / 2} ${size / 2})`);
