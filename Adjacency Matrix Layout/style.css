@@ -9,8 +9,6 @@ body {
   background: hsl(220, 16%, 96%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
 }
 
 #root {
@@ -18,12 +16,15 @@ body {
   background: hsl(0, 0%, 100%);
   padding: 2rem;
   border-radius: 1rem;
-  margin: auto;
+  width: 95vw;
+  max-width: 42rem;
+  margin-block: 1rem;
+  margin-inline: auto;
   box-shadow: 0 0.25rem 0.8rem -1rem currentColor;
 }
 
 #root > * + * {
-  margin-top: 0.7em;
+  margin-block-start: 0.7em;
 }
 
 h1 {
@@ -48,8 +49,7 @@ a {
 
 svg {
   display: block;
-  width: 95vw;
-  max-width: 42rem;
+  width: 100%;
   height: auto;
   margin-inline: auto;
 }

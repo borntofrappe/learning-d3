@@ -163,7 +163,6 @@ groupNodes
   .attr("dominant-baseline", "middle")
   .attr("text-anchor", "end")
   /*
-  // pre-layout
   .attr("transform", (d) => {
     const y = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
 
@@ -181,7 +180,6 @@ groupNodes
   .append("text")
   .attr("text-anchor", "middle")
   /*
-  // pre-layout
   .attr("transform", (d) => {
     const x = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
 
@@ -197,7 +195,6 @@ const groupsEdges = groupEdges
   .enter()
   .append("g")
   /*
-  // pre-layout
   .attr("transform", (d) => {
     const x = scaleNodes(nodes.find(({ id }) => id === d.target).node);
     const y = scaleNodes(nodes.find(({ id }) => id === d.source).node);
@@ -251,14 +248,14 @@ groupFrame
   .append("rect")
   .attr("width", size)
   .attr("height", size)
-  .attr("stroke", "hsl(205, 89%, 15%)")
   .attr("fill", "url(#matrix-grid)")
+  .attr("stroke", "hsl(205, 89%, 15%)")
+  .attr("stroke-width", "2")
   .attr("rx", "10");
 
 groupsEdges
   .on("mouseenter", function (e, d) {
     /* 
-    // pre-layout
     const value = format(d.weight);
     
     const { node: source } = nodes.find(({ id }) => id === d.source);
@@ -286,7 +283,6 @@ groupsEdges
       );
 
     /* 
-      // pre-layout
       groupHighlight
         .select("rect")
         .attr("transform", d3.select(this).attr("transform"));
