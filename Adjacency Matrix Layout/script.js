@@ -49,7 +49,7 @@ const scaleColor = d3
 
 const size = 300;
 const margin = {
-  top: 30,
+  top: 50,
   bottom: 30,
   left: 70,
   right: 20,
@@ -85,6 +85,20 @@ pattern
   .attr("fill", "none")
   .attr("stroke", "currentColor");
 
+const marker = defs
+  .append("marker")
+  .attr("id", "marker")
+  .attr("viewBox", "0 -1.5 3 3")
+  .attr("markerWidth", "5")
+  .attr("markerHeight", "5")
+  .attr("orient", "auto");
+
+marker
+  .append("path")
+  .attr("d", "M 0 -1.5 3 0 0 1.5")
+  .attr("fill", "currentColor")
+  .attr("stroke", "none");
+
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
@@ -114,7 +128,8 @@ groupHighlight
   .append("path")
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("stroke-width", "2");
+  .attr("stroke-width", "2")
+  .attr("marker-end", "url(#marker)");
 
 groupHighlight
   .append("text")
@@ -149,7 +164,7 @@ groupNodes
   .attr("text-anchor", "middle")
   .attr(
     "transform",
-    (d) => `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} -10)`
+    (d) => `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} -20)`
   )
   .text((d) => d.node);
 
@@ -189,9 +204,10 @@ groupsEdges
 
     groupHighlight
       .select("path")
+      .transition()
       .attr(
         "d",
-        `M 0 ${v} h ${h - a} a ${a} ${a} 0 0 0 ${a} ${-a} v ${-(v - a)}`
+        `M 0 ${v} h ${h - a} a ${a} ${a} 0 0 0 ${a} ${-a} v ${-(v - a + 5)}`
       );
     groupHighlight
       .select("rect")
