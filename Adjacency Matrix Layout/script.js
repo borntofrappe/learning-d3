@@ -48,6 +48,10 @@ const scaleColor = d3
   .range(["hsl(205, 79%, 92%)", "hsl(205, 74%, 65%)"]);
 
 const size = 300;
+const sizeCell = size / nodes.length;
+const rectPadding = 0.1 * sizeCell;
+const rectCell = sizeCell - rectPadding * 2;
+
 const margin = {
   top: 50,
   bottom: 30,
@@ -55,10 +59,19 @@ const margin = {
   right: 20,
 };
 
+const scaleNodes = d3
+  .scaleBand()
+  .domain(nodes.map((d) => d.node))
+  .range([0, size]);
+
 const root = d3.select("body").append("div").attr("id", "root");
 
 root.append("h1").text("Where do they live?");
-root.append("p").text("");
+root
+  .append("p")
+  .html(
+    "A <span>(relatively dated)</span> article <a href='https://www.theguardian.com/news/datablog/2012/jan/26/europe-population-who-lives-where'>from The Guardian</a> highlights where people live in Europe, focusing on the connections between a few countries."
+  );
 
 const svg = root
   .append("svg")
@@ -71,8 +84,6 @@ const svg = root
   );
 
 const defs = svg.append("defs");
-
-const sizeCell = size / nodes.length;
 
 const pattern = defs
   .append("pattern")
@@ -110,11 +121,6 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const scaleNodes = d3
-  .scaleBand()
-  .domain(nodes.map((d) => d.node))
-  .range([0, size]);
-
 const groupNodes = group
   .append("g")
   .attr("font-size", "12")
@@ -126,6 +132,63 @@ const groupFrame = group.append("g").style("pointer-events", "none");
 const groupHighlight = group
   .append("g")
   .style("pointer-events", "none")
+  .attr("opacity", "0");
+
+groupNodes
+  .append("g")
+  .selectAll("text")
+  .data(nodes)
+  .enter()
+  .append("text")
+  .attr("dominant-baseline", "middle")
+  .attr("text-anchor", "end")
+  .attr("transform", (d) => {
+    const y = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
+
+    return `translate(-10 ${y})`;
+  })
+  .text((d) => d.node);
+
+groupNodes
+  .append("g")
+  .selectAll("text")
+  .data(nodes)
+  .enter()
+  .append("text")
+  .attr("text-anchor", "middle")
+  .attr("transform", (d) => {
+    const x = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
+
+    return `translate(${x} ${-(10 + 8)})`;
+  })
+  .text((d) => d.node);
+
+const groupsEdges = groupEdges
+  .selectAll("g")
+  .data(edges)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => {
+    const x = scaleNodes(nodes.find(({ id }) => id === d.target).node);
+    const y = scaleNodes(nodes.find(({ id }) => id === d.source).node);
+
+    return `translate(${x} ${y})`;
+  });
+
+groupsEdges
+  .append("rect")
+  .attr("x", rectPadding)
+  .attr("y", rectPadding)
+  .attr("width", rectCell)
+  .attr("height", rectCell)
+  .attr("fill", (d) => scaleColor(d.weight))
+  .attr("rx", "10");
+
+groupsEdges
+  .append("rect")
+  .attr("width", sizeCell)
+  .attr("height", sizeCell)
+  .attr("fill", "transparent")
   .attr("opacity", "0");
 
 groupHighlight
@@ -152,36 +215,6 @@ groupHighlight
   .attr("dominant-baseline", "hanging")
   .attr("font-size", "12");
 
-groupNodes
-  .append("g")
-  .selectAll("text")
-  .data(nodes)
-  .enter()
-  .append("text")
-  .attr("dominant-baseline", "middle")
-  .attr("text-anchor", "end")
-  .attr(
-    "transform",
-    (d) => `translate(-10 ${scaleNodes(d.node) + scaleNodes.bandwidth() / 2})`
-  )
-  .text((d) => d.node);
-
-groupNodes
-  .append("g")
-  .selectAll("text")
-  .data(nodes)
-  .enter()
-  .append("text")
-  .attr("text-anchor", "middle")
-  .attr(
-    "transform",
-    (d) =>
-      `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} ${-(
-        10 + 8
-      )})`
-  )
-  .text((d) => d.node);
-
 groupFrame
   .append("rect")
   .attr("width", size)
@@ -190,44 +223,15 @@ groupFrame
   .attr("fill", "url(#matrix-grid)")
   .attr("rx", "10");
 
-const groupsEdges = groupEdges
-  .selectAll("g")
-  .data(edges)
-  .enter()
-  .append("g")
-  .attr("transform", (d) => {
-    const y = scaleNodes(nodes.find(({ id }) => id === d.source).node);
-    const x = scaleNodes(nodes.find(({ id }) => id === d.target).node);
-    return `translate(${x} ${y})`;
-  });
-
-const rectPadding = 0.1 * sizeCell;
-const rectCell = sizeCell - rectPadding * 2;
-groupsEdges
-  .append("rect")
-  .attr("x", rectPadding)
-  .attr("y", rectPadding)
-  .attr("width", rectCell)
-  .attr("height", rectCell)
-  .attr("fill", (d) => scaleColor(d.weight))
-  .attr("rx", "10");
-
-groupsEdges
-  .append("rect")
-  .attr("width", sizeCell)
-  .attr("height", sizeCell)
-  .attr("fill", "transparent")
-  .attr("opacity", "0");
-
 groupsEdges
   .on("mouseenter", function (e, d) {
+    const { node: source } = nodes.find(({ id }) => id === d.source);
+    const { node: target } = nodes.find(({ id }) => id === d.target);
+    const value = format(d.weight);
+
     const a = sizeCell / 2;
-    const v =
-      scaleNodes(nodes.find(({ id }) => id === d.source).node) +
-      scaleNodes.bandwidth() / 2;
-    const h =
-      scaleNodes(nodes.find(({ id }) => id === d.target).node) +
-      scaleNodes.bandwidth() / 2;
+    const v = scaleNodes(source) + scaleNodes.bandwidth() / 2;
+    const h = scaleNodes(target) + scaleNodes.bandwidth() / 2;
 
     groupHighlight
       .select("path")
@@ -236,6 +240,7 @@ groupsEdges
         "d",
         `M 0 ${v} h ${h - a} a ${a} ${a} 0 0 0 ${a} ${-a} v ${-(v - a + 5)}`
       );
+
     groupHighlight
       .select("rect")
       .attr("transform", d3.select(this).attr("transform"));
@@ -243,13 +248,7 @@ groupsEdges
     groupHighlight
       .select("text")
       .html(
-        `<tspan font-weight="700">${format(
-          d.weight
-        )}</tspan> people born in <tspan font-weight="700">${
-          nodes.find(({ id }) => id === d.source).node
-        }</tspan> live in <tspan font-weight="700">${
-          nodes.find(({ id }) => id === d.target).node
-        }</tspan>.`
+        `<tspan font-weight="700">${value}</tspan> people born in <tspan font-weight="700">${source}</tspan> live in <tspan font-weight="700">${target}</tspan>.`
       );
 
     groupHighlight.attr("opacity", "1");
