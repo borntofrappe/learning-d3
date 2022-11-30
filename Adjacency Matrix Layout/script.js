@@ -64,6 +64,24 @@ const scaleNodes = d3
   .domain(nodes.map((d) => d.node))
   .range([0, size]);
 
+nodes.forEach((d) => {
+  const o = scaleNodes(d.node);
+  d.x = o;
+  d.y = o;
+  d.size = scaleNodes.bandwidth();
+});
+
+edges.forEach((d) => {
+  const { node: source, x, size } = nodes.find(({ id }) => id === d.source);
+  const { node: target, y } = nodes.find(({ id }) => id === d.target);
+
+  d.source = source;
+  d.target = target;
+  d.nodeSize = size;
+  d.x = y;
+  d.y = x;
+});
+
 const root = d3.select("body").append("div").attr("id", "root");
 
 root.append("h1").text("Where do they live?");
@@ -128,7 +146,9 @@ const groupNodes = group
   .attr("font-weight", "700");
 
 const groupEdges = group.append("g");
+
 const groupFrame = group.append("g").style("pointer-events", "none");
+
 const groupHighlight = group
   .append("g")
   .style("pointer-events", "none")
@@ -142,11 +162,15 @@ groupNodes
   .append("text")
   .attr("dominant-baseline", "middle")
   .attr("text-anchor", "end")
+  /*
+  // pre-layout
   .attr("transform", (d) => {
     const y = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
 
     return `translate(-10 ${y})`;
   })
+  */
+  .attr("transform", (d) => `translate(-10 ${d.y + d.size / 2})`)
   .text((d) => d.node);
 
 groupNodes
@@ -156,11 +180,15 @@ groupNodes
   .enter()
   .append("text")
   .attr("text-anchor", "middle")
+  /*
+  // pre-layout
   .attr("transform", (d) => {
     const x = scaleNodes(d.node) + scaleNodes.bandwidth() / 2;
 
     return `translate(${x} ${-(10 + 8)})`;
   })
+  */
+  .attr("transform", (d) => `translate(${d.x + d.size / 2} ${-(10 + 8)})`)
   .text((d) => d.node);
 
 const groupsEdges = groupEdges
@@ -168,12 +196,16 @@ const groupsEdges = groupEdges
   .data(edges)
   .enter()
   .append("g")
+  /*
+  // pre-layout
   .attr("transform", (d) => {
     const x = scaleNodes(nodes.find(({ id }) => id === d.target).node);
     const y = scaleNodes(nodes.find(({ id }) => id === d.source).node);
 
     return `translate(${x} ${y})`;
-  });
+  })
+  */
+  .attr("transform", (d) => `translate(${d.x} ${d.y})`);
 
 groupsEdges
   .append("rect")
@@ -225,13 +257,25 @@ groupFrame
 
 groupsEdges
   .on("mouseenter", function (e, d) {
+    /* 
+    // pre-layout
+    const value = format(d.weight);
+    
     const { node: source } = nodes.find(({ id }) => id === d.source);
     const { node: target } = nodes.find(({ id }) => id === d.target);
-    const value = format(d.weight);
 
-    const a = sizeCell / 2;
     const v = scaleNodes(source) + scaleNodes.bandwidth() / 2;
     const h = scaleNodes(target) + scaleNodes.bandwidth() / 2;
+    const a = sizeCell / 2;
+    */
+
+    const value = format(d.weight);
+
+    const { source, target, x, y, nodeSize: size } = d;
+
+    const h = x + size / 2;
+    const v = y + size / 2;
+    const a = size / 2;
 
     groupHighlight
       .select("path")
@@ -241,9 +285,14 @@ groupsEdges
         `M 0 ${v} h ${h - a} a ${a} ${a} 0 0 0 ${a} ${-a} v ${-(v - a + 5)}`
       );
 
-    groupHighlight
-      .select("rect")
-      .attr("transform", d3.select(this).attr("transform"));
+    /* 
+      // pre-layout
+      groupHighlight
+        .select("rect")
+        .attr("transform", d3.select(this).attr("transform"));
+    */
+
+    groupHighlight.select("rect").attr("transform", `translate(${x} ${y})`);
 
     groupHighlight
       .select("text")
