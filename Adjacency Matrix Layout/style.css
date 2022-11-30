@@ -5,8 +5,36 @@
 }
 
 body {
-  background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
+  color: hsl(231, 45%, 9%);
+  background: hsl(220, 16%, 96%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+}
+
+#root {
+  color: hsl(213, 34%, 17%);
+  background: hsl(0, 0%, 100%);
+  padding: 2rem;
+  border-radius: 1rem;
+  margin: auto;
+
+  box-shadow: 0 0.25rem 0.8rem -1rem currentColor;
+}
+
+#root > * + * {
+  margin-top: 0.7em;
+}
+
+h1 {
+  font-size: 1.38rem;
+  max-width: 40ch;
+}
+
+svg {
+  display: block;
+  width: 95vw;
+  max-width: 42rem;
+  height: auto;
 }

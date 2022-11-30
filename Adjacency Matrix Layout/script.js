@@ -45,7 +45,7 @@ const format = d3.format(",");
 const scaleColor = d3
   .scaleLinear()
   .domain([0, d3.max(edges, (d) => d.weight)])
-  .range(["hsl(0, 0%, 100%)", "hsl(0, 0%, 50%)"]);
+  .range(["hsl(205, 79%, 92%)", "hsl(205, 74%, 65%)"]);
 
 const size = 300;
 const margin = {
@@ -55,8 +55,12 @@ const margin = {
   right: 20,
 };
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+root.append("h1").text("Where do they live?");
+root.append("p").text("");
+
+const svg = root
   .append("svg")
   .style("max-width", "30rem")
   .attr(
@@ -83,21 +87,24 @@ pattern
   .attr("width", "100")
   .attr("height", "100")
   .attr("fill", "none")
-  .attr("stroke", "currentColor");
+  .attr("stroke", "hsl(205, 89%, 15%)");
 
 const marker = defs
   .append("marker")
   .attr("id", "marker")
-  .attr("viewBox", "0 -1.5 3 3")
+  .attr("viewBox", "-0.5 -2 3 4")
   .attr("markerWidth", "5")
   .attr("markerHeight", "5")
   .attr("orient", "auto");
 
 marker
   .append("path")
-  .attr("d", "M 0 -1.5 3 0 0 1.5")
-  .attr("fill", "currentColor")
-  .attr("stroke", "none");
+  .attr("d", "M 0 -1.5 2 0 0 1.5z")
+  .attr("fill", "hsl(205, 65%, 55%)")
+  .attr("stroke", "hsl(205, 65%, 55%)")
+  .attr("stroke-width", "1")
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round");
 
 const group = svg
   .append("g")
@@ -108,7 +115,12 @@ const scaleNodes = d3
   .domain(nodes.map((d) => d.node))
   .range([0, size]);
 
-const groupNodes = group.append("g").attr("font-size", "12");
+const groupNodes = group
+  .append("g")
+  .attr("font-size", "12")
+  .attr("fill", "currentColor")
+  .attr("font-weight", "700");
+
 const groupEdges = group.append("g");
 const groupFrame = group.append("g").style("pointer-events", "none");
 const groupHighlight = group
@@ -120,14 +132,14 @@ groupHighlight
   .append("rect")
   .attr("width", sizeCell)
   .attr("height", sizeCell)
-  .attr("fill", "currentColor")
+  .attr("fill", "hsl(205, 65%, 55%)")
   .attr("stroke", "none")
   .attr("fill-opacity", "0.1");
 
 groupHighlight
   .append("path")
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "hsl(205, 65%, 55%)")
   .attr("stroke-width", "2")
   .attr("marker-end", "url(#marker)");
 
@@ -160,11 +172,13 @@ groupNodes
   .data(nodes)
   .enter()
   .append("text")
-  .attr("dominant-baseline", "baseline")
   .attr("text-anchor", "middle")
   .attr(
     "transform",
-    (d) => `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} -20)`
+    (d) =>
+      `translate(${scaleNodes(d.node) + scaleNodes.bandwidth() / 2} ${-(
+        10 + 8
+      )})`
   )
   .text((d) => d.node);
 
@@ -172,8 +186,9 @@ groupFrame
   .append("rect")
   .attr("width", size)
   .attr("height", size)
-  .attr("stroke", "currentColor")
-  .attr("fill", "url(#matrix-grid)");
+  .attr("stroke", "hsl(205, 89%, 15%)")
+  .attr("fill", "url(#matrix-grid)")
+  .attr("rx", "10");
 
 const groupsEdges = groupEdges
   .selectAll("g")
@@ -186,11 +201,23 @@ const groupsEdges = groupEdges
     return `translate(${x} ${y})`;
   });
 
+const rectPadding = 0.1 * sizeCell;
+const rectCell = sizeCell - rectPadding * 2;
+groupsEdges
+  .append("rect")
+  .attr("x", rectPadding)
+  .attr("y", rectPadding)
+  .attr("width", rectCell)
+  .attr("height", rectCell)
+  .attr("fill", (d) => scaleColor(d.weight))
+  .attr("rx", "10");
+
 groupsEdges
   .append("rect")
   .attr("width", sizeCell)
   .attr("height", sizeCell)
-  .attr("fill", (d) => scaleColor(d.weight));
+  .attr("fill", "transparent")
+  .attr("opacity", "0");
 
 groupsEdges
   .on("mouseenter", function (e, d) {
@@ -215,10 +242,14 @@ groupsEdges
 
     groupHighlight
       .select("text")
-      .text(
-        `${format(d.weight)} people from ${
+      .html(
+        `<tspan font-weight="700">${format(
+          d.weight
+        )}</tspan> people born in <tspan font-weight="700">${
           nodes.find(({ id }) => id === d.source).node
-        } live in ${nodes.find(({ id }) => id === d.target).node}`
+        }</tspan> live in <tspan font-weight="700">${
+          nodes.find(({ id }) => id === d.target).node
+        }</tspan>.`
       );
 
     groupHighlight.attr("opacity", "1");
