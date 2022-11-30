@@ -1,0 +1,55 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: hsl(231, 45%, 9%);
+  background: hsl(220, 16%, 96%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  color: hsl(213, 34%, 17%);
+  background: hsl(0, 0%, 100%);
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 95vw;
+  max-width: 42rem;
+  margin-block: 1rem;
+  margin-inline: auto;
+  box-shadow: 0 0.25rem 0.8rem -1rem currentColor;
+}
+
+#root > * + * {
+  margin-block-start: 0.7em;
+}
+
+h1 {
+  font-size: 1.38rem;
+  max-width: 40ch;
+}
+
+p {
+  max-width: 65ch;
+}
+
+p > span {
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 0.1rem dotted currentColor;
+}
+
+svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+}

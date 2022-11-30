@@ -36,6 +36,7 @@ Projects exploring the D3 library.
 | [Reusable Chart](https://codepen.io/borntofrappe/pen/BaVZdMo)                 | call, function          |
 | [Waffle Layout](https://codepen.io/borntofrappe/pen/qBKVJgM)                  | layout, function        |
 | [Perlin-like Noise](https://codepen.io/borntofrappe/pen/PoaBoQd)              | scale, transition       |
+| [Adjacency Matrix Layout](https://codepen.io/borntofrappe/pen/ZERMyMz)        | layout, attributes      |
 
 Projects leaning on D3 to create interesting visualizations.
 
