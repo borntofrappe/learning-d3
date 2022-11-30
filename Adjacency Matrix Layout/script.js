@@ -40,6 +40,8 @@ const edges = [
   { source: 5, target: 4, weight: 105608 },
 ];
 
+const format = d3.format(",");
+
 const scaleColor = d3
   .scaleLinear()
   .domain([0, d3.max(edges, (d) => d.weight)])
@@ -48,7 +50,7 @@ const scaleColor = d3
 const size = 300;
 const margin = {
   top: 30,
-  bottom: 20,
+  bottom: 30,
   left: 70,
   right: 20,
 };
@@ -94,7 +96,34 @@ const scaleNodes = d3
 
 const groupNodes = group.append("g").attr("font-size", "12");
 const groupEdges = group.append("g");
-const groupFrame = group.append("g");
+const groupFrame = group.append("g").style("pointer-events", "none");
+const groupHighlight = group
+  .append("g")
+  .style("pointer-events", "none")
+  .attr("opacity", "0");
+
+groupHighlight
+  .append("rect")
+  .attr("width", sizeCell)
+  .attr("height", sizeCell)
+  .attr("fill", "currentColor")
+  .attr("stroke", "none")
+  .attr("fill-opacity", "0.1");
+
+groupHighlight
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "2");
+
+groupHighlight
+  .append("text")
+  .attr("x", size)
+  .attr("y", size + 10)
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "end")
+  .attr("dominant-baseline", "hanging")
+  .attr("font-size", "12");
 
 groupNodes
   .append("g")
@@ -147,3 +176,37 @@ groupsEdges
   .attr("width", sizeCell)
   .attr("height", sizeCell)
   .attr("fill", (d) => scaleColor(d.weight));
+
+groupsEdges
+  .on("mouseenter", function (e, d) {
+    const a = sizeCell / 2;
+    const v =
+      scaleNodes(nodes.find(({ id }) => id === d.source).node) +
+      scaleNodes.bandwidth() / 2;
+    const h =
+      scaleNodes(nodes.find(({ id }) => id === d.target).node) +
+      scaleNodes.bandwidth() / 2;
+
+    groupHighlight
+      .select("path")
+      .attr(
+        "d",
+        `M 0 ${v} h ${h - a} a ${a} ${a} 0 0 0 ${a} ${-a} v ${-(v - a)}`
+      );
+    groupHighlight
+      .select("rect")
+      .attr("transform", d3.select(this).attr("transform"));
+
+    groupHighlight
+      .select("text")
+      .text(
+        `${format(d.weight)} people from ${
+          nodes.find(({ id }) => id === d.source).node
+        } live in ${nodes.find(({ id }) => id === d.target).node}`
+      );
+
+    groupHighlight.attr("opacity", "1");
+  })
+  .on("mouseleave", () => {
+    groupHighlight.attr("opacity", "0");
+  });
