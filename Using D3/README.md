@@ -4,7 +4,7 @@ This repository relies on the D3 library from start to finish, from concocting t
 
 _Please note:_ keeping the spirit of this repository the sub-folders include the demo relying only on D3. In this document I reference other demos from CodePen or again Svelte's own REPL.
 
-## [Line Chart](https://codepen.io/borntofrappe/pen/zYdjZYg)
+## [Line Chart](https://codepen.io/borntofrappe/full/zYdjZYg)
 
 The line chart highlights search interest for the word **Pikmin** in the US, considering data from [Google Trends](https://trends.google.com/trends/explore?date=2020-01-01%202021-11-04&geo=US&q=pikmin).
 
@@ -66,11 +66,11 @@ From this starting point the idea is to use an `#each` block to iterate through 
 {/each}
 ```
 
-## [Scatterplot](https://codepen.io/borntofrappe/pen/eYErvNa)
+## [Scatterplot](https://codepen.io/borntofrappe/full/eYErvNa)
 
 The scatterplot maps the waiting time between eruptions and the duration of the same natural phenomenon for [Old Faithful](https://en.wikipedia.org/wiki/Old_Faithful), a popular geyser in Yellowstone Park.
 
-### [React](https://codepen.io/borntofrappe/pen/porVebG)
+### [React](https://codepen.io/borntofrappe/full/porVebG)
 
 Similarly to the line chart and the Svelte counterpart, React allows to use the same D3 functions for the scales and axis. What changes is how the markup is produced, with JSX syntax.
 
@@ -100,7 +100,7 @@ Ultimately React raises a warning to include a `key` and differentiate the eleme
 const circles = data.map((d, i) => <circle key={`circle-${i}}`} />);
 ```
 
-## [Select Histogram](https://codepen.io/borntofrappe/pen/LYjmWGN)
+## [Select Histogram](https://codepen.io/borntofrappe/full/LYjmWGN)
 
 The visualization creates and updates a histogram to consider the distribution of one statistic for pokemon of the first generation. The idea is to start with a specific stat and allow to explore other metrics with a `<select>` element.
 
@@ -129,7 +129,7 @@ For the exit selection, unnecessary group elements, you remove the entire lot.
 
 With Svelte it is enough to rely on reactive declarations to have the change in metric cascade through the DOM.
 
-## [Animated Lollipop](https://codepen.io/borntofrappe/pen/gOxzmrX)
+## [Animated Lollipop](https://codepen.io/borntofrappe/full/gOxzmrX)
 
 Starting from a lollipop chart I first created with Svelte, the project illustrates the flexibility of the `.transition` function and the d3-only solution.
 
@@ -143,7 +143,7 @@ Instead of plotting the data in static visualizations, the project includes a si
 
 At high level, the idea is to animate the enter and update selection together, staggering the individual data points based on their index. If there are elements in the exit selection, however, the idea is to first animate and remove these elements before continuing with the previous combination.
 
-## [Interactive Density Plot](https://codepen.io/borntofrappe/pen/KKvGzYL)
+## [Interactive Density Plot](https://codepen.io/borntofrappe/full/KKvGzYL)
 
 The project works to show how D3 manages event like `mouseenter to update the visualization following the reader's interactions. The data points are difficult to select individually, so that the script includes a projection with `d3.Delaunay`. Remove the comments to see how the projection works by layering a series of triangles above the data.
 

@@ -29,12 +29,12 @@ Here's a repository filled with projects to master the library, its many modules
 | [Complete the F1 Season](https://codepen.io/borntofrappe/pen/QWMeGWV)         | line chart, interaction    |
 | [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)                 | line, interaction          |
 | [Seasonal Data](https://codepen.io/borntofrappe/pen/BadEeLE)                  | line chart, redesign       |
-| Geo Practice                                                                  | geo, topojson              |
+| [Geo Practice](https://codepen.io/borntofrappe/pen/RwZdKMK)                   | geo, topojson              |
 | [Ideal Lap Analysis](https://codepen.io/borntofrappe/pen/YzxMKXj)             | structure                  |
 | [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)       | bar, transition, animation |
 | [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)        | data binding, stack        |
 | [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)        | pie, arc                   |
-| Using D3                                                                      | utilities                  |
+| [Using D3](https://codepen.io/borntofrappe/pen/gOxzmrX)                       | d3, react, svelte          |
 | [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)                    | sankey, radial             |
 | [Eurovision Votes](https://codepen.io/borntofrappe/pen/dyvJpOJ)               | sankey, scatterplot        |
 | [F1 Race Lap Chart](https://codepen.io/borntofrappe/pen/yLMoYbY)              | line                       |
