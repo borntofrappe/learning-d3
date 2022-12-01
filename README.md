@@ -7,69 +7,97 @@ Here's a repository filled with projects to master the library, its many modules
 <details open>
 <summary><h2 style="display: inline">Projects</h2></summary>
 
-### [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)
+### [Adjacency Matrix Layout](https://codepen.io/borntofrappe/pen/ZERMyMz)
 
-> enter-update-exit, join
+> layout, attributes
 
-### [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)
+### [Perlin-like Noise](https://codepen.io/borntofrappe/pen/PoaBoQd)
 
-> random, normal
+> scale, transition
 
-### [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)
+### [Tally Chart](https://codepen.io/borntofrappe/pen/wvXXoeP)
 
-> scale-chromatic, symbol
+> call, filter
 
-### [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)
+### [Proportional Area Chart](https://codepen.io/borntofrappe/pen/JjZvpMG)
 
-> simulation
+> call, pie
 
-### [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)
+### [Layered Area Chart](https://codepen.io/borntofrappe/pen/xxzYmzx)
 
-> data, table, shape
+> area, perspective
 
-### [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)
+### [Multiple Series 3D Bar Chart](https://codepen.io/borntofrappe/pen/jOKZbqM)
 
-> spider, lineRadial
+> bar, perspective
 
-### [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg)
+### [Waffle Layout](https://codepen.io/borntofrappe/pen/qBKVJgM)
 
-> random, area
+> layout, function
 
-### [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)
+### [Scrollytelling](https://codepen.io/borntofrappe/pen/XWYaLZv)
 
-> area, marker
+> call, observer
 
-### [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)
+### [Reusable Chart](https://codepen.io/borntofrappe/pen/BaVZdMo)
 
-> chord, ribbon, arc
+> call, function
 
-### [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)
+### [Wind Rose](https://codepen.io/borntofrappe/pen/mdKmYLR)
 
-> arc, path
+> arc, layout
 
-### [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)
+### [EU Gas Storage](https://codepen.io/borntofrappe/pen/JjZNoRB)
 
-> d3, react
+> lineRadial, transition
 
-### [Bins](https://codepen.io/borntofrappe/pen/NWdVGre)
+### [The Names of the Future](https://codepen.io/borntofrappe/pen/MWXpeve)
 
-> array, bin, random
+> stack, streamgraph
 
-### [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)
+### [Tournament Trees](https://codepen.io/borntofrappe/pen/oNyzrBJ)
 
-> mouse, line,delaunay
+> hierarchy, tree
 
-### [School Closures Choropleth Map](https://codepen.io/borntofrappe/pen/oNBaKdw)
+### [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)
 
-> geo, topojson
+> treemap, text
 
-### Using D3
+### [CSS Technologies](https://codepen.io/borntofrappe/pen/qBKNPXY)
 
-> utilities
+> line, transition
 
-### [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)
+### [CSS Features](https://codepen.io/borntofrappe/pen/qBKZNyb)
 
-> data binding, stack
+> pack, grid, transition
+
+### [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)
+
+> scaleQuantile, datum
+
+### [F1 Calendar Map](https://codepen.io/borntofrappe/pen/GRGJYMN)
+
+> geo, transition, line
+
+### Beauteous Villages
+
+> geojson, transition
+
+### [Perception of Probability](https://codepen.io/borntofrappe/pen/LYzqpwX)
+
+> numerical, categorical
+
+### [Complete the F1 Season](https://codepen.io/borntofrappe/pen/QWMeGWV)
+
+> line chart, interaction
+
+### [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)
+
+> line, interaction
+
+### [Seasonal Data](https://codepen.io/borntofrappe/pen/BadEeLE)
+
+> line chart, redesign
 
 ### Geo Practice
 
@@ -79,49 +107,125 @@ Here's a repository filled with projects to master the library, its many modules
 
 > structure
 
-### [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)
+### [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)
 
-> line, interaction
+> bar, transition, animation
 
-### [Perception of Probability](https://codepen.io/borntofrappe/pen/LYzqpwX)
+### [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg)
 
-> numerical, categorical
+> stack, random
 
-### Beauteous Villages
+### [Nested and Stacked Bars](https://codepen.io/borntofrappe/pen/MWvXjEx)
 
-> geojson, transition
+> data binding, stack
 
-### [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)
+### [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)
 
-> scaleQuantile, datum
+> pie, arc
 
-### [Word Map](https://codepen.io/borntofrappe/pen/xxzEKaW)
+### Using D3
 
-> treemap, text
+> utilities
 
-### [EU Gas Storage](https://codepen.io/borntofrappe/pen/JjZNoRB)
+### [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)
 
-> lineRadial, transition
+> sankey, radial
 
-### [Wind Rose](https://codepen.io/borntofrappe/pen/mdKmYLR)
+### [Eurovision Votes](https://codepen.io/borntofrappe/pen/dyvJpOJ)
 
-> arc, layout
+> sankey, scatterplot
 
-### [Reusable Chart](https://codepen.io/borntofrappe/pen/BaVZdMo)
+### [F1 Race Lap Chart](https://codepen.io/borntofrappe/pen/yLMoYbY)
 
-> call, function
+> line
 
-### [Waffle Layout](https://codepen.io/borntofrappe/pen/qBKVJgM)
+### [UNESCO World Heritage](https://codepen.io/borntofrappe/pen/jOyRJKO)
 
-> layout, function
+> geo, topojson
 
-### [Perlin-like Noise](https://codepen.io/borntofrappe/pen/PoaBoQd)
+### [School Closures Choropleth Map](https://codepen.io/borntofrappe/pen/oNBaKdw)
 
-> scale, transition
+> geo, topojson
 
-### [Adjacency Matrix Layout](https://codepen.io/borntofrappe/pen/ZERMyMz)
+### [Most Celebrated F1 Drivers](https://codepen.io/borntofrappe/pen/MWbqLYM)
 
-> layout, attributes
+> accessibility, transition
+
+### [Number of Births](https://codepen.io/borntofrappe/full/YzpLpjm)
+
+> line, lineRadial, delaunay
+
+### [Lines and Delaunay](https://codepen.io/borntofrappe/pen/ExNQbax)
+
+> mouse, line,delaunay
+
+### [Football Stats](https://codepen.io/borntofrappe/pen/eYBeJjL)
+
+> squares, hexagons
+
+### [Bins](https://codepen.io/borntofrappe/pen/NWdVGre)
+
+> array, bin, random
+
+### [Renderer(s)](https://codepen.io/borntofrappe/pen/zYrGwZV)
+
+> d3, react
+
+### [Arc Diagram](https://codepen.io/borntofrappe/pen/RwrwdVv)
+
+> arc, path
+
+### [Chord Diagram](https://codepen.io/borntofrappe/pen/gOPObrL)
+
+> chord, ribbon, arc
+
+### [Area Spread](https://codepen.io/borntofrappe/pen/dyGbWLq)
+
+> area, marker
+
+### [Pseudo 3D D3](https://codepen.io/borntofrappe/pen/yLeBLYX)
+
+> zdog
+
+### [Correlation Study](https://codepen.io/borntofrappe/pen/VwvodeX)
+
+> line
+
+### [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg)
+
+> random, area
+
+### [Spider Chart](https://codepen.io/borntofrappe/pen/ZEbZxgb)
+
+> spider, lineRadial
+
+### [Trending Turnips](https://codepen.io/borntofrappe/pen/pojGaEZ)
+
+> line, lineRadial
+
+### [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)
+
+> bar, pie
+
+### [Data Practice](https://codepen.io/borntofrappe/pen/pojPJGa)
+
+> data, table, shape
+
+### [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV)
+
+> simulation, force, on
+
+### [Force Simulation](https://codepen.io/borntofrappe/pen/GRpNqpd)
+
+> simulation
+
+### [Color Scales](https://codepen.io/borntofrappe/pen/yLYJpKq)
+
+> scale-chromatic, symbol
+
+### [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)
+
+> marker, line
 
 ### [The Seasons of 2019](https://codepen.io/borntofrappe/pen/jOPeKZp)
 
@@ -131,117 +235,15 @@ Here's a repository filled with projects to master the library, its many modules
 
 > hierarchy, tree
 
-### [Stack Overflow Trends](https://codepen.io/borntofrappe/pen/oNjjdeZ)
+### [Random Distribution](https://codepen.io/borntofrappe/pen/wvKwRoB)
 
-> marker, line
+> random, normal
 
-### [Color Filled Simulation](https://codepen.io/borntofrappe/pen/dyYOBzV)
+### [Data Join](https://codepen.io/borntofrappe/pen/wvaxwdY)
 
-> simulation, force, on
+> enter-update-exit, join
 
-### [Faux 3D D3](https://codepen.io/borntofrappe/pen/NWGeZNV)
-
-> bar, pie
-
-### [Turnip Turnabout](https://codepen.io/borntofrappe/pen/pojGaEZ)
-
-> line, lineRadial
-
-### [Stacked and Random Percentages](https://codepen.io/borntofrappe/pen/QWjeEEg)
-
-> stack, random
-
-### [Correlation Study](https://codepen.io/borntofrappe/pen/VwvodeX)
-
-> line
-
-### [Pseudo 3D D3](https://codepen.io/borntofrappe/pen/yLeBLYX)
-
-> zdog
-
-### [Football Stats](https://codepen.io/borntofrappe/pen/eYBeJjL)
-
-> squares, hexagons
-
-### [Number of Births](https://codepen.io/borntofrappe/full/YzpLpjm)
-
-> line, lineRadial, delaunay
-
-### [Most Celebrated F1 Drivers](https://codepen.io/borntofrappe/pen/MWbqLYM)
-
-> accessibility, transition
-
-### [UNESCO World Heritage](https://codepen.io/borntofrappe/pen/jOyRJKO)
-
-> geo, topojson
-
-### [F1 Race Lap Chart](https://codepen.io/borntofrappe/pen/yLMoYbY)
-
-> line
-
-### [Eurovision Votes](https://codepen.io/borntofrappe/pen/dyvJpOJ)
-
-> sankey, scatterplot
-
-### [Seine River](https://codepen.io/borntofrappe/pen/qBroKjx)
-
-> sankey, radial
-
-### [Atmospheric Composition](https://codepen.io/borntofrappe/pen/rNzvvLE)
-
-> pie, arc
-
-### [Cumulative CO2 Emissions](https://codepen.io/borntofrappe/pen/VwzBZgB)
-
-> bar, transition, animation
-
-### [Seasonal Data](https://codepen.io/borntofrappe/pen/BadEeLE)
-
-> line chart, redesign
-
-### [Complete the F1 Season](https://codepen.io/borntofrappe/pen/QWMeGWV)
-
-> line chart, interaction
-
-### [F1 Calendar Map](https://codepen.io/borntofrappe/pen/GRGJYMN)
-
-> geo, transition, line
-
-### [CSS Features](https://codepen.io/borntofrappe/pen/qBKZNyb)
-
-> pack, grid, transition
-
-### [CSS Technologies](https://codepen.io/borntofrappe/pen/qBKNPXY)
-
-> line, transition
-
-### [Tournament Trees](https://codepen.io/borntofrappe/pen/oNyzrBJ)
-
-> hierarchy, tree
-
-### [The Names of the Future](https://codepen.io/borntofrappe/pen/MWXpeve)
-
-> stack, streamgraph
-
-### [Scrollytelling](https://codepen.io/borntofrappe/pen/XWYaLZv)
-
-> call, observer
-
-### [Multiple Series 3D Bar Chart](https://codepen.io/borntofrappe/pen/jOKZbqM)
-
-> bar, perspective
-
-### [Layered Area Chart](https://codepen.io/borntofrappe/pen/xxzYmzx)
-
-> area, perspective
-
-### [Proportional Area Chart](https://codepen.io/borntofrappe/pen/JjZvpMG)
-
-> call, pie
-
-### [Tally Chart](https://codepen.io/borntofrappe/pen/wvXXoeP)
-
-> call, filter
+---
 
 </details>
 
