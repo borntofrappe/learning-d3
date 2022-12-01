@@ -231,7 +231,7 @@ svg
     .geoMercator()
     .fitSize([size, size], countries)
     .rotate([-2.8, -46.7])
-    .scale(3000);
+    .scale(2900);
 
   const path = d3.geoPath().projection(projection);
 
@@ -257,7 +257,7 @@ svg
         .attr("font-size", "18")
         .attr("transform", "translate(0 24)");
 
-      textIntro.append("tspan").text("As of October 2022 there are");
+      textIntro.append("tspan").text("With the 2022 edition there are");
 
       const numberIntro = textIntro
         .append("tspan")
@@ -292,7 +292,7 @@ svg
             `translate(${projection([longitude, latitude])})`
         )
         .attr("fill", "hsl(0, 0%, 27%)")
-        .attr("r", "3");
+        .attr("r", "4");
 
       const hX = 5;
       const hY = size - 24;
@@ -349,24 +349,89 @@ svg
         .data(data)
         .enter()
         .append("path")
-        .attr("opacity", 0)
+        .attr("opacity", "0")
         .attr("d", (d, i) => voronoi.renderCell(i));
 
-      cellsHighlight.on("pointerenter", function (e, d) {
-        const i = cellsHighlight.nodes().indexOf(this);
+      // transition
+      const transitionGroup = d3.transition().duration(500).ease(d3.easeQuadIn);
+      const durationTransitionData = 2500;
 
-        const { locality, longitude, latitude } = data[i];
-        const [x, y] = projection([longitude, latitude]);
+      const transitionData = d3
+        .transition(transitionGroup)
+        .transition()
+        .duration(durationTransitionData);
+
+      const transitionHighlight = d3
+        .transition(transitionData)
+        .transition()
+        .duration(500)
+        .delay(1500);
+
+      group.style("opacity", 0).transition(transitionGroup).style("opacity", 1);
+
+      numberIntro
+        .text(0)
+        .transition(transitionData)
+        .textTween(() => (t) => Math.floor(t * data.length));
+
+      groupData
+        .selectAll("circle")
+        .attr("r", "0")
+        .transition(transitionGroup)
+        .transition()
+        .delay((_, i, { length }) => (durationTransitionData / length) * i)
+        .ease(d3.easeBounceOut)
+        .attr("r", "4");
+
+      groupHighlight
+        .select("path")
+        .attr("pathLength", 1)
+        .attr("stroke-dasharray", 1)
+        .attr("stroke-dashoffset", 1);
+
+      groupHighlight.select("circle").attr("r", "0");
+
+      groupHighlight.style("opacity", "0").style("visibility", "hidden");
+
+      groupHighlight
+        .transition(transitionHighlight)
+        .style("opacity", "1")
+        .style("visibility", "visible");
+
+      transitionHighlight.on("end", () => {
+        const transition = d3.transition().duration(750).delay(500);
 
         groupHighlight
           .select("path")
-          .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
+          .attr("stroke-dashoffset", "1")
+          .transition(transition)
+          .attr("stroke-dashoffset", "0");
 
         groupHighlight
           .select("circle")
-          .attr("transform", `translate(${x} ${y})`);
+          .attr("r", "0")
+          .transition(transition)
+          .transition()
+          .attr("r", "7");
 
-        textDetails.select("tspan:last-of-type").text(locality);
+        transition.on("end", () => {
+          cellsHighlight.on("pointerenter", function (e, d) {
+            const i = cellsHighlight.nodes().indexOf(this);
+
+            const { locality, longitude, latitude } = data[i];
+            const [x, y] = projection([longitude, latitude]);
+
+            groupHighlight
+              .select("path")
+              .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
+
+            groupHighlight
+              .select("circle")
+              .attr("transform", `translate(${x} ${y})`);
+
+            textDetails.select("tspan:last-of-type").text(locality);
+          });
+        });
       });
     });
 })();
