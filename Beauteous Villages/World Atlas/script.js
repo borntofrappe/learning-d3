@@ -250,6 +250,7 @@ svg
       const groupIntro = group.append("g");
       const groupGeoJSON = group.append("g");
       const groupData = group.append("g");
+      const groupHighlight = group.append("g");
 
       const textIntro = groupIntro
         .append("text")
@@ -292,5 +293,80 @@ svg
         )
         .attr("fill", "hsl(0, 0%, 27%)")
         .attr("r", "3");
+
+      const hX = 5;
+      const hY = size - 24;
+
+      const { locality, longitude, latitude } =
+        data[Math.floor(Math.random() * data.length)];
+      const [x, y] = projection([longitude, latitude]);
+
+      groupHighlight
+        .append("path")
+        .attr("fill", "none")
+        .attr("stroke", "hsl(0, 0%, 27%)")
+        .attr("stroke-width", "1")
+        .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
+
+      groupHighlight
+        .append("circle")
+        .attr("fill", "hsl(0, 0%, 27%)")
+        .attr("stroke", "hsl(0, 0%, 97%)")
+        .attr("stroke-width", "1")
+        .attr("r", "6")
+        .attr("transform", `translate(${x} ${y})`);
+
+      const groupDetails = groupHighlight
+        .append("g")
+        .attr("transform", `translate(${hX} ${hY})`);
+
+      groupDetails.append("circle").attr("r", "5");
+
+      const textDetails = groupDetails
+        .append("text")
+        .attr("font-size", "18")
+        .attr("x", "10")
+        .attr("y", "5");
+
+      textDetails.append("tspan").text("Villages such as ");
+
+      textDetails
+        .append("tspan")
+        .attr("dx", "2")
+        .attr("font-size", "24")
+        .attr("font-weight", "bold")
+        .text(locality);
+
+      const delaunay = d3.Delaunay.from(
+        data.map(({ longitude, latitude }) => projection([longitude, latitude]))
+      );
+
+      const voronoi = delaunay.voronoi([0, 0, size, size]);
+
+      const cellsHighlight = groupHighlight
+        .append("g")
+        .selectAll("path")
+        .data(data)
+        .enter()
+        .append("path")
+        .attr("opacity", 0)
+        .attr("d", (d, i) => voronoi.renderCell(i));
+
+      cellsHighlight.on("pointerenter", function (e, d) {
+        const i = cellsHighlight.nodes().indexOf(this);
+
+        const { locality, longitude, latitude } = data[i];
+        const [x, y] = projection([longitude, latitude]);
+
+        groupHighlight
+          .select("path")
+          .attr("d", `M ${hX} ${hY} v -15 L ${x} ${y}`);
+
+        groupHighlight
+          .select("circle")
+          .attr("transform", `translate(${x} ${y})`);
+
+        textDetails.select("tspan:last-of-type").text(locality);
+      });
     });
 })();
