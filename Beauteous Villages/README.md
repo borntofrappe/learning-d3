@@ -120,3 +120,9 @@ To summarize the flow of the script:
 The idea is to update the village highlighted in the bottom left corner as the pointer hovers of different sections of the map.
 
 For the sections I implemented a Delaunay triangulation to expand the interactable area (the circles being too small a target). The code follows the example of the demo _Lines and Delaunay_, in this very repository, with the only difference being the coordinates of the points. Use the projection function for the x and y values.
+
+## Update — World Atlas
+
+The repository recreates the visualization without accessing a local `.json` file for inland France and the list of villages.
+
+For the map, the script retrieve a TopoJSON file from an online source. The idea is to then rotate/scale to focus on France specifically and draw the only connected feature.
