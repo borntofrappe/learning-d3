@@ -1,4 +1,3 @@
-// https://www.les-plus-beaux-villages-de-france.org/fr/nos-villages/
 const data = [
   { longitude: 4.5566, latitude: 44.3034, locality: "Aiguèze" },
   { longitude: -1.4977, latitude: 43.3071, locality: "Ainhoa" },

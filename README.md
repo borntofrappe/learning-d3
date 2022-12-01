@@ -24,7 +24,7 @@ Here's a repository filled with projects to master the library, its many modules
 | [CSS Features](https://codepen.io/borntofrappe/pen/qBKZNyb)                   | pack, grid, transition     |
 | [Boxplot Experiment](https://codepen.io/borntofrappe/pen/oNybwPB)             | scaleQuantile, datum       |
 | [F1 Calendar Map](https://codepen.io/borntofrappe/pen/GRGJYMN)                | geo, transition, line      |
-| Beauteous Villages                                                            | geojson, transition        |
+| [Beauteous Villages](https://codepen.io/borntofrappe/pen/KKeGNVg)             | geojson, transition        |
 | [Perception of Probability](https://codepen.io/borntofrappe/pen/LYzqpwX)      | numerical, categorical     |
 | [Complete the F1 Season](https://codepen.io/borntofrappe/pen/QWMeGWV)         | line chart, interaction    |
 | [Spaghetti Plot](https://codepen.io/borntofrappe/pen/XWawvgw)                 | line, interaction          |
