@@ -231,7 +231,7 @@ svg
     .geoMercator()
     .fitSize([size, size], countries)
     .rotate([-2.8, -46.7])
-    .scale(3200);
+    .scale(3000);
 
   const path = d3.geoPath().projection(projection);
 
@@ -247,8 +247,30 @@ svg
     .on("end", () => {
       const group = svg.append("g");
 
+      const groupIntro = group.append("g");
       const groupGeoJSON = group.append("g");
       const groupData = group.append("g");
+
+      const textIntro = groupIntro
+        .append("text")
+        .attr("font-size", "18")
+        .attr("transform", "translate(0 24)");
+
+      textIntro.append("tspan").text("As of October 2022 there are");
+
+      const numberIntro = textIntro
+        .append("tspan")
+        .attr("dx", "5")
+        .attr("font-size", "24")
+        .attr("font-weight", "bold")
+        .text(data.length);
+
+      textIntro
+        .append("tspan")
+        .attr("x", "0")
+        .attr("font-style", "italic")
+        .attr("y", "26")
+        .text("beautiful villages");
 
       groupGeoJSON
         .append("path")
