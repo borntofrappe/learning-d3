@@ -115,9 +115,11 @@ const height = 800;
 const margin = {
   top: 10,
   bottom: 10,
-  left: 10,
-  right: 10,
+  left: 50,
+  right: 50,
 };
+
+const format = (d) => `${d3.format(",")(d)} GW`;
 
 const scaleOffset = d3
   .scaleBand()
@@ -142,6 +144,7 @@ const marker = defs
   .append("marker")
   .attr("id", "marker")
   .attr("viewBox", "0 -1.5 3 3")
+  .attr("markerUnits", "userSpaceOnUse")
   .attr("markerWidth", "10")
   .attr("markerHeight", "10")
   .attr("orient", "auto");
@@ -163,7 +166,7 @@ const groupCenter = group
 const groupNodes = groupCenter
   .append("g")
   .attr("fill", "currentColor")
-  .attr("font-size", "14")
+  .attr("font-size", "15")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "middle")
   .style("text-transform", "uppercase");
@@ -171,7 +174,14 @@ const groupNodes = groupCenter
 const groupEdges = groupCenter
   .append("g")
   .attr("fill", "none")
-  .attr("stroke", "currentColor");
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "1");
+
+const groupHighlight = groupCenter
+  .append("g")
+  .attr("fill", "currentColor")
+  .attr("font-size", "15")
+  .attr("dominant-baseline", "middle");
 
 const groupsNodes = groupNodes
   .selectAll("g")
@@ -196,7 +206,7 @@ const pathEdges = groupEdges
     const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
     const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
     const oy = y1 - y0;
-    const ox = oy > 0 ? -65 : 65;
+    const ox = oy > 0 ? -75 : 75;
     const a = oy / 2;
     return `M ${ox} ${y0} a ${a} ${a} 0 0 0 0 ${oy}`;
   });
@@ -206,13 +216,31 @@ groupsNodes
     d3.select(this).select("text").attr("font-weight", "700");
 
     const { node, id } = d;
-    groupEdges
+    const pathEdges = groupEdges
       .selectAll("path")
-      .attr("opacity", "0.1")
+      .attr("opacity", "0.05")
       .attr("stroke-width", "1")
-      .filter((d) => d.source === id)
-      .attr("opacity", "1")
-      .attr("stroke-width", "1.25");
+      .filter((d) => d.source === id);
+
+    pathEdges.attr("opacity", "1").attr("stroke-width", "1.25");
+
+    groupHighlight.selectAll("*").remove();
+    pathEdges.each((d) => {
+      const { source, target, weight } = d;
+
+      const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
+      const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+      const oy = y1 - y0;
+      const ox = oy > 0 ? 65 : -65;
+      const textAnchor = oy > 0 ? "start" : "end";
+
+      groupHighlight
+        .append("text")
+        .attr("font-weight", "700")
+        .attr("text-anchor", textAnchor)
+        .attr("transform", `translate(${ox} ${y1})`)
+        .text(format(weight));
+    });
   })
   .on("mouseleave", function () {
     d3.select(this).select("text").attr("font-weight", "400");
@@ -220,4 +248,7 @@ groupsNodes
 
 svg.on("mouseleave", () => {
   groupEdges.selectAll("path").attr("opacity", "1").attr("stroke-width", "1");
+  groupNodes.select("text").attr("font-weight", "400");
+
+  groupHighlight.selectAll("*").remove();
 });
