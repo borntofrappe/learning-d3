@@ -217,6 +217,7 @@ const groupsNodes = groupNodes
   .data(nodes)
   .enter()
   .append("g")
+  // pre-layout
   // .attr(
   //   "transform",
   //   (d) => `translate(0 ${scaleOffset(d.id) + scaleOffset.bandwidth() / 2})`
@@ -232,6 +233,7 @@ const pathEdges = groupEdges
   .append("path")
   .attr("marker-end", "url(#marker)")
   .attr("d", (d) => {
+    // pre-layout
     // const { source, target } = d;
     // const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
     // const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
@@ -242,10 +244,17 @@ const pathEdges = groupEdges
 
     const x0 = dy > 0 ? -inset : inset;
 
+    const h = dy > 0 ? outset * -1 : outset;
+
     const distance = scaleDistance(Math.abs(source - target));
+
+    // draw arcs instead of straight lines
+    // return `M ${x0} ${y0} h ${h} a ${dy / 2} ${dy / 2} 0 0 0 0 ${dy} h ${
+    //   h * -1
+    // }`;
+
     const lx = dy > 0 ? distance * -1 : distance;
     const ly = dy / 2;
-    const h = dy > 0 ? outset * -1 : outset;
 
     return `M ${x0} ${y0} h ${h} l ${lx} ${ly} ${lx * -1} ${ly} h ${h * -1}`;
   });
@@ -264,6 +273,7 @@ groupsNodes
 
     groupHighlight.selectAll("*").remove();
     pathEdges.each((d) => {
+      // pre-layout
       // const { source, target, weight } = d;
 
       // const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
