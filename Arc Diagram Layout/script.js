@@ -115,10 +115,11 @@ const height = 800;
 const margin = {
   top: 10,
   bottom: 10,
-  left: 50,
-  right: 50,
+  left: 10,
+  right: 10,
 };
-
+const offset = 70;
+const outset = 5;
 const format = (d) => `${d3.format(",")(d)} GW`;
 
 const scaleOffset = d3
@@ -126,11 +127,19 @@ const scaleOffset = d3
   .domain(nodes.map((d) => d.id))
   .range([0, height]);
 
+const maxGapId = d3.max(edges, (d) => Math.abs(d.source - d.target));
+
+const scaleGap = d3
+  .scaleBand()
+  .domain(d3.range(maxGapId + 1))
+  .range([0, width / 2 - outset - offset]);
+
 const svg = d3
   .select("body")
   .append("svg")
+  .style("display", "block")
   .style("max-width", "40rem")
-  .style("outline", "1px solid")
+  .style("margin-inline", "auto")
   .attr(
     "viewBox",
     `0 0 ${width + margin.left + margin.right} ${
@@ -174,7 +183,7 @@ const groupNodes = groupCenter
 const groupEdges = groupCenter
   .append("g")
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "hsl(220, 80%, 60%)")
   .attr("stroke-width", "1");
 
 const groupHighlight = groupCenter
@@ -205,10 +214,18 @@ const pathEdges = groupEdges
     const { source, target } = d;
     const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
     const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
-    const oy = y1 - y0;
-    const ox = oy > 0 ? -75 : 75;
-    const a = oy / 2;
-    return `M ${ox} ${y0} a ${a} ${a} 0 0 0 0 ${oy}`;
+
+    const dy = y1 - y0;
+
+    const x0 = dy > 0 ? -offset : offset;
+
+    const gap = scaleGap(Math.abs(source - target));
+    const lx = dy > 0 ? gap * -1 : gap;
+    const ly = dy / 2;
+    const h = dy > 0 ? outset * -1 : outset;
+    console.log(Math.abs(source - target));
+
+    return `M ${x0} ${y0} h ${h} l ${lx} ${ly} ${lx * -1} ${ly} h ${h * -1}`;
   });
 
 groupsNodes
@@ -231,7 +248,7 @@ groupsNodes
       const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
       const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
       const oy = y1 - y0;
-      const ox = oy > 0 ? 65 : -65;
+      const ox = oy > 0 ? offset : -offset;
       const textAnchor = oy > 0 ? "start" : "end";
 
       groupHighlight
