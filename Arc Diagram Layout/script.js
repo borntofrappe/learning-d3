@@ -124,11 +124,6 @@ const scaleOffset = d3
   .domain(nodes.map((d) => d.id))
   .range([0, height]);
 
-const scaleWeight = d3
-  .scaleLinear()
-  .domain([0, d3.max(edges, (d) => d.weight)])
-  .range([2, 2]);
-
 const svg = d3
   .select("body")
   .append("svg")
@@ -140,6 +135,22 @@ const svg = d3
       height + margin.top + margin.bottom
     }`
   );
+
+const defs = svg.append("defs");
+
+const marker = defs
+  .append("marker")
+  .attr("id", "marker")
+  .attr("viewBox", "0 -1.5 3 3")
+  .attr("markerWidth", "10")
+  .attr("markerHeight", "10")
+  .attr("orient", "auto");
+
+marker
+  .append("path")
+  .attr("d", "M 0 -1.5 3 0 0 1.5")
+  .attr("fill", "currentColor")
+  .attr("stroke", "none");
 
 const group = svg
   .append("g")
@@ -174,18 +185,39 @@ const groupsNodes = groupNodes
 
 groupsNodes.append("text").text((d) => d.node);
 
-groupEdges
+const pathEdges = groupEdges
   .selectAll("path")
   .data(edges)
   .enter()
   .append("path")
+  .attr("marker-end", "url(#marker)")
   .attr("d", (d) => {
     const { source, target } = d;
     const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
     const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
     const oy = y1 - y0;
-    const ox = oy > 0 ? -55 : 55;
+    const ox = oy > 0 ? -65 : 65;
     const a = oy / 2;
-
     return `M ${ox} ${y0} a ${a} ${a} 0 0 0 0 ${oy}`;
   });
+
+groupsNodes
+  .on("mouseenter", function (e, d) {
+    d3.select(this).select("text").attr("font-weight", "700");
+
+    const { node, id } = d;
+    groupEdges
+      .selectAll("path")
+      .attr("opacity", "0.1")
+      .attr("stroke-width", "1")
+      .filter((d) => d.source === id)
+      .attr("opacity", "1")
+      .attr("stroke-width", "1.25");
+  })
+  .on("mouseleave", function () {
+    d3.select(this).select("text").attr("font-weight", "400");
+  });
+
+svg.on("mouseleave", () => {
+  groupEdges.selectAll("path").attr("opacity", "1").attr("stroke-width", "1");
+});
