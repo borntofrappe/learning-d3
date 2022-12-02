@@ -1,5 +1,3 @@
-// https://ec.europa.eu/eurostat/cache/infographs/energy/bloc-2c.html
-
 const nodes = [
   { node: "Belgium", id: 0 },
   { node: "Bulgaria", id: 1 },
@@ -134,8 +132,16 @@ const scaleGap = d3
   .domain(d3.range(maxGapId + 1))
   .range([0, width / 2 - outset - offset]);
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+root.append("h1").text("How does electricity flow in the EU?");
+root
+  .append("p")
+  .html(
+    "Member states of the European Union export electricity between each other, creating an interesting network of connections."
+  );
+
+const svg = root
   .append("svg")
   .style("display", "block")
   .style("max-width", "40rem")
@@ -153,15 +159,14 @@ const marker = defs
   .append("marker")
   .attr("id", "marker")
   .attr("viewBox", "0 -1.5 3 3")
-  .attr("markerUnits", "userSpaceOnUse")
-  .attr("markerWidth", "10")
-  .attr("markerHeight", "10")
+  .attr("markerWidth", "6")
+  .attr("markerHeight", "6")
   .attr("orient", "auto");
 
 marker
   .append("path")
   .attr("d", "M 0 -1.5 3 0 0 1.5")
-  .attr("fill", "currentColor")
+  .attr("fill", "var(--color-highlight, hsl(199, 84%, 55%))")
   .attr("stroke", "none");
 
 const group = svg
@@ -183,8 +188,8 @@ const groupNodes = groupCenter
 const groupEdges = groupCenter
   .append("g")
   .attr("fill", "none")
-  .attr("stroke", "hsl(220, 80%, 60%)")
-  .attr("stroke-width", "1");
+  .attr("stroke", "var(--color-highlight, hsl(199, 84%, 55%))")
+  .attr("stroke-width", "2");
 
 const groupHighlight = groupCenter
   .append("g")
@@ -223,7 +228,6 @@ const pathEdges = groupEdges
     const lx = dy > 0 ? gap * -1 : gap;
     const ly = dy / 2;
     const h = dy > 0 ? outset * -1 : outset;
-    console.log(Math.abs(source - target));
 
     return `M ${x0} ${y0} h ${h} l ${lx} ${ly} ${lx * -1} ${ly} h ${h * -1}`;
   });
@@ -236,10 +240,9 @@ groupsNodes
     const pathEdges = groupEdges
       .selectAll("path")
       .attr("opacity", "0.05")
-      .attr("stroke-width", "1")
       .filter((d) => d.source === id);
 
-    pathEdges.attr("opacity", "1").attr("stroke-width", "1.25");
+    pathEdges.attr("opacity", "1");
 
     groupHighlight.selectAll("*").remove();
     pathEdges.each((d) => {
@@ -264,7 +267,7 @@ groupsNodes
   });
 
 svg.on("mouseleave", () => {
-  groupEdges.selectAll("path").attr("opacity", "1").attr("stroke-width", "1");
+  groupEdges.selectAll("path").attr("opacity", "1");
   groupNodes.select("text").attr("font-weight", "400");
 
   groupHighlight.selectAll("*").remove();
