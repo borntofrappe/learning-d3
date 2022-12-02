@@ -116,7 +116,8 @@ const margin = {
   left: 10,
   right: 10,
 };
-const offset = 70;
+
+const inset = 70;
 const outset = 5;
 const format = (d) => `${d3.format(",")(d)} GW`;
 
@@ -125,12 +126,26 @@ const scaleOffset = d3
   .domain(nodes.map((d) => d.id))
   .range([0, height]);
 
-const maxGapId = d3.max(edges, (d) => Math.abs(d.source - d.target));
+const maxDistanceId = d3.max(edges, (d) => Math.abs(d.source - d.target));
 
-const scaleGap = d3
+nodes.forEach((d) => {
+  const offset = scaleOffset(d.id) + scaleOffset.bandwidth() / 2;
+  d.offset = offset;
+});
+
+edges.forEach((d) => {
+  const { source, target } = d;
+
+  const offsetStart = scaleOffset(source) + scaleOffset.bandwidth() / 2;
+  const offsetEnd = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+  d.offsetStart = offsetStart;
+  d.offsetEnd = offsetEnd;
+});
+
+const scaleDistance = d3
   .scaleBand()
-  .domain(d3.range(maxGapId + 1))
-  .range([0, width / 2 - outset - offset]);
+  .domain(d3.range(maxDistanceId + 1))
+  .range([0, width / 2 - outset - inset]);
 
 const root = d3.select("body").append("div").attr("id", "root");
 
@@ -202,10 +217,11 @@ const groupsNodes = groupNodes
   .data(nodes)
   .enter()
   .append("g")
-  .attr(
-    "transform",
-    (d) => `translate(0 ${scaleOffset(d.id) + scaleOffset.bandwidth() / 2})`
-  );
+  // .attr(
+  //   "transform",
+  //   (d) => `translate(0 ${scaleOffset(d.id) + scaleOffset.bandwidth() / 2})`
+  // )
+  .attr("transform", (d) => `translate(0 ${d.offset})`);
 
 groupsNodes.append("text").text((d) => d.node);
 
@@ -216,16 +232,18 @@ const pathEdges = groupEdges
   .append("path")
   .attr("marker-end", "url(#marker)")
   .attr("d", (d) => {
-    const { source, target } = d;
-    const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
-    const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+    // const { source, target } = d;
+    // const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
+    // const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+
+    const { source, target, offsetStart: y0, offsetEnd: y1 } = d;
 
     const dy = y1 - y0;
 
-    const x0 = dy > 0 ? -offset : offset;
+    const x0 = dy > 0 ? -inset : inset;
 
-    const gap = scaleGap(Math.abs(source - target));
-    const lx = dy > 0 ? gap * -1 : gap;
+    const distance = scaleDistance(Math.abs(source - target));
+    const lx = dy > 0 ? distance * -1 : distance;
     const ly = dy / 2;
     const h = dy > 0 ? outset * -1 : outset;
 
@@ -236,7 +254,7 @@ groupsNodes
   .on("mouseenter", function (e, d) {
     d3.select(this).select("text").attr("font-weight", "700");
 
-    const { node, id } = d;
+    const { id } = d;
     const pathEdges = groupEdges
       .selectAll("path")
       .attr("opacity", "0.05")
@@ -246,12 +264,15 @@ groupsNodes
 
     groupHighlight.selectAll("*").remove();
     pathEdges.each((d) => {
-      const { source, target, weight } = d;
+      // const { source, target, weight } = d;
 
-      const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
-      const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+      // const y0 = scaleOffset(source) + scaleOffset.bandwidth() / 2;
+      // const y1 = scaleOffset(target) + scaleOffset.bandwidth() / 2;
+
+      const { offsetStart: y0, offsetEnd: y1, weight } = d;
+
       const oy = y1 - y0;
-      const ox = oy > 0 ? offset : -offset;
+      const ox = oy > 0 ? inset : -inset;
       const textAnchor = oy > 0 ? "start" : "end";
 
       groupHighlight
