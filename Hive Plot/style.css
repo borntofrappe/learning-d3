@@ -1,0 +1,30 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: hsl(209, 61%, 16%);
+  background: hsl(210, 36%, 96%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  width: 90vw;
+  max-width: 38rem;
+  margin: 1rem auto;
+  padding: 1rem;
+  color: hsl(209, 61%, 16%);
+  background: hsl(0, 0%, 100%);
+  box-shadow: 0 0.25rem 1rem -0.5rem hsl(210, 22%, 49%, 0.5);
+}
+
+svg {
+  color: hsl(211, 39%, 23%);
+  --color-subdue: hsl(210, 22%, 49%);
+  display: block;
+  width: 100%;
+  height: auto;
+}
