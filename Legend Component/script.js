@@ -97,10 +97,12 @@ const legend = () => {
   let fontSize = 24;
   let roundingRect = 0.2;
 
+  const dispatch = d3.dispatch("enter-label", "leave-legend");
+
   const legend = (selection) => {
     const scaleOffset = d3.scaleBand().domain(labels).range([0, height]);
 
-    selection
+    const rect = selection
       .append("rect")
       .attr("width", width)
       .attr("height", height)
@@ -132,6 +134,19 @@ const legend = () => {
       .attr("fill", "currentColor")
       .attr("font-size", fontSize)
       .text((d) => d);
+
+    groups.on("mouseenter", function (e, d) {
+      groups.attr("opacity", "0.1").attr("font-weight", "inherit");
+      d3.select(this).attr("opacity", "1").attr("font-weight", "700");
+
+      dispatch.call("enter-label", this, e, d);
+    });
+
+    rect.on("mouseleave", function (e) {
+      groups.attr("opacity", "1").attr("font-weight", "inherit");
+
+      dispatch.call("leave-legend", this, e);
+    });
   };
 
   legend.labels = function (values) {
@@ -176,6 +191,13 @@ const legend = () => {
     return this;
   };
 
+  legend.on = function () {
+    if (!arguments.length) return on;
+
+    dispatch.on.apply(dispatch, arguments);
+    return this;
+  };
+
   return legend;
 };
 
@@ -186,26 +208,18 @@ groupLegend.call(
     .height(size)
     .fontSize(24)
     .roundingRect(0.5)
+    .on("enter-label", (e, d) => {
+      groupPaths
+        .selectAll("path")
+        .attr("opacity", "0.1")
+        .filter(({ data }) => data.label === d)
+        .attr("opacity", "1");
+
+      const { value } = pieData.find(({ data }) => data.label === d).data;
+      textHighlight.text(format(value));
+    })
+    .on("leave-legend", function (e) {
+      groupPaths.selectAll("path").attr("opacity", "1");
+      textHighlight.text(format(total));
+    })
 );
-
-// groupsLegend.on("mouseenter", function (e, d) {
-//   groupsLegend.attr("opacity", "0.1").attr("font-weight", "inherit");
-//   d3.select(this).attr("opacity", "1").attr("font-weight", "700");
-
-//   groupPaths
-//     .selectAll("path")
-//     .attr("opacity", "0.1")
-//     .filter(({ data }) => data.label === d)
-//     .attr("opacity", "1");
-
-//   const { value } = pieData.find(({ data }) => data.label === d).data;
-//   textHighlight.text(format(value));
-// });
-
-// groupLegend.on("mouseleave", () => {
-//   groupsLegend.attr("opacity", "1").attr("font-weight", "inherit");
-
-//   groupPaths.selectAll("path").attr("opacity", "1");
-
-//   textHighlight.text(format(total));
-// });
