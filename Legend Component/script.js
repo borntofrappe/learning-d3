@@ -90,61 +90,122 @@ groupPaths
     (d, i) => `var(--color-${i + 1}, ${scaleColor(d.data.label)})`
   );
 
-const legendHeight = size;
-const labels = data.map((d) => d.label);
-const scaleOffset = d3.scaleBand().domain(labels).range([0, legendHeight]);
+const legend = () => {
+  let labels = ["A", "B", "C"];
+  let width = 100;
+  let height = 500;
+  let fontSize = 24;
+  let roundingRect = 0.2;
 
-groupLegend
-  .append("rect")
-  .attr("width", legendWidth)
-  .attr("height", legendHeight)
-  .attr("fill", "transparent")
-  .attr("opacity", "0");
+  const legend = (selection) => {
+    const scaleOffset = d3.scaleBand().domain(labels).range([0, height]);
 
-const groupsLegend = groupLegend
-  .selectAll("g")
-  .data(labels)
-  .enter()
-  .append("g")
-  .attr(
-    "transform",
-    (d) => `translate(0 ${scaleOffset(d) + scaleOffset.bandwidth() / 2})`
-  );
+    selection
+      .append("rect")
+      .attr("width", width)
+      .attr("height", height)
+      .attr("fill", "transparent")
+      .attr("opacity", "0");
 
-groupsLegend
-  .append("rect")
-  .attr("y", "-10")
-  .attr("width", "20")
-  .attr("height", "20")
-  .attr("rx", "4")
-  .attr("fill", (d) => scaleColor(d));
+    const groups = selection
+      .selectAll("g")
+      .data(labels)
+      .enter()
+      .append("g")
+      .attr(
+        "transform",
+        (d) => `translate(0 ${scaleOffset(d) + scaleOffset.bandwidth() / 2})`
+      );
 
-groupsLegend
-  .append("text")
-  .attr("x", "28")
-  .attr("dominant-baseline", "central")
-  .attr("fill", "currentColor")
-  .attr("font-size", "24")
-  .text((d) => d);
+    groups
+      .append("rect")
+      .attr("y", -fontSize / 2)
+      .attr("width", fontSize)
+      .attr("height", fontSize)
+      .attr("rx", fontSize * roundingRect)
+      .attr("fill", (d) => scaleColor(d));
 
-groupsLegend.on("mouseenter", function (e, d) {
-  groupsLegend.attr("opacity", "0.1").attr("font-weight", "inherit");
-  d3.select(this).attr("opacity", "1").attr("font-weight", "700");
+    groups
+      .append("text")
+      .attr("x", fontSize + 10)
+      .attr("dominant-baseline", "central")
+      .attr("fill", "currentColor")
+      .attr("font-size", fontSize)
+      .text((d) => d);
+  };
 
-  groupPaths
-    .selectAll("path")
-    .attr("opacity", "0.1")
-    .filter(({ data }) => data.label === d)
-    .attr("opacity", "1");
+  legend.labels = function (values) {
+    if (!arguments.length) return labels;
 
-  const { value } = pieData.find(({ data }) => data.label === d).data;
-  textHighlight.text(format(value));
-});
+    labels = values;
+    return this;
+  };
 
-groupLegend.on("mouseleave", () => {
-  groupsLegend.attr("opacity", "1").attr("font-weight", "inherit");
+  legend.width = function (value) {
+    if (!arguments.length) return width;
 
-  groupPaths.selectAll("path").attr("opacity", "1");
+    width = value;
+    return this;
+  };
 
-  textHighlight.text(format(total));
-});
+  legend.height = function (value) {
+    if (!arguments.length) return height;
+
+    height = value;
+    return this;
+  };
+
+  legend.scaleOffset = function (scale) {
+    if (!arguments.length) return scaleOffset;
+
+    scaleOffset = scale;
+    return this;
+  };
+
+  legend.fontSize = function (value) {
+    if (!arguments.length) return fontSize;
+
+    fontSize = value;
+    return this;
+  };
+
+  legend.roundingRect = function (value) {
+    if (!arguments.length) return roundingRect;
+
+    roundingRect = value;
+    return this;
+  };
+
+  return legend;
+};
+
+groupLegend.call(
+  legend()
+    .labels(data.map((d) => d.label))
+    .width(legendWidth)
+    .height(size)
+    .fontSize(24)
+    .roundingRect(0.5)
+);
+
+// groupsLegend.on("mouseenter", function (e, d) {
+//   groupsLegend.attr("opacity", "0.1").attr("font-weight", "inherit");
+//   d3.select(this).attr("opacity", "1").attr("font-weight", "700");
+
+//   groupPaths
+//     .selectAll("path")
+//     .attr("opacity", "0.1")
+//     .filter(({ data }) => data.label === d)
+//     .attr("opacity", "1");
+
+//   const { value } = pieData.find(({ data }) => data.label === d).data;
+//   textHighlight.text(format(value));
+// });
+
+// groupLegend.on("mouseleave", () => {
+//   groupsLegend.attr("opacity", "1").attr("font-weight", "inherit");
+
+//   groupPaths.selectAll("path").attr("opacity", "1");
+
+//   textHighlight.text(format(total));
+// });
