@@ -58,7 +58,15 @@ const groupCenter = group
   .append("g")
   .attr("transform", `translate(${size / 2} ${size / 2})`);
 
-groupCenter
+const groupPaths = groupCenter
+  .append("g")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr("stroke-linecap", "round")
+  .attr("stroke-linejoin", "round");
+
+groupPaths
   .selectAll("path")
   .data(pieData)
   .enter()
@@ -68,12 +76,7 @@ groupCenter
   .style(
     "color",
     (d, i) => `var(--color-${i + 1}, ${scaleColor(d.data.label)})`
-  )
-  .attr("fill", "none")
-  .attr("stroke", "currentColor")
-  .attr("stroke-width", strokeWidth)
-  .attr("stroke-linecap", "round")
-  .attr("stroke-linejoin", "round");
+  );
 
 const legendHeight = size;
 const labels = data.map((d) => d.label);
@@ -83,7 +86,8 @@ groupLegend
   .append("rect")
   .attr("width", legendWidth)
   .attr("height", legendHeight)
-  .attr("fill", "hsl(0, 0%, 97%)");
+  .attr("fill", "transparent")
+  .attr("opacity", "0");
 
 const groupsLegend = groupLegend
   .selectAll("g")
@@ -110,3 +114,20 @@ groupsLegend
   .attr("fill", "currentColor")
   .attr("font-size", "24")
   .text((d) => d);
+
+groupsLegend.on("mouseenter", function (e, d) {
+  groupsLegend.attr("opacity", "0.1").attr("font-weight", "inherit");
+  d3.select(this).attr("opacity", "1").attr("font-weight", "700");
+
+  groupPaths
+    .selectAll("path")
+    .attr("opacity", "0.1")
+    .filter(({ data }) => data.label === d)
+    .attr("opacity", "1");
+});
+
+groupLegend.on("mouseleave", () => {
+  groupsLegend.attr("opacity", "1").attr("font-weight", "inherit");
+
+  groupPaths.selectAll("path").attr("opacity", "1");
+});
