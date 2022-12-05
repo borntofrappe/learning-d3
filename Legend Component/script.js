@@ -1,11 +1,14 @@
 const data = [
-  { value: 445757, label: "Solid fossil fuels" },
-  { value: 4554664, label: "Natural gas" },
-  { value: 6372414, label: "Petroleum" },
-  { value: 1766433, label: "Renewables" },
+  { value: 866.25, label: "Housing" },
+  { value: 247.5, label: "Transportation" },
+  { value: 371.25, label: "Food" },
+  { value: 618.75, label: "Insurance" },
+  { value: 297, label: "Utilities" },
+  { value: 74.25, label: "Other" },
 ].sort((a, b) => b.value - a.value);
 
-const format = d3.format(",");
+const format = (d) => `${d3.format(",")(d)}£`;
+const total = data.reduce((acc, curr) => acc + curr.value, 0);
 
 const scaleColor = d3
   .scaleOrdinal()
@@ -36,7 +39,7 @@ const pieData = pie(data);
 
 const root = d3.select("body").append("div");
 
-root.append("h1").text("Energy sources");
+root.append("h1").text("Budget categories");
 
 const svg = root
   .attr("id", "root")
@@ -57,6 +60,15 @@ const groupLegend = group
 const groupCenter = group
   .append("g")
   .attr("transform", `translate(${size / 2} ${size / 2})`);
+
+const textHighlight = groupCenter
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "central")
+  .attr("font-size", "64")
+  .attr("font-weight", "700")
+  .text(format(total));
 
 const groupPaths = groupCenter
   .append("g")
@@ -124,10 +136,15 @@ groupsLegend.on("mouseenter", function (e, d) {
     .attr("opacity", "0.1")
     .filter(({ data }) => data.label === d)
     .attr("opacity", "1");
+
+  const { value } = pieData.find(({ data }) => data.label === d).data;
+  textHighlight.text(format(value));
 });
 
 groupLegend.on("mouseleave", () => {
   groupsLegend.attr("opacity", "1").attr("font-weight", "inherit");
 
   groupPaths.selectAll("path").attr("opacity", "1");
+
+  textHighlight.text(format(total));
 });
