@@ -75,21 +75,24 @@ groupCenter
   .attr("stroke-linecap", "round")
   .attr("stroke-linejoin", "round");
 
+const legendHeight = size;
+const labels = data.map((d) => d.label);
+const scaleOffset = d3.scaleBand().domain(labels).range([0, legendHeight]);
+
 groupLegend
   .append("rect")
   .attr("width", legendWidth)
-  .attr("height", size)
+  .attr("height", legendHeight)
   .attr("fill", "hsl(0, 0%, 97%)");
 
 const groupsLegend = groupLegend
   .selectAll("g")
-  .data(data)
+  .data(labels)
   .enter()
   .append("g")
   .attr(
     "transform",
-    (d, i, { length }) =>
-      `translate(0 ${(i * size) / length + size / length / 2})`
+    (d) => `translate(0 ${scaleOffset(d) + scaleOffset.bandwidth() / 2})`
   );
 
 groupsLegend
@@ -97,8 +100,8 @@ groupsLegend
   .attr("y", "-10")
   .attr("width", "20")
   .attr("height", "20")
-  .attr("rx", "2")
-  .attr("fill", (d) => scaleColor(d.label));
+  .attr("rx", "4")
+  .attr("fill", (d) => scaleColor(d));
 
 groupsLegend
   .append("text")
@@ -106,4 +109,4 @@ groupsLegend
   .attr("dominant-baseline", "central")
   .attr("fill", "currentColor")
   .attr("font-size", "24")
-  .text((d) => d.label);
+  .text((d) => d);
