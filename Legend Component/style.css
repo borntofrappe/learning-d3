@@ -1,0 +1,24 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  color: hsl(0, 0%, 11%);
+  background: hsl(240, 11%, 96%);
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
+    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  max-width: 30rem;
+  margin: 1rem auto;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  background: hsl(0, 0%, 100%);
+  --color-1: hsl(238, 50%, 53%);
+  --color-2: hsl(215, 70%, 67%);
+  --color-3: hsl(195, 83%, 67%);
+  --color-4: hsl(192, 100%, 94%);
+}
