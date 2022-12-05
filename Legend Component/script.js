@@ -22,6 +22,8 @@ const margin = 50;
 const strokeWidth = 36;
 const padAngle = 0.15;
 const radius = size / 2 - strokeWidth / 2;
+const legendWidth = 200;
+const legendGap = 50;
 
 const pie = d3
   .pie()
@@ -39,11 +41,18 @@ root.append("h1").text("Energy sources");
 const svg = root
   .attr("id", "root")
   .append("svg")
-  .attr("viewBox", `0 0 ${size + margin * 2} ${size + margin * 2}`);
+  .attr(
+    "viewBox",
+    `0 0 ${size + margin * 2 + legendGap + legendWidth} ${size + margin * 2}`
+  );
 
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin} ${margin})`);
+
+const groupLegend = group
+  .append("g")
+  .attr("transform", `translate(${size + legendGap} 0)`);
 
 const groupCenter = group
   .append("g")
@@ -65,3 +74,36 @@ groupCenter
   .attr("stroke-width", strokeWidth)
   .attr("stroke-linecap", "round")
   .attr("stroke-linejoin", "round");
+
+groupLegend
+  .append("rect")
+  .attr("width", legendWidth)
+  .attr("height", size)
+  .attr("fill", "hsl(0, 0%, 97%)");
+
+const groupsLegend = groupLegend
+  .selectAll("g")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    (d, i, { length }) =>
+      `translate(0 ${(i * size) / length + size / length / 2})`
+  );
+
+groupsLegend
+  .append("rect")
+  .attr("y", "-10")
+  .attr("width", "20")
+  .attr("height", "20")
+  .attr("rx", "2")
+  .attr("fill", (d) => scaleColor(d.label));
+
+groupsLegend
+  .append("text")
+  .attr("x", "28")
+  .attr("dominant-baseline", "central")
+  .attr("fill", "currentColor")
+  .attr("font-size", "24")
+  .text((d) => d.label);
