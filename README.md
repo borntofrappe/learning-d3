@@ -6,6 +6,7 @@ Here's a repository filled with projects to master the library, its many modules
 
 | Title                                                                         | Keywords                   |
 | ----------------------------------------------------------------------------- | -------------------------- |
+| [Legend Component](https://codepen.io/borntofrappe/pen/RwJEOyg)               | component, dispatch        |
 | [Hive Plot](https://codepen.io/borntofrappe/pen/MWXzdqm)                      | hive, areaRadial           |
 | [Arc Diagram Layout](https://codepen.io/borntofrappe/pen/PoaxYyq)             | layout, attributes         |
 | [Adjacency Matrix Layout](https://codepen.io/borntofrappe/pen/ZERMyMz)        | layout, attributes         |
