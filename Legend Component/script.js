@@ -91,16 +91,22 @@ groupPaths
   );
 
 const legend = () => {
-  let labels = ["A", "B", "C"];
-  let width = 100;
-  let height = 500;
+  let scale = d3
+    .scaleOrdinal()
+    .domain(["tomato", "seagreen", "aqua"])
+    .range(["tomato", "seagreen", "aqua"]);
+
+  let width = 150;
+  let height = 200;
   let fontSize = 24;
   let roundingRect = 0.2;
+  let scaleOffset = d3.scaleBand();
 
   const dispatch = d3.dispatch("enter-label", "leave-legend");
 
   const legend = (selection) => {
-    const scaleOffset = d3.scaleBand().domain(labels).range([0, height]);
+    const labels = scale.domain();
+    scaleOffset.domain(labels).range([0, height]);
 
     const rect = selection
       .append("rect")
@@ -125,7 +131,7 @@ const legend = () => {
       .attr("width", fontSize)
       .attr("height", fontSize)
       .attr("rx", fontSize * roundingRect)
-      .attr("fill", (d) => scaleColor(d));
+      .attr("fill", (d) => scale(d));
 
     groups
       .append("text")
@@ -149,10 +155,10 @@ const legend = () => {
     });
   };
 
-  legend.labels = function (values) {
-    if (!arguments.length) return labels;
+  legend.scale = function (value) {
+    if (!arguments.length) return scale;
 
-    labels = values;
+    scale = value;
     return this;
   };
 
@@ -203,7 +209,7 @@ const legend = () => {
 
 groupLegend.call(
   legend()
-    .labels(data.map((d) => d.label))
+    .scale(scaleColor)
     .width(legendWidth)
     .height(size)
     .fontSize(24)
