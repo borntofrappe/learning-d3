@@ -81,12 +81,22 @@ const margin = {
   left: 20,
 };
 
-const scaleX = d3
+const scaleOffset = d3
   .scaleBand()
   .domain(d3.range(d3.max(dataGoals, (d) => d.goals) + 1))
   .range([0, width]);
 
-const axisX = d3.axisBottom(scaleX).tickSize(0);
+const dataNodes = dataGoals.map((d) => {
+  const { goals } = d;
+  const offset = scaleOffset(goals) + scaleOffset.bandwidth() / 2;
+
+  return {
+    ...d,
+    offset,
+  };
+});
+
+const axisX = d3.axisBottom(scaleOffset).tickSize(0);
 
 const svg = d3
   .select("body")
@@ -119,12 +129,9 @@ const groupGoals = groupCenter.append("g");
 
 const groupsGoals = groupGoals
   .selectAll("g")
-  .data(dataGoals)
+  .data(dataNodes)
   .enter()
   .append("g")
-  .attr(
-    "transform",
-    (d) => `translate(${scaleX(d.goals) + scaleX.bandwidth() / 2} 0)`
-  );
+  .attr("transform", (d) => `translate(${d.offset} 0)`);
 
 groupsGoals.append("circle").attr("r", "10");
