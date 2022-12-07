@@ -72,7 +72,7 @@ const dataGoals = data.map((d) => {
 });
 
 const width = 500;
-const height = 100;
+const height = 120;
 
 const margin = {
   top: 20,
@@ -111,12 +111,6 @@ const simulation = d3
     d3.forceY().y(() => height / 2)
   );
 
-// while (simulation.alpha() > simulation.alphaMin()) {
-//   simulation.tick();
-// }
-
-const axisX = d3.axisBottom(scaleOffset).tickSize(0);
-
 const svg = d3
   .select("body")
   .append("svg")
@@ -126,6 +120,12 @@ const svg = d3
       height + (margin.top + margin.bottom)
     }`
   );
+
+while (simulation.alpha() > simulation.alphaMin()) {
+  simulation.tick();
+}
+
+const axisX = d3.axisBottom(scaleOffset).tickSize(0);
 
 const group = svg
   .append("g")
@@ -149,4 +149,10 @@ const groupsGoals = groupGoals
   .append("g")
   .attr("transform", (d) => `translate(${d.x} ${d.y})`);
 
-groupsGoals.append("circle").attr("r", radius);
+groupsGoals
+  .append("use")
+  .attr("x", -radius)
+  .attr("y", -radius)
+  .attr("width", radius * 2)
+  .attr("height", radius * 2)
+  .attr("href", "#football");
