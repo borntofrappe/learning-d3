@@ -74,11 +74,14 @@ const dataGoals = data.map((d) => {
 const width = 500;
 const height = 120;
 
+const strokeWidth = 8;
+const rounding = 10;
+
 const margin = {
-  top: 20,
-  right: 20,
-  bottom: 20,
-  left: 20,
+  top: 10,
+  right: 10,
+  bottom: 10,
+  left: 10,
 };
 
 const radius = 8;
@@ -131,14 +134,53 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const groupAxis = group.append("g").attr("fill", "currentColor");
+const groupAxis = group.append("g");
 
-groupAxis
+const groupAxisX = groupAxis
   .append("g")
   .attr("transform", `translate(0 ${height})`)
-  .call(axisX)
-  .select("path")
-  .remove();
+  .call(axisX);
+
+const groupAxisY = groupAxis
+  .append("g")
+  .attr("fill", "none")
+  .attr("stroke", "var(--color-subdued, currentColor)")
+  .attr("stroke-width", "0.5");
+
+groupAxisX.select("path").remove();
+groupAxisX.selectAll("text").attr("opacity", "0");
+
+groupAxisX
+  .selectAll("g.tick")
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "var(--color-subdued, currentColor)")
+  .attr("stroke-width", "0.5")
+  .attr("d", `M 0 0 v ${-height}`);
+
+groupAxisY
+  .selectAll("path")
+  .data(d3.range(4).map((d, _, { length }) => (height / length) * d))
+  .enter()
+  .append("path")
+  .attr("d", (d) => `M 0 ${d} h ${width}`);
+
+groupAxis
+  .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr("stroke-linejoin", "round")
+  .attr(
+    "d",
+    `M 0 ${height}  v ${-(
+      height - rounding
+    )} a ${rounding} ${rounding} 0 0 1 ${rounding} ${-rounding} h ${
+      width - rounding * 2
+    } a ${rounding} ${rounding} 0 0 1 ${rounding} ${rounding} v ${
+      height - rounding
+    }`
+  );
 
 const groupGoals = group.append("g");
 
