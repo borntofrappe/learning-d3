@@ -58,3 +58,58 @@ const data = [
   { goals: [0, 0], teams: ["Morocco", "Spain"] },
   { goals: [6, 1], teams: ["Portugal", "Switzerland"] },
 ];
+
+const dataGoals = data.map((d) => d.goals.reduce((a, c) => a + c, 0));
+
+const width = 500;
+const height = 200;
+
+const margin = {
+  top: 20,
+  right: 20,
+  bottom: 20,
+  left: 20,
+};
+
+const scaleX = d3
+  .scaleBand()
+  .domain(d3.range(d3.max(dataGoals) + 1))
+  .range([0, width]);
+
+const axisX = d3.axisTop(scaleX).tickSize(0);
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + (margin.left + margin.right)} ${
+      height + (margin.top + margin.bottom)
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g").attr("fill", "currentColor");
+
+groupAxis.append("g").call(axisX).select("path").remove();
+
+const groupCenter = group
+  .append("g")
+  .attr("transform", `translate(0 ${height / 2})`);
+
+const groupGoals = groupCenter.append("g");
+
+const groupsGoals = groupGoals
+  .selectAll("g")
+  .data(dataGoals)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    (d) => `translate(${scaleX(d) + scaleX.bandwidth() / 2} 0)`
+  );
+
+groupsGoals.append("circle").attr("r", "10");
