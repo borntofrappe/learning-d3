@@ -72,7 +72,7 @@ const dataGoals = data.map((d) => {
 });
 
 const width = 500;
-const height = 200;
+const height = 100;
 
 const margin = {
   top: 20,
@@ -80,6 +80,8 @@ const margin = {
   bottom: 20,
   left: 20,
 };
+
+const radius = 8;
 
 const scaleOffset = d3
   .scaleBand()
@@ -95,6 +97,23 @@ const dataNodes = dataGoals.map((d) => {
     offset,
   };
 });
+
+const simulation = d3
+  .forceSimulation()
+  .nodes(dataNodes)
+  .force("collision", d3.forceCollide().radius(radius))
+  .force(
+    "x",
+    d3.forceX().x((d) => d.offset)
+  )
+  .force(
+    "y",
+    d3.forceY().y(() => height / 2)
+  );
+
+while (simulation.alpha() > simulation.alphaMin()) {
+  simulation.tick();
+}
 
 const axisX = d3.axisBottom(scaleOffset).tickSize(0);
 
@@ -121,17 +140,13 @@ groupAxis
   .select("path")
   .remove();
 
-const groupCenter = group
-  .append("g")
-  .attr("transform", `translate(0 ${height / 2})`);
-
-const groupGoals = groupCenter.append("g");
+const groupGoals = group.append("g");
 
 const groupsGoals = groupGoals
   .selectAll("g")
   .data(dataNodes)
   .enter()
   .append("g")
-  .attr("transform", (d) => `translate(${d.offset} 0)`);
+  .attr("transform", (d) => `translate(${d.x} ${d.y})`);
 
-groupsGoals.append("circle").attr("r", "10");
+groupsGoals.append("circle").attr("r", radius);
