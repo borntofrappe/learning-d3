@@ -9,7 +9,80 @@
     <link rel="icon" href="../icon.png" />
   </head>
   <body>
-    <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
-    <script src="script.js"></script>
+    <svg style="display: none">
+      <symbol id="football" viewBox="-50 -50 100 100">
+        <defs>
+          <clipPath id="c">
+            <circle r="50" />
+          </clipPath>
+          <path
+            id="h"
+            d="M -8.5 -14.5 h 17 l 7 14.5 -7 14.5 h -17 l -7 -14.5 z"
+            fill="currentColor"
+          />
+          <path id="s" d="M 0 0 h 50" fill="none" stroke="currentColor" />
+          <path
+            id="l"
+            transform="translate(50 0) rotate(120)"
+            d="M 0 0 h 50"
+            fill="none"
+            stroke="currentColor"
+          />
+        </defs>
+
+        <g clip-path="url(#c)">
+          <circle
+            r="49.5"
+            fill="hsl(0, 0%, 100%)"
+            stroke="currentColor"
+            stroke-width="1"
+          />
+
+          <g>
+            <use href="#h" />
+            <use href="#h" transform="rotate(0) translate(50 0)" />
+            <use href="#h" transform="rotate(60) translate(50 0)" />
+            <use href="#h" transform="rotate(120) translate(50 0)" />
+            <use href="#h" transform="rotate(180) translate(50 0)" />
+            <use href="#h" transform="rotate(240) translate(50 0)" />
+            <use href="#h" transform="rotate(300) translate(50 0)" />
+          </g>
+
+          <g fill="none" stroke="currentColor">
+            <g transform="rotate(0)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+            <g transform="rotate(60)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+            <g transform="rotate(120)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+            <g transform="rotate(180)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+            <g transform="rotate(240)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+            <g transform="rotate(300)">
+              <use href="#s" />
+              <use href="#l" />
+            </g>
+          </g>
+        </g>
+      </symbol>
+    </svg>
+
+    <svg viewBox="0 0 16 16">
+      <use href="#football" />
+    </svg>
+
+    <!-- <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script> -->
+    <!-- <script src="script.js"></script> -->
   </body>
 </html>

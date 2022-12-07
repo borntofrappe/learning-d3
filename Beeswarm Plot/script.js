@@ -111,9 +111,9 @@ const simulation = d3
     d3.forceY().y(() => height / 2)
   );
 
-while (simulation.alpha() > simulation.alphaMin()) {
-  simulation.tick();
-}
+// while (simulation.alpha() > simulation.alphaMin()) {
+//   simulation.tick();
+// }
 
 const axisX = d3.axisBottom(scaleOffset).tickSize(0);
 
