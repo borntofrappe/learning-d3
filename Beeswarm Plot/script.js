@@ -1,65 +1,75 @@
 // goals up to the round of 16
-// feel free to update as the competition unfolds (and Portugal loses in the final)
+// feel free to update as the competition unfolds and Portugal loses in the final
 const data = [
-  { goals: [0, 2], teams: ["Qatar", "Equador"] },
-  { goals: [0, 2], teams: ["Senegal", "Netherlands"] },
-  { goals: [1, 3], teams: ["Qatar", "Senegal"] },
-  { goals: [1, 1], teams: ["Netherlands", "Equador"] },
-  { goals: [1, 2], teams: ["Equador", "Senegal"] },
-  { goals: [2, 0], teams: ["Netherlands", "Qatar"] },
-  { goals: [6, 2], teams: ["England", "Iran"] },
-  { goals: [1, 1], teams: ["UnitedStates", "Wales"] },
-  { goals: [0, 2], teams: ["Wales", "Iran"] },
-  { goals: [0, 0], teams: ["England", "UnitedStates"] },
-  { goals: [0, 3], teams: ["Wales", "England"] },
-  { goals: [0, 1], teams: ["Iran", "UnitedStates"] },
-  { goals: [1, 2], teams: ["Argentina", "SaudiArabia"] },
-  { goals: [0, 0], teams: ["Mexico", "Poland"] },
-  { goals: [2, 0], teams: ["Poland", "SaudiArabia"] },
-  { goals: [2, 0], teams: ["Argentina", "Mexico"] },
-  { goals: [0, 2], teams: ["Poland", "Argentina"] },
-  { goals: [1, 2], teams: ["SaudiArabia", "Mexico"] },
-  { goals: [0, 0], teams: ["Denmark", "Tunisia"] },
-  { goals: [4, 1], teams: ["France", "Australia"] },
-  { goals: [0, 1], teams: ["Tunisia", "Australia"] },
-  { goals: [2, 1], teams: ["France", "Denmark"] },
-  { goals: [1, 0], teams: ["Australia", "Denmark"] },
-  { goals: [1, 0], teams: ["Tunisia", "France"] },
-  { goals: [1, 2], teams: ["Germany", "Japan"] },
-  { goals: [7, 0], teams: ["Spain", "CostaRica"] },
-  { goals: [0, 1], teams: ["Japan", "CostaRica"] },
-  { goals: [1, 1], teams: ["Spain", "Germany"] },
-  { goals: [2, 1], teams: ["Japan", "Spain"] },
-  { goals: [2, 4], teams: ["CostaRica", "Germany"] },
-  { goals: [0, 0], teams: ["Morocco", "Croatia"] },
-  { goals: [1, 0], teams: ["Belgium", "Canada"] },
-  { goals: [0, 2], teams: ["Belgium", "Morocco"] },
-  { goals: [4, 1], teams: ["Croatia", "Canada"] },
-  { goals: [0, 0], teams: ["Croatia", "Belgium"] },
-  { goals: [1, 2], teams: ["Canada", "Morocco"] },
-  { goals: [1, 0], teams: ["Switzerland", "Cameroon"] },
-  { goals: [2, 0], teams: ["Brazil", "Serbia"] },
-  { goals: [3, 3], teams: ["Cameroon", "Serbia"] },
-  { goals: [1, 0], teams: ["Brazil", "Switzerland"] },
-  { goals: [2, 3], teams: ["Serbia", "Switzerland"] },
-  { goals: [1, 0], teams: ["Cameroon", "Brazil"] },
-  { goals: [0, 0], teams: ["Uruguay", "SouthKorea"] },
-  { goals: [3, 2], teams: ["Portugal", "Ghana"] },
-  { goals: [2, 3], teams: ["SouthKorea", "Ghana"] },
-  { goals: [2, 0], teams: ["Portugal", "Uruguay"] },
-  { goals: [0, 2], teams: ["Ghana", "Uruguay"] },
-  { goals: [2, 1], teams: ["SouthKorea", "Portugal"] },
-  { goals: [3, 1], teams: ["Netherlands", "UnitedStates"] },
-  { goals: [2, 1], teams: ["Argentina", "Australia"] },
-  { goals: [1, 1], teams: ["Japan", "Croatia"] },
-  { goals: [4, 1], teams: ["Brazil", "SouthKorea"] },
-  { goals: [3, 0], teams: ["England", "Senegal"] },
-  { goals: [3, 1], teams: ["France", "Poland"] },
-  { goals: [0, 0], teams: ["Morocco", "Spain"] },
-  { goals: [6, 1], teams: ["Portugal", "Switzerland"] },
+  { match: "Qatar-Equador", result: "0-2" },
+  { match: "Senegal-Netherlands", result: "0-2" },
+  { match: "Qatar-Senegal", result: "1-3" },
+  { match: "Netherlands-Equador", result: "1-1" },
+  { match: "Equador-Senegal", result: "1-2" },
+  { match: "Netherlands-Qatar", result: "2-0" },
+  { match: "England-Iran", result: "6-2" },
+  { match: "United States-Wales", result: "1-1" },
+  { match: "Wales-Iran", result: "0-2" },
+  { match: "England-United States", result: "0-0" },
+  { match: "Wales-England", result: "0-3" },
+  { match: "Iran-United States", result: "0-1" },
+  { match: "Argentina-Saudi Arabia", result: "1-2" },
+  { match: "Mexico-Poland", result: "0-0" },
+  { match: "Poland-Saudi Arabia", result: "2-0" },
+  { match: "Argentina-Mexico", result: "2-0" },
+  { match: "Poland-Argentina", result: "0-2" },
+  { match: "Saudi Arabia-Mexico", result: "1-2" },
+  { match: "Denmark-Tunisia", result: "0-0" },
+  { match: "France-Australia", result: "4-1" },
+  { match: "Tunisia-Australia", result: "0-1" },
+  { match: "France-Denmark", result: "2-1" },
+  { match: "Australia-Denmark", result: "1-0" },
+  { match: "Tunisia-France", result: "1-0" },
+  { match: "Germany-Japan", result: "1-2" },
+  { match: "Spain-Costa Rica", result: "7-0" },
+  { match: "Japan-Costa Rica", result: "0-1" },
+  { match: "Spain-Germany", result: "1-1" },
+  { match: "Japan-Spain", result: "2-1" },
+  { match: "Costa Rica-Germany", result: "2-4" },
+  { match: "Morocco-Croatia", result: "0-0" },
+  { match: "Belgium-Canada", result: "1-0" },
+  { match: "Belgium-Morocco", result: "0-2" },
+  { match: "Croatia-Canada", result: "4-1" },
+  { match: "Croatia-Belgium", result: "0-0" },
+  { match: "Canada-Morocco", result: "1-2" },
+  { match: "Switzerland-Cameroon", result: "1-0" },
+  { match: "Brazil-Serbia", result: "2-0" },
+  { match: "Cameroon-Serbia", result: "3-3" },
+  { match: "Brazil-Switzerland", result: "1-0" },
+  { match: "Serbia-Switzerland", result: "2-3" },
+  { match: "Cameroon-Brazil", result: "1-0" },
+  { match: "Uruguay-South Korea", result: "0-0" },
+  { match: "Portugal-Ghana", result: "3-2" },
+  { match: "South Korea-Ghana", result: "2-3" },
+  { match: "Portugal-Uruguay", result: "2-0" },
+  { match: "Ghana-Uruguay", result: "0-2" },
+  { match: "South Korea-Portugal", result: "2-1" },
+  { match: "Netherlands-United States", result: "3-1" },
+  { match: "Argentina-Australia", result: "2-1" },
+  { match: "Japan-Croatia", result: "1-1" },
+  { match: "Brazil-South Korea", result: "4-1" },
+  { match: "England-Senegal", result: "3-0" },
+  { match: "France-Poland", result: "3-1" },
+  { match: "Morocco-Spain", result: "0-0" },
+  { match: "Portugal-Switzerland", result: "6-1" },
 ];
 
-const dataGoals = data.map((d) => d.goals.reduce((a, c) => a + c, 0));
+const dataGoals = data.map((d) => {
+  const { match, result } = d;
+  const goals = result
+    .split("-")
+    .reduce((acc, curr) => acc + parseInt(curr, 10), 0);
+
+  return {
+    ...d,
+    goals,
+  };
+});
 
 const width = 500;
 const height = 200;
@@ -73,10 +83,10 @@ const margin = {
 
 const scaleX = d3
   .scaleBand()
-  .domain(d3.range(d3.max(dataGoals) + 1))
+  .domain(d3.range(d3.max(dataGoals, (d) => d.goals) + 1))
   .range([0, width]);
 
-const axisX = d3.axisTop(scaleX).tickSize(0);
+const axisX = d3.axisBottom(scaleX).tickSize(0);
 
 const svg = d3
   .select("body")
@@ -94,7 +104,12 @@ const group = svg
 
 const groupAxis = group.append("g").attr("fill", "currentColor");
 
-groupAxis.append("g").call(axisX).select("path").remove();
+groupAxis
+  .append("g")
+  .attr("transform", `translate(0 ${height})`)
+  .call(axisX)
+  .select("path")
+  .remove();
 
 const groupCenter = group
   .append("g")
@@ -109,7 +124,7 @@ const groupsGoals = groupGoals
   .append("g")
   .attr(
     "transform",
-    (d) => `translate(${scaleX(d) + scaleX.bandwidth() / 2} 0)`
+    (d) => `translate(${scaleX(d.goals) + scaleX.bandwidth() / 2} 0)`
   );
 
 groupsGoals.append("circle").attr("r", "10");
