@@ -178,6 +178,8 @@ const groupHighlight = group
   .attr("font-size", "13")
   .attr("font-weight", "700");
 
+const groupDelaunay = group.append("g").attr("opacity", "0");
+
 const groupAxisX = groupAxis
   .append("g")
   .attr("transform", `translate(0 ${height})`)
@@ -240,16 +242,29 @@ groupsGoals
   .attr("height", radius * 2)
   .attr("href", "#football");
 
-groupsGoals
+const delaunay = d3.Delaunay.from(
+  dataNodes,
+  (d) => d.x,
+  (d) => d.y
+);
+
+const voronoi = delaunay.voronoi([0, 0, width, height]);
+
+groupDelaunay
+  .selectAll("path")
+  .data(dataNodes)
+  .enter()
+  .append("path")
+  .attr("d", (_, i) => voronoi.renderCell(i))
   .on("pointerenter", function (e, d) {
-    groupsGoals.attr("opacity", "0.5");
-    d3.select(this)
+    groupsGoals
+      .attr("opacity", "0.5")
+      .filter(({ match }) => match === d.match)
       .attr("opacity", "1")
       .select("use")
       .transition()
       .attr("transform", "scale(1.2)");
 
-    console.log(d);
     const { match, result } = d;
     groupHighlight
       .append("text")
@@ -264,8 +279,13 @@ groupsGoals
       );
   })
   .on("pointerleave", function (e, d) {
-    groupsGoals.attr("opacity", "1");
-    d3.select(this).select("use").transition().attr("transform", "scale(1)");
+    groupsGoals
+      .attr("opacity", "1")
+      .filter(({ match }) => match === d.match)
+      .select("use")
+      .transition()
+      .attr("transform", "scale(1)");
 
     groupHighlight.select("text").remove();
+    //
   });
