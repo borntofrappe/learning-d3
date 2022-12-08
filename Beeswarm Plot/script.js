@@ -1,5 +1,3 @@
-// goals up to the round of 16
-// feel free to update as the competition unfolds and Portugal loses in the final
 const data = [
   { match: "Qatar-Equador", result: "0-2" },
   { match: "Senegal-Netherlands", result: "0-2" },
@@ -59,6 +57,7 @@ const data = [
   { match: "Portugal-Switzerland", result: "6-1" },
 ];
 
+// { ...data, goals }
 const dataGoals = data.map((d) => {
   const { match, result } = d;
   const goals = result
@@ -71,6 +70,7 @@ const dataGoals = data.map((d) => {
   };
 });
 
+// { goals, frequency }
 const dataFrequency = Object.entries(
   dataGoals.reduce((acc, curr) => {
     acc[curr.goals] = acc[curr.goals] ? acc[curr.goals] + 1 : 1;
@@ -80,7 +80,7 @@ const dataFrequency = Object.entries(
 
 const totalGoals = dataGoals.reduce((acc, curr) => acc + curr.goals, 0);
 const maxGoals = d3.max(dataFrequency, (d) => d.goals);
-const { goals: maxGoalsFrequency } = dataFrequency.find(
+const { goals: goalsMaxFrequency } = dataFrequency.find(
   (d) => d.frequency === d3.max(dataFrequency, (d) => d.frequency)
 );
 
@@ -105,13 +105,16 @@ const scaleOffset = d3
   .domain(d3.range(d3.max(dataGoals, (d) => d.goals) + 1))
   .range([0, width]);
 
+// { ...dataGoals, x, y }
 const dataNodes = dataGoals.map((d) => {
   const { goals } = d;
-  const offset = scaleOffset(goals) + scaleOffset.bandwidth() / 2;
+  const x = scaleOffset(goals) + scaleOffset.bandwidth() / 2;
+  const y = height / 2;
 
   return {
     ...d,
-    offset,
+    x,
+    y,
   };
 });
 
@@ -121,11 +124,11 @@ const simulation = d3
   .force("collision", d3.forceCollide().radius(radius))
   .force(
     "x",
-    d3.forceX().x((d) => d.offset)
+    d3.forceX().x((d) => d.x)
   )
   .force(
     "y",
-    d3.forceY().y(() => height / 2)
+    d3.forceY().y((d) => d.y)
   );
 
 const root = d3.select("body").append("div").attr("id", "root");
@@ -135,13 +138,13 @@ header.append("h1").text("Just how many goals?");
 header
   .append("p")
   .html(
-    `Following the group stages and the round of 16, teams scored <strong>${totalGoals}</strong> times.`
+    `Following the group stages and the round of 16, teams at the 2022 FIFA World Cup scored <strong>${totalGoals}</strong> times.`
   );
 
 header
   .append("p")
   .html(
-    `While the record is <strong>${maxGoals}</strong> goals, however, most matches ended with <strong>${maxGoalsFrequency}</strong>.`
+    `While the record is <strong>${maxGoals}</strong> goals, however, most matches ended with <strong>${goalsMaxFrequency}</strong>.`
   );
 
 const svg = root
@@ -153,6 +156,7 @@ const svg = root
     }`
   );
 
+// run the simulation before you draw the data points
 while (simulation.alpha() > simulation.alphaMin()) {
   simulation.tick();
 }
@@ -180,11 +184,7 @@ const groupAxisX = groupAxis
   .attr("transform", `translate(0 ${height})`)
   .call(axisX);
 
-const groupAxisY = groupAxis
-  .append("g")
-  .attr("fill", "none")
-  .attr("stroke", "var(--color-net, currentColor)")
-  .attr("stroke-width", "1");
+const groupAxisY = groupAxis.append("g");
 
 groupAxisX.select("path").remove();
 groupAxisX.selectAll("text").attr("opacity", "0");
@@ -204,6 +204,9 @@ groupAxisY
   )
   .enter()
   .append("path")
+  .attr("fill", "none")
+  .attr("stroke", "var(--color-net, currentColor)")
+  .attr("stroke-width", "1")
   .attr("d", (d) => `M 0 ${d} h ${width}`);
 
 groupAxis
@@ -285,5 +288,4 @@ groupDelaunay
       .attr("transform", "scale(1)");
 
     groupHighlight.select("text").remove();
-    //
   });

@@ -7,10 +7,11 @@
 body {
   color: hsl(35, 100%, 92%);
   background: linear-gradient(45deg, hsl(338, 77%, 19%), hsl(342, 74%, 31%));
+  --color-accent: hsl(174, 97%, 40%);
+
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   min-height: 100vh;
-  --color-accent: hsl(174, 97%, 40%);
 }
 
 ::selection {
@@ -36,7 +37,7 @@ h1 {
 }
 
 p {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
 }
 
 strong {
