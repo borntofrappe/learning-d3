@@ -5,16 +5,16 @@
 }
 
 body {
-  color: #ffefd8;
-  background: linear-gradient(45deg, #540b26, #8b1538);
+  color: hsl(35, 100%, 92%);
+  background: linear-gradient(45deg, hsl(338, 77%, 19%), hsl(342, 74%, 31%));
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   min-height: 100vh;
-  --color-accent: #03cab5;
+  --color-accent: hsl(174, 97%, 40%);
 }
 
 ::selection {
-  background: #03cab5aa;
+  background: hsla(174, 97%, 40%, 0.7);
 }
 
 #root {
@@ -44,6 +44,6 @@ strong {
 }
 
 svg {
-  color: #eed4b1;
-  --color-subdued: #967285;
+  color: hsl(33, 64%, 81%);
+  --color-net: hsla(33, 64%, 81%, 0.2);
 }

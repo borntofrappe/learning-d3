@@ -88,7 +88,8 @@ const width = 500;
 const height = 120;
 
 const strokeWidth = 8;
-const rounding = 10;
+const rounding = 8;
+const verticalStripes = 5;
 
 const margin = {
   top: 20,
@@ -152,12 +153,6 @@ const svg = root
     }`
   );
 
-const brief = root.append("div");
-
-brief
-  .append("p")
-  .text("Evidently, some matches were more prolific than others.");
-
 while (simulation.alpha() > simulation.alphaMin()) {
   simulation.tick();
 }
@@ -188,7 +183,7 @@ const groupAxisX = groupAxis
 const groupAxisY = groupAxis
   .append("g")
   .attr("fill", "none")
-  .attr("stroke", "var(--color-subdued, currentColor)")
+  .attr("stroke", "var(--color-net, currentColor)")
   .attr("stroke-width", "1");
 
 groupAxisX.select("path").remove();
@@ -198,13 +193,15 @@ groupAxisX
   .selectAll("g.tick")
   .append("path")
   .attr("fill", "none")
-  .attr("stroke", "var(--color-subdued, currentColor)")
+  .attr("stroke", "var(--color-net, currentColor)")
   .attr("stroke-width", "1")
   .attr("d", `M 0 0 v ${-height}`);
 
 groupAxisY
   .selectAll("path")
-  .data(d3.range(4).map((d, _, { length }) => (height / length) * d))
+  .data(
+    d3.range(verticalStripes).map((d, _, { length }) => (height / length) * d)
+  )
   .enter()
   .append("path")
   .attr("d", (d) => `M 0 ${d} h ${width}`);
@@ -240,7 +237,7 @@ groupsGoals
   .style("color", "var(--color-accent)")
   .attr("width", radius * 2)
   .attr("height", radius * 2)
-  .attr("href", "#football");
+  .attr("href", "#football-ball");
 
 const delaunay = d3.Delaunay.from(
   dataNodes,
@@ -258,12 +255,13 @@ groupDelaunay
   .attr("d", (_, i) => voronoi.renderCell(i))
   .on("pointerenter", function (e, d) {
     groupsGoals
-      .attr("opacity", "0.5")
+      .style("filter", "grayscale(0.7) brightness(0.5)")
       .filter(({ match }) => match === d.match)
-      .attr("opacity", "1")
+      .style("filter", "grayscale(0) brightness(1)")
       .select("use")
       .transition()
-      .attr("transform", "scale(1.2)");
+      .duration(350)
+      .attr("transform", "rotate(20) scale(1.25)");
 
     const { match, result } = d;
     groupHighlight
@@ -280,7 +278,7 @@ groupDelaunay
   })
   .on("pointerleave", function (e, d) {
     groupsGoals
-      .attr("opacity", "1")
+      .style("filter", "grayscale(0) brightness(1)")
       .filter(({ match }) => match === d.match)
       .select("use")
       .transition()
