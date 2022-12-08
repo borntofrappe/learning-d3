@@ -91,7 +91,7 @@ const strokeWidth = 8;
 const rounding = 10;
 
 const margin = {
-  top: 10,
+  top: 20,
   right: 10,
   bottom: 10,
   left: 10,
@@ -169,6 +169,14 @@ const group = svg
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 const groupAxis = group.append("g");
+const groupGoals = group.append("g");
+const groupHighlight = group
+  .append("g")
+  .attr("transform", `translate(${width} ${-(strokeWidth + 1)})`)
+  .attr("text-anchor", "end")
+  .attr("fill", "currentColor")
+  .attr("font-size", "13")
+  .attr("font-weight", "700");
 
 const groupAxisX = groupAxis
   .append("g")
@@ -216,8 +224,6 @@ groupAxis
     }`
   );
 
-const groupGoals = group.append("g");
-
 const groupsGoals = groupGoals
   .selectAll("g")
   .data(dataNodes)
@@ -233,3 +239,33 @@ groupsGoals
   .attr("width", radius * 2)
   .attr("height", radius * 2)
   .attr("href", "#football");
+
+groupsGoals
+  .on("pointerenter", function (e, d) {
+    groupsGoals.attr("opacity", "0.5");
+    d3.select(this)
+      .attr("opacity", "1")
+      .select("use")
+      .transition()
+      .attr("transform", "scale(1.2)");
+
+    console.log(d);
+    const { match, result } = d;
+    groupHighlight
+      .append("text")
+      .html(
+        `${match.replace(
+          "-",
+          " - "
+        )} <tspan font-weight="initial" font-size="0.8em">ended</tspan> ${result.replace(
+          "-",
+          " - "
+        )}`
+      );
+  })
+  .on("pointerleave", function (e, d) {
+    groupsGoals.attr("opacity", "1");
+    d3.select(this).select("use").transition().attr("transform", "scale(1)");
+
+    groupHighlight.select("text").remove();
+  });

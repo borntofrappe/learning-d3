@@ -19,6 +19,7 @@ body {
 
 #root {
   max-width: 60rem;
+  padding: 1rem;
   margin: 1rem auto;
 }
 
@@ -43,6 +44,6 @@ strong {
 }
 
 svg {
-  color: #e0c59e;
+  color: #eed4b1;
   --color-subdued: #967285;
 }
