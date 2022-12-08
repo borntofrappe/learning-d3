@@ -5,18 +5,44 @@
 }
 
 body {
-  color: hsl(210, 24%, 16%);
-  background: hsl(216, 33%, 97%);
+  color: #ffefd8;
+  background: linear-gradient(45deg, #540b26, #8b1538);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
   min-height: 100vh;
-  display: flex;
+  --color-accent: #03cab5;
+}
+
+::selection {
+  background: #03cab5aa;
+}
+
+#root {
+  max-width: 60rem;
+  margin: 1rem auto;
+}
+
+#root > * + * {
+  margin-block-start: 1em;
+}
+
+header > * + * {
+  margin-block-start: 0.5em;
+}
+
+h1 {
+  font-size: 1.67rem;
+}
+
+p {
+  font-size: 1.1rem;
+}
+
+strong {
+  border-bottom: 0.2rem solid var(--color-accent);
 }
 
 svg {
-  color: hsl(209, 20%, 25%);
-  --color-subdued: hsl(210, 16%, 82%);
-  max-width: 60rem;
-  margin: auto;
-  display: block;
+  color: #e0c59e;
+  --color-subdued: #967285;
 }

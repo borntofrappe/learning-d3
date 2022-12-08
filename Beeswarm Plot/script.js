@@ -71,6 +71,19 @@ const dataGoals = data.map((d) => {
   };
 });
 
+const dataFrequency = Object.entries(
+  dataGoals.reduce((acc, curr) => {
+    acc[curr.goals] = acc[curr.goals] ? acc[curr.goals] + 1 : 1;
+    return acc;
+  }, {})
+).map(([goals, frequency]) => ({ goals: parseInt(goals, 10), frequency }));
+
+const totalGoals = dataGoals.reduce((acc, curr) => acc + curr.goals, 0);
+const maxGoals = d3.max(dataFrequency, (d) => d.goals);
+const { goals: maxGoalsFrequency } = dataFrequency.find(
+  (d) => d.frequency === d3.max(dataFrequency, (d) => d.frequency)
+);
+
 const width = 500;
 const height = 120;
 
@@ -114,8 +127,23 @@ const simulation = d3
     d3.forceY().y(() => height / 2)
   );
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+const header = root.append("header");
+header.append("h1").text("Just how many goals?");
+header
+  .append("p")
+  .html(
+    `Following the group stages and the round of 16, teams scored <strong>${totalGoals}</strong> times.`
+  );
+
+header
+  .append("p")
+  .html(
+    `While the record is <strong>${maxGoals}</strong> goals, however, most matches ended with <strong>${maxGoalsFrequency}</strong>.`
+  );
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",
@@ -123,6 +151,12 @@ const svg = d3
       height + (margin.top + margin.bottom)
     }`
   );
+
+const brief = root.append("div");
+
+brief
+  .append("p")
+  .text("Evidently, some matches were more prolific than others.");
 
 while (simulation.alpha() > simulation.alphaMin()) {
   simulation.tick();
@@ -145,7 +179,7 @@ const groupAxisY = groupAxis
   .append("g")
   .attr("fill", "none")
   .attr("stroke", "var(--color-subdued, currentColor)")
-  .attr("stroke-width", "0.5");
+  .attr("stroke-width", "1");
 
 groupAxisX.select("path").remove();
 groupAxisX.selectAll("text").attr("opacity", "0");
@@ -155,7 +189,7 @@ groupAxisX
   .append("path")
   .attr("fill", "none")
   .attr("stroke", "var(--color-subdued, currentColor)")
-  .attr("stroke-width", "0.5")
+  .attr("stroke-width", "1")
   .attr("d", `M 0 0 v ${-height}`);
 
 groupAxisY
@@ -195,6 +229,7 @@ groupsGoals
   .append("use")
   .attr("x", -radius)
   .attr("y", -radius)
+  .style("color", "var(--color-accent)")
   .attr("width", radius * 2)
   .attr("height", radius * 2)
   .attr("href", "#football");
