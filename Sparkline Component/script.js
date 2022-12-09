@@ -543,15 +543,12 @@ const data = [
 
 const timeParse = d3.timeParse("%Y-%m-%d");
 
-const [datum] = data;
-const { word, values } = datum;
-
 const width = 200;
 const height = 20;
 
 const scaleX = d3
   .scaleTime()
-  .domain(d3.extent(values, (d) => timeParse(d.date)))
+  .domain(d3.extent(data[0].values, (d) => timeParse(d.date)))
   .range([0, width]);
 const scaleY = d3.scaleLinear().domain([0, 100]).range([height, 0]);
 
@@ -564,11 +561,19 @@ const table = d3.select("body").append("table");
 
 table.append("thead").html("<tr><th>Word</th><th>Interest</th></tr>");
 
-const tr = table.append("tbody").append("tr");
+const trs = table
+  .append("tbody")
+  .selectAll("tr")
+  .data(data)
+  .enter()
+  .append("tr");
 
-tr.append("td").append("h2").text(word);
+trs
+  .append("td")
+  .append("h2")
+  .text((d) => d.word);
 
-const svg = tr
+const svg = trs
   .append("td")
   .append("svg")
   .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`)
@@ -577,7 +582,7 @@ const svg = tr
 
 svg
   .append("path")
-  .datum(values)
+  .datum((d) => d.values)
   .attr("d", line)
   .attr("fill", "none")
   .attr("stroke", "currentColor");
