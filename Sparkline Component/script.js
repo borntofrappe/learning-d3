@@ -1,6 +1,6 @@
 const data = [
   {
-    title: "Clafoutis",
+    word: "Clafoutis",
     values: [
       { value: 2, date: "2022-01-02" },
       { value: 4, date: "2022-01-09" },
@@ -54,7 +54,7 @@ const data = [
     ],
   },
   {
-    title: "Taboule",
+    word: "Taboule",
     values: [
       { value: 0, date: "2022-01-02" },
       { value: 0, date: "2022-01-09" },
@@ -108,7 +108,7 @@ const data = [
     ],
   },
   {
-    title: "Salade Cesar",
+    word: "Salade Cesar",
     values: [
       { value: 9, date: "2022-01-02" },
       { value: 16, date: "2022-01-09" },
@@ -162,7 +162,7 @@ const data = [
     ],
   },
   {
-    title: "Gombo",
+    word: "Gombo",
     values: [
       { value: 0, date: "2022-01-02" },
       { value: 0, date: "2022-01-09" },
@@ -216,7 +216,7 @@ const data = [
     ],
   },
   {
-    title: "Moutarde",
+    word: "Moutarde",
     values: [
       { value: 57, date: "2022-01-02" },
       { value: 53, date: "2022-01-09" },
@@ -270,7 +270,7 @@ const data = [
     ],
   },
   {
-    title: "Sex on the beach",
+    word: "Sex on the beach",
     values: [
       { value: 4, date: "2022-01-02" },
       { value: 9, date: "2022-01-09" },
@@ -324,7 +324,7 @@ const data = [
     ],
   },
   {
-    title: "Wrap froid",
+    word: "Wrap froid",
     values: [
       { value: 0, date: "2022-01-02" },
       { value: 0, date: "2022-01-09" },
@@ -378,7 +378,7 @@ const data = [
     ],
   },
   {
-    title: "Pate a crepes",
+    word: "Pate a crepes",
     values: [
       { value: 2, date: "2022-01-02" },
       { value: 6, date: "2022-01-09" },
@@ -432,7 +432,7 @@ const data = [
     ],
   },
   {
-    title: "Coulis tomate",
+    word: "Coulis tomate",
     values: [
       { value: 0, date: "2022-01-02" },
       { value: 26, date: "2022-01-09" },
@@ -486,7 +486,7 @@ const data = [
     ],
   },
   {
-    title: "Sauce Cesar",
+    word: "Sauce Cesar",
     values: [
       { value: 11, date: "2022-01-02" },
       { value: 14, date: "2022-01-09" },
@@ -540,3 +540,34 @@ const data = [
     ],
   },
 ];
+
+const timeParse = d3.timeParse("%Y-%m-%d");
+
+const [datum] = data;
+const { word, values } = datum;
+
+const width = 200;
+const height = 20;
+
+const scaleX = d3
+  .scaleTime()
+  .domain(d3.extent(values, (d) => timeParse(d.date)))
+  .range([0, width]);
+const scaleY = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+const line = d3
+  .line()
+  .x((d) => scaleX(timeParse(d.date)))
+  .y((d) => scaleY(d.value));
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`);
+
+svg
+  .append("path")
+  .datum(values)
+  .attr("d", line)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor");
