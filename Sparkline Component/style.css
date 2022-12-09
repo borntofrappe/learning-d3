@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Mulish:wght@500&display=swap");
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -5,8 +7,39 @@
 }
 
 body {
-  background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
-    helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  color: #0b1629;
+  background: #ffffff;
+  --color-line: #ff3f34;
+  font-family: "Mulish", -apple-system, BlinkMacSystemFont, avenir next, avenir,
+    segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+table {
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+thead {
+  display: none;
+}
+
+thead th {
+  text-align: left;
+}
+
+tbody tr:not(:first-of-type) {
+  border-top: 0.1rem solid #d6dee1;
+}
+
+tbody tr td {
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 1.5rem 0.5rem;
+}
+
+tbody tr td:last-of-type {
+  font-size: 1.5rem;
+  color: var(--color-line, currentColor);
 }

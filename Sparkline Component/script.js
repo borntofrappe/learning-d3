@@ -34,7 +34,8 @@ const sparkline = () => {
       .datum(data)
       .attr("d", line)
       .attr("fill", "none")
-      .attr("stroke", "currentColor");
+      .attr("stroke", "currentColor")
+      .attr("stroke-width", "2");
   };
 
   sparkline.data = function (array) {
@@ -145,7 +146,7 @@ const data = [
     ],
   },
   {
-    word: "Taboule",
+    word: "Taboulé",
     values: [
       { value: 0, date: "2022-01-02" },
       { value: 0, date: "2022-01-09" },
@@ -199,7 +200,7 @@ const data = [
     ],
   },
   {
-    word: "Salade Cesar",
+    word: "Salade César",
     values: [
       { value: 9, date: "2022-01-02" },
       { value: 16, date: "2022-01-09" },
@@ -469,7 +470,7 @@ const data = [
     ],
   },
   {
-    word: "Pate a crepes",
+    word: "Pâte à crêpes",
     values: [
       { value: 2, date: "2022-01-02" },
       { value: 6, date: "2022-01-09" },
@@ -577,7 +578,7 @@ const data = [
     ],
   },
   {
-    word: "Sauce Cesar",
+    word: "Sauce César",
     values: [
       { value: 11, date: "2022-01-02" },
       { value: 14, date: "2022-01-09" },
