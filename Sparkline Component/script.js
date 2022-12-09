@@ -542,6 +542,7 @@ const data = [
 ];
 
 const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%B %-d");
 
 const width = 200;
 const height = 20;
@@ -568,10 +569,7 @@ const trs = table
   .enter()
   .append("tr");
 
-trs
-  .append("td")
-  .append("h2")
-  .text((d) => d.word);
+trs.append("td").text((d) => d.word);
 
 const svg = trs
   .append("td")
@@ -579,6 +577,16 @@ const svg = trs
   .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`)
   .style("height", "1em")
   .style("width", "auto");
+
+svg.append("title").text((d) => `${d.word}`);
+svg.append("desc").text((d) => {
+  const { word, values } = d;
+  const { date } =
+    values[values.findIndex((d) => d.value === d3.max(values, (d) => d.value))];
+  const prettyDate = timeFormat(timeParse(date));
+
+  return `The word "${word}" searched the most on ${prettyDate}`;
+});
 
 svg
   .append("path")
