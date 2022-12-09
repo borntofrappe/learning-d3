@@ -1,3 +1,94 @@
+const sparkline = () => {
+  let data;
+  let width;
+  let height;
+  let timeParse;
+  let timeFormat;
+  let title;
+  let description;
+
+  const sparkline = (selection) => {
+    const scaleX = d3
+      .scaleTime()
+      .domain(d3.extent(data, (d) => timeParse(d.date)))
+      .range([0, width]);
+
+    const scaleY = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+
+    const line = d3
+      .line()
+      .x((d) => scaleX(timeParse(d.date)))
+      .y((d) => scaleY(d.value));
+
+    const svg = selection
+      .append("svg")
+      .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`)
+      .style("height", "1em")
+      .style("width", "auto");
+
+    svg.append("title").text(title);
+    svg.append("desc").text(description);
+
+    svg
+      .append("path")
+      .datum(data)
+      .attr("d", line)
+      .attr("fill", "none")
+      .attr("stroke", "currentColor");
+  };
+
+  sparkline.data = function (array) {
+    if (!arguments.length) return data;
+
+    data = array;
+    return this;
+  };
+
+  sparkline.width = function (number) {
+    if (!arguments.length) return width;
+
+    width = number;
+    return this;
+  };
+
+  sparkline.height = function (number) {
+    if (!arguments.length) return height;
+
+    height = number;
+    return this;
+  };
+
+  sparkline.timeParse = function (fn) {
+    if (!arguments.length) return timeParse;
+
+    timeParse = fn;
+    return this;
+  };
+
+  sparkline.timeFormat = function (fn) {
+    if (!arguments.length) return timeFormat;
+
+    timeFormat = fn;
+    return this;
+  };
+
+  sparkline.title = function (string) {
+    if (!arguments.length) return title;
+
+    title = string;
+    return this;
+  };
+
+  sparkline.description = function (string) {
+    if (!arguments.length) return description;
+
+    description = string;
+    return this;
+  };
+
+  return sparkline;
+};
+
 const data = [
   {
     word: "Clafoutis",
@@ -541,23 +632,6 @@ const data = [
   },
 ];
 
-const timeParse = d3.timeParse("%Y-%m-%d");
-const timeFormat = d3.timeFormat("%B %-d");
-
-const width = 200;
-const height = 20;
-
-const scaleX = d3
-  .scaleTime()
-  .domain(d3.extent(data[0].values, (d) => timeParse(d.date)))
-  .range([0, width]);
-const scaleY = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-
-const line = d3
-  .line()
-  .x((d) => scaleX(timeParse(d.date)))
-  .y((d) => scaleY(d.value));
-
 const table = d3.select("body").append("table");
 
 table.append("thead").html("<tr><th>Word</th><th>Interest</th></tr>");
@@ -570,27 +644,30 @@ const trs = table
   .append("tr");
 
 trs.append("td").text((d) => d.word);
-
-const svg = trs
-  .append("td")
-  .append("svg")
-  .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`)
-  .style("height", "1em")
-  .style("width", "auto");
-
-svg.append("title").text((d) => `${d.word}`);
-svg.append("desc").text((d) => {
+trs.append("td").each(function (d) {
   const { word, values } = d;
+
+  const width = 200;
+  const height = 20;
+
+  const timeParse = d3.timeParse("%Y-%m-%d");
+  const timeFormat = d3.timeFormat("%B %-d");
+
   const { date } =
     values[values.findIndex((d) => d.value === d3.max(values, (d) => d.value))];
   const prettyDate = timeFormat(timeParse(date));
 
-  return `The word "${word}" searched the most on ${prettyDate}`;
-});
+  const title = word;
+  const description = `The word "${word}" was searched the most on ${prettyDate}`;
 
-svg
-  .append("path")
-  .datum((d) => d.values)
-  .attr("d", line)
-  .attr("fill", "none")
-  .attr("stroke", "currentColor");
+  d3.select(this).call(
+    sparkline()
+      .data(values)
+      .width(width)
+      .height(height)
+      .timeParse(timeParse)
+      .timeFormat(timeFormat)
+      .title(title)
+      .description(description)
+  );
+});
