@@ -1,24 +1,34 @@
 const sparkline = () => {
-  let data;
-  let width;
-  let height;
-  let timeParse;
-  let timeFormat;
-  let title;
-  let description;
+  const { timeParse, scaleTime, scaleLinear, extent } = d3;
+
+  let data = Array(31)
+    .fill()
+    .map((_, i) => ({
+      date: `2022-01-${i + 1}`,
+      value: 50,
+    }));
+
+  let dateAccessor = (d) => timeParse("%Y-%m-%-d")(d.date);
+  let valueAccessor = (d) => d.value;
+  let domain = [0, 100];
+
+  let width = 200;
+  let height = 20;
+
+  let title = "";
+  let description = "";
 
   const sparkline = (selection) => {
-    const scaleX = d3
-      .scaleTime()
-      .domain(d3.extent(data, (d) => timeParse(d.date)))
+    const scaleX = scaleTime()
+      .domain(extent(data, (d) => dateAccessor(d)))
       .range([0, width]);
 
-    const scaleY = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+    const scaleY = scaleLinear().domain(domain).range([height, 0]);
 
-    const line = d3
+    const lineGenerator = d3
       .line()
-      .x((d) => scaleX(timeParse(d.date)))
-      .y((d) => scaleY(d.value));
+      .x((d) => scaleX(dateAccessor(d)))
+      .y((d) => scaleY(valueAccessor(d)));
 
     const svg = selection
       .append("svg")
@@ -32,7 +42,7 @@ const sparkline = () => {
     svg
       .append("path")
       .datum(data)
-      .attr("d", line)
+      .attr("d", lineGenerator)
       .attr("fill", "none")
       .attr("stroke", "currentColor")
       .attr("stroke-width", "2");
@@ -42,6 +52,27 @@ const sparkline = () => {
     if (!arguments.length) return data;
 
     data = array;
+    return this;
+  };
+
+  sparkline.dateAccessor = function (fn) {
+    if (!arguments.length) return dateAccessor;
+
+    dateAccessor = fn;
+    return this;
+  };
+
+  sparkline.valueAccessor = function (fn) {
+    if (!arguments.length) return valueAccessor;
+
+    valueAccessor = fn;
+    return this;
+  };
+
+  sparkline.domain = function (array) {
+    if (!arguments.length) return domain;
+
+    domain = array;
     return this;
   };
 
@@ -56,20 +87,6 @@ const sparkline = () => {
     if (!arguments.length) return height;
 
     height = number;
-    return this;
-  };
-
-  sparkline.timeParse = function (fn) {
-    if (!arguments.length) return timeParse;
-
-    timeParse = fn;
-    return this;
-  };
-
-  sparkline.timeFormat = function (fn) {
-    if (!arguments.length) return timeFormat;
-
-    timeFormat = fn;
     return this;
   };
 
@@ -633,7 +650,22 @@ const data = [
   },
 ];
 
-const table = d3.select("body").append("table");
+const root = d3.select("body").append("div").attr("id", "root");
+
+root.append("h1").text("Most searched recipes");
+root
+  .append("p")
+  .html(
+    "In the review of <a href='https://trends.google.com/trends/yis/2022/FR/'>2022 search results</a>, for France, Google Trends highlights the most searched recipes."
+  );
+
+root
+  .append("p")
+  .text(
+    "The ten most frequent words show interesting, often seasonal, patterns."
+  );
+
+const table = root.append("table");
 
 table.append("thead").html("<tr><th>Word</th><th>Interest</th></tr>");
 
@@ -648,9 +680,6 @@ trs.append("td").text((d) => d.word);
 trs.append("td").each(function (d) {
   const { word, values } = d;
 
-  const width = 200;
-  const height = 20;
-
   const timeParse = d3.timeParse("%Y-%m-%d");
   const timeFormat = d3.timeFormat("%B %-d");
 
@@ -658,17 +687,17 @@ trs.append("td").each(function (d) {
     values[values.findIndex((d) => d.value === d3.max(values, (d) => d.value))];
   const prettyDate = timeFormat(timeParse(date));
 
-  const title = word;
   const description = `The word "${word}" was searched the most on ${prettyDate}`;
 
-  d3.select(this).call(
-    sparkline()
-      .data(values)
-      .width(width)
-      .height(height)
-      .timeParse(timeParse)
-      .timeFormat(timeFormat)
-      .title(title)
-      .description(description)
-  );
+  const sparklineComponent = sparkline()
+    .data(values)
+    .dateAccessor((d) => timeParse(d.date))
+    .valueAccessor((d) => d.value)
+    .domain([0, 100])
+    .width(200)
+    .height(20)
+    .title(word)
+    .description(description);
+
+  d3.select(this).call(sparklineComponent);
 });
