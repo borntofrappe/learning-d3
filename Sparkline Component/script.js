@@ -560,10 +560,20 @@ const line = d3
   .x((d) => scaleX(timeParse(d.date)))
   .y((d) => scaleY(d.value));
 
-const svg = d3
-  .select("body")
+const table = d3.select("body").append("table");
+
+table.append("thead").html("<tr><th>Word</th><th>Interest</th></tr>");
+
+const tr = table.append("tbody").append("tr");
+
+tr.append("td").append("h2").text(word);
+
+const svg = tr
+  .append("td")
   .append("svg")
-  .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`);
+  .attr("viewBox", `-1 -1 ${width + 2} ${height + 2}`)
+  .style("height", "1em")
+  .style("width", "auto");
 
 svg
   .append("path")
