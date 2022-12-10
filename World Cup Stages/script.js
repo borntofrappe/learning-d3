@@ -1,12 +1,39 @@
-const nodes = [{ id: 0 }, { id: 1 }, { id: 2 }, { value: 3 }];
+const phases = [
+  "Winner",
+  "Final",
+  "Semifinal",
+  "Quarter-final",
+  "Round of 16",
+  "Group stage",
+];
+
+const editions = 4;
+
+const nodesPhases = d3.range(editions).reduce((acc, curr) => {
+  return [...acc, ...phases.map((d) => ({ id: `${d} ${curr}` }))];
+}, []);
+
+const linksPhases = d3.range(editions - 1).reduce((acc, curr) => {
+  return [
+    ...acc,
+    ...phases.map((d) => ({
+      source: `${d} ${curr}`,
+      target: `${d} ${curr + 1}`,
+      value: 1,
+    })),
+  ];
+}, []);
+
+const nodes = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }];
 
 const links = [
   { source: 0, target: 3, value: 1 },
   { source: 1, target: 2, value: 1 },
 ];
 
+const heightEdition = 250;
 const width = 500;
-const height = 500;
+const height = heightEdition * editions;
 const margin = {
   top: 20,
   bottom: 20,
@@ -16,14 +43,14 @@ const margin = {
 
 const sankey = d3
   .sankey()
-  .nodeSort((a, b) => a.id - b.id)
+  .nodeId((d) => d.id)
   .nodePadding(20)
   .extent([
     [0, 0],
-    [width, height],
+    [height, width],
   ]);
 
-const graph = sankey({ nodes, links });
+const graph = sankey({ nodes: nodesPhases, links: linksPhases });
 
 const svg = d3
   .select("body")
@@ -46,10 +73,10 @@ groupNodes
   .selectAll("rect")
   .data(graph.nodes)
   .join("rect")
-  .attr("x", (d) => d.x0)
-  .attr("y", (d) => d.y0)
-  .attr("width", (d) => d.x1 - d.x0)
-  .attr("height", (d) => d.y1 - d.y0)
+  .attr("x", (d) => d.y0)
+  .attr("y", (d) => d.x0)
+  .attr("width", (d) => d.y1 - d.y0)
+  .attr("height", (d) => d.x1 - d.x0)
   .attr("fill", "currentColor");
 
 groupLinks
@@ -59,9 +86,9 @@ groupLinks
   .attr("stroke", "currentColor")
   .attr("d", (d) => {
     const { source, target } = d;
-    const { x1: x0, y0, y1: y3 } = source;
-    const { x0: x1, y0: y1, y1: y2 } = target;
+    const { y0: x0, y1: x1, x1: y0 } = source;
+    const { y0: x3, y1: x2, x0: y1 } = target;
 
-    return `M ${x0} ${y0} ${x1} ${y1} ${x1} ${y2} ${x0} ${y3}`;
+    return `M ${x0} ${y0} ${x1} ${y0} ${x2} ${y1} ${x3} ${y1}`;
   })
   .attr("opacity", "0.25");
