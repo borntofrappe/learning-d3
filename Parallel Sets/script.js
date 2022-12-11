@@ -24,35 +24,37 @@ const data = {
   2000: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
 };
 
-const dataRibbons = Object.entries(data).reduce(
-  (acc, curr) => {
-    const [year, teams] = curr;
-    const nodes = teams.map((team, i) => ({
-      id: `${year}-${team}`,
-      position: i + 1,
-      source: `${year}-${team}`,
-      target: `${parseInt(year, 10) + 1}-${team}`,
-      value: 1,
-    }));
-    acc.nodes.push(...nodes);
-
-    if (year !== "2022") {
-      const links = teams.map((team) => ({
-        source: `${year}-${team}`,
-        target: `${parseInt(year, 10) + 1}-${team}`,
-        value: 1,
+const dataRibbons = Object.entries(data)
+  .sort((a, b) => (a[0] > b[0] ? 1 : -1))
+  .reduce(
+    (acc, curr, i, { length }) => {
+      const [key, teams] = curr;
+      const year = parseInt(key, 10);
+      const nodes = teams.map((team, i) => ({
+        id: `${year}-${team}`,
+        position: i + 1,
       }));
-      acc.links.push(...links);
+      acc.nodes.push(...nodes);
+
+      if (i < length - 1) {
+        const links = teams.map((team) => ({
+          source: `${year}-${team}`,
+          target: `${year + 1}-${team}`,
+          value: 1,
+        }));
+        acc.links.push(...links);
+      }
+
+      acc.years.push(year);
+
+      return acc;
+    },
+    {
+      nodes: [],
+      links: [],
+      years: [],
     }
-    acc.years.push(year);
-    return acc;
-  },
-  {
-    nodes: [],
-    links: [],
-    years: [],
-  }
-);
+  );
 
 const { nodes, links, years } = dataRibbons;
 
