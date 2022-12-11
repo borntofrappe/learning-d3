@@ -1,10 +1,14 @@
-# World Cup Stages
+# Parallel sets
 
-Highlight national football teams competing in the world cup, specifically which phase each team reached throughout the multiple editions.
+Create a visualization similar to [parallel sets](https://datavizproject.com/data-type/parallel-sets/)
+
+## Data
+
+Table results from the Six Nations competition, starting from the year 2000 with the incorporation of Italy.
 
 ## Sankey ribbons
 
-The goal is to ultimately map countries with a visualization similar to [parallel sets](https://datavizproject.com/data-type/parallel-sets/).
+The goal is to ultimately map countries with a visualization similar to a sankey diagram.
 
 Use `d3.sankey` to position an array of nodes. To force a specific order sort the nodes specifically.
 
