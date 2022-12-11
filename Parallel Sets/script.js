@@ -56,9 +56,9 @@ const { nodes, links, years } = Object.entries(data)
     }
   );
 
-const widthPerYear = 200;
-const width = widthPerYear * years.length;
-const height = 600;
+const width = 500;
+const heightPerYear = 250;
+const height = heightPerYear * years.length;
 const margin = {
   top: 20,
   bottom: 20,
@@ -72,7 +72,7 @@ const sankey = d3
   .nodeSort((a, b) => a.position - b.position)
   .extent([
     [0, 0],
-    [width, height],
+    [height, width],
   ]);
 
 const graph = sankey({ nodes, links });
@@ -120,10 +120,10 @@ groupNodes
   .selectAll("rect")
   .data(graph.nodes)
   .join("rect")
-  .attr("x", (d) => d.x0)
-  .attr("y", (d) => d.y0)
-  .attr("width", (d) => d.x1 - d.x0)
-  .attr("height", (d) => d.y1 - d.y0)
+  .attr("x", (d) => d.y0)
+  .attr("y", (d) => d.x0)
+  .attr("width", (d) => d.y1 - d.y0)
+  .attr("height", (d) => d.x1 - d.x0)
   .attr("fill", "currentColor");
 
 groupLinks
@@ -133,9 +133,9 @@ groupLinks
   .attr("fill", "currentColor")
   .attr("d", (d) => {
     const { source, target } = d;
-    const { x1: x0, y0, y1: y3 } = source;
-    const { x0: x1, y0: y1, y1: y2 } = target;
+    const { y0: x0, y1: x1, x1: y0 } = source;
+    const { y1: x2, y0: x3, x0: y1 } = target;
 
-    return `M ${x0} ${y0} ${x1} ${y1} ${x1} ${y2} ${x0} ${y3}`;
+    return `M ${x0} ${y0} ${x1} ${y0} ${x2} ${y1} ${x3} ${y1}`;
   })
   .attr("opacity", "0.25");
