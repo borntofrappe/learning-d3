@@ -30,11 +30,15 @@ h1 {
 }
 
 p {
-  max-width: 70ch;
   line-height: 1.5;
 }
 
-#root rect:hover,
-path:hover {
-  color: var(--color-highlight);
+.visually-hidden:not(:focus):not(:active) {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }

@@ -32,7 +32,9 @@ const { nodes, links, years } = Object.entries(data)
       const year = parseInt(key, 10);
       const nodes = teams.map((team, i) => ({
         id: `${year}-${team}`,
+        team,
         position: i + 1,
+        year,
       }));
       acc.nodes.push(...nodes);
 
@@ -56,27 +58,28 @@ const { nodes, links, years } = Object.entries(data)
     }
   );
 
+const teams = Object.values(data)[0].sort((a, b) => (a > b ? 1 : -1));
+
 const width = 500;
 const heightPerYear = 250;
 const height = heightPerYear * years.length;
 const margin = {
-  top: 20,
-  bottom: 20,
-  left: 20,
-  right: 20,
+  top: 25,
+  right: 5,
+  bottom: 25,
+  left: 5,
 };
 
 const sankey = d3
   .sankey()
   .nodeId((d) => d.id)
-  .nodeSort((a, b) => a.position - b.position)
+  .nodeSort((a, b) => b.position - a.position)
   .extent([
     [0, 0],
     [height, width],
   ]);
 
 const graph = sankey({ nodes, links });
-const teams = Object.values(data)[0].sort((a, b) => (a > b ? 1 : -1));
 
 const root = d3.select("body").append("div").attr("id", "root");
 
@@ -95,9 +98,20 @@ header
 header
   .append("p")
   .html(
-    `Ever since the year 2000 six nations compete in one of the most prestigious rugby tournaments: ${teams
-      .map((team) => `<strong>${team}</strong>`)
-      .join(", ")}.`
+    "Ever since the year 2000 six nations compete in one of the most prestigious rugby tournaments."
+  );
+
+header
+  .append("p")
+  .attr("class", "visually-hidden")
+  .html(
+    `These are: ${teams.map((team) => `<strong>${team}</strong>`).join(", ")}.`
+  );
+
+root
+  .append("p")
+  .text(
+    "Select a node to highlight the journey of a specific team, from wodden spoon to glory."
   );
 
 const svg = root
@@ -116,20 +130,41 @@ const group = svg
 const groupLinks = group.append("g");
 const groupNodes = group.append("g");
 
-groupNodes
-  .selectAll("rect")
+const groupsNodes = groupNodes
+  .selectAll("g")
   .data(graph.nodes)
-  .join("rect")
-  .attr("x", (d) => d.y0)
-  .attr("y", (d) => d.x0)
+  .enter()
+  .append("g")
+  .attr("transform", (d) => `translate(${d.y0} ${d.x0})`);
+
+groupsNodes
+  .append("rect")
   .attr("width", (d) => d.y1 - d.y0)
   .attr("height", (d) => d.x1 - d.x0)
   .attr("fill", "currentColor");
 
-groupLinks
+const labels = groupsNodes
+  .append("text")
+  .attr("fill", "currentColor")
+  .attr("font-weight", "700")
+  .attr("font-size", "12")
+  .attr("text-anchor", "middle")
+  .attr("x", (d) => (d.y1 - d.y0) / 2)
+  .attr("y", "-6")
+  .text((d) => d.team);
+
+labels.filter((d) => d.year !== years[0]).attr("opacity", "0");
+labels
+  .filter((d) => d.year === years[years.length - 1])
+  .attr("opacity", "1")
+  .attr("dominant-baseline", "hanging")
+  .attr("y", (d) => d.x1 - d.x0 + 4);
+
+const paths = groupLinks
   .selectAll("path")
   .data(graph.links)
-  .join("path")
+  .enter()
+  .append("path")
   .attr("fill", "currentColor")
   .attr("d", (d) => {
     const { source, target } = d;
@@ -138,4 +173,36 @@ groupLinks
 
     return `M ${x0} ${y0} ${x1} ${y0} ${x2} ${y1} ${x3} ${y1}`;
   })
-  .attr("opacity", "0.25");
+  .attr("opacity", "0.2");
+
+groupsNodes.on("click", (e, d) => {
+  e.stopPropagation();
+
+  groupsNodes
+    .select("rect")
+    .attr("fill", "currentColor")
+    .filter(({ team }) => team === d.team)
+    .attr("fill", "var(--color-highlight, hsl(45, 91%, 54%))");
+
+  labels
+    .filter((d) => d.year !== years[0] && d.year !== years[years.length - 1])
+    .attr("opacity", "0")
+    .filter(({ team }) => team === d.team)
+    .attr("opacity", "1");
+
+  paths
+    .attr("fill", "currentColor")
+    .attr("opacity", "0.2")
+    .filter(({ source }) => source.team === d.team)
+    .attr("fill", "var(--color-highlight, hsl(45, 91%, 54%))")
+    .attr("opacity", "0.36");
+});
+
+svg.on("click", () => {
+  groupsNodes.select("rect").attr("fill", "currentColor");
+  labels
+    .filter((d) => d.year !== years[0] && d.year !== years[years.length - 1])
+    .attr("opacity", "0");
+
+  paths.attr("fill", "currentColor").attr("opacity", "0.2");
+});
