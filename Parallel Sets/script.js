@@ -24,7 +24,7 @@ const data = {
   2000: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
 };
 
-const dataRibbons = Object.entries(data)
+const { nodes, links, years } = Object.entries(data)
   .sort((a, b) => (a[0] > b[0] ? 1 : -1))
   .reduce(
     (acc, curr, i, { length }) => {
@@ -56,9 +56,7 @@ const dataRibbons = Object.entries(data)
     }
   );
 
-const { nodes, links, years } = dataRibbons;
-
-const widthPerYear = 150;
+const widthPerYear = 200;
 const width = widthPerYear * years.length;
 const height = 600;
 const margin = {
@@ -78,9 +76,31 @@ const sankey = d3
   ]);
 
 const graph = sankey({ nodes, links });
+const teams = Object.values(data)[0].sort((a, b) => (a > b ? 1 : -1));
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+
+const header = root.append("header");
+
+header
+  .append("h1")
+  .text("Six Nations Championship")
+  .append("svg")
+  .attr("viewBox", "0 0 10 10")
+  .style("width", "1.5em")
+  .style("height", "auto")
+  .append("use")
+  .attr("href", "#trophy");
+
+header
+  .append("p")
+  .html(
+    `Ever since the year 2000 six nations compete in one of the most prestigious rugby tournaments: ${teams
+      .map((team) => `<strong>${team}</strong>`)
+      .join(", ")}.`
+  );
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",
@@ -110,7 +130,7 @@ groupLinks
   .selectAll("path")
   .data(graph.links)
   .join("path")
-  .attr("stroke", "currentColor")
+  .attr("fill", "currentColor")
   .attr("d", (d) => {
     const { source, target } = d;
     const { x1: x0, y0, y1: y3 } = source;

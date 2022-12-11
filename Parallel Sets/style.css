@@ -5,8 +5,36 @@
 }
 
 body {
+  color: hsl(250, 52%, 33%);
   background: hsl(0, 0%, 97%);
-  color: hsl(0, 0%, 7%);
+  --color-highlight: hsl(45, 91%, 54%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
+#root {
+  max-width: 52rem;
+  margin: 1rem auto;
+}
+
+#root > * + * {
+  margin-top: 1em;
+}
+
+header > * + * {
+  margin-top: 0.5em;
+}
+
+h1 {
+  font-size: 1.49rem;
+}
+
+p {
+  max-width: 70ch;
+  line-height: 1.25;
+}
+
+#root rect:hover,
+path:hover {
+  color: var(--color-highlight);
 }

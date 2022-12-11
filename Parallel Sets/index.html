@@ -4,11 +4,42 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>World Cup Stages</title>
+    <title>Six Nations Championship</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="../icon.png" />
   </head>
   <body>
+    <svg style="width: 0; height: 0; position: absolute" aria-hidden="true">
+      <symbol id="trophy" viewBox="0 0 100 100">
+        <g
+          transform="translate(50 8)"
+          fill="hsl(45, 91%, 54%)"
+          stroke="hsl(45, 91%, 54%)"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="4"
+        >
+          <path d="M -4 30 h 8 v 32 0 h-8z" />
+          <path d="M -20 0 h 40 v 30 a 20 20 0 0 1 -40 0z" />
+          <path d="M 28 10 h 16 a 16 16 0 0 1 -16 16z" />
+          <path
+            transform="scale(-1 1)"
+            d="M 28 10 h 16 a 16 16 0 0 1 -16 16z"
+          />
+        </g>
+        <g
+          transform="translate(50 80)"
+          fill="none"
+          stroke="hsl(250, 52%, 33%)"
+          stroke-width="8"
+          stroke-linecap="round"
+        >
+          <path d="M -20 0 h 40" />
+          <path d="M -30 12 h 60" />
+        </g>
+      </symbol>
+    </svg>
+
     <script src="https://unpkg.com/d3@7.6.1/dist/d3.min.js"></script>
     <script src="https://unpkg.com/d3-sankey@0.12.3/dist/d3-sankey.min.js"></script>
     <script src="script.js"></script>
