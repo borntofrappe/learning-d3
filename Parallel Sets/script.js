@@ -1,107 +1,64 @@
-const data = [
-  {
-    year: 2022,
-    teams: ["France", "Ireland", "England", "Scotland", "Wales", "Italy"],
-  },
-  {
-    year: 2021,
-    teams: ["Wales", "France", "Ireland", "Scotland", "England", "Italy"],
-  },
-  {
-    year: 2020,
-    teams: ["England", "France", "Ireland", "Scotland", "Wales", "Italy"],
-  },
-  {
-    year: 2019,
-    teams: ["Wales", "England", "Ireland", "France", "Scotland", "Italy"],
-  },
-  {
-    year: 2018,
-    teams: ["Ireland", "Wales", "Scotland", "France", "England", "Italy"],
-  },
-  {
-    year: 2017,
-    teams: ["England", "Ireland", "France", "Scotland", "Wales", "Italy"],
-  },
-  {
-    year: 2016,
-    teams: ["England", "Wales", "Ireland", "Scotland", "France", "Italy"],
-  },
-  {
-    year: 2015,
-    teams: ["Ireland", "England", "Wales", "France", "Italy", "Scotland"],
-  },
-  {
-    year: 2014,
-    teams: ["Ireland", "England", "Wales", "France", "Scotland", "Italy"],
-  },
-  {
-    year: 2013,
-    teams: ["Wales", "England", "Scotland", "Italy", "Ireland", "France"],
-  },
-  {
-    year: 2012,
-    teams: ["Wales", "England", "Ireland", "France", "Italy", "Scotland"],
-  },
-  {
-    year: 2011,
-    teams: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
-  },
-  {
-    year: 2010,
-    teams: ["France", "Ireland", "England", "Wales", "Scotland", "Italy"],
-  },
-  {
-    year: 2009,
-    teams: ["Ireland", "England", "France", "Wales", "Scotland", "Italy"],
-  },
-  {
-    year: 2008,
-    teams: ["Wales", "England", "France", "Ire", "Scotland", "Italy"],
-  },
-  {
-    year: 2007,
-    teams: ["France", "Ireland", "England", "Italy", "Wales", "Scotland"],
-  },
-  {
-    year: 2006,
-    teams: ["France", "Ireland", "Scotland", "England", "Wales", "Italy"],
-  },
-  {
-    year: 2005,
-    teams: ["Wales", "France", "Ireland", "England", "Scotland", "Italy"],
-  },
-  {
-    year: 2004,
-    teams: ["France", "Ireland", "England", "Wales", "Italy", "Scotland"],
-  },
-  {
-    year: 2003,
-    teams: ["England", "Ireland", "France", "Scotland", "Italy", "Wales"],
-  },
-  {
-    year: 2002,
-    teams: ["France", "England", "Ireland", "Scotland", "Wales", "Italy"],
-  },
-  {
-    year: 2001,
-    teams: ["England", "Ireland", "Scotland", "Wales", "France", "Italy"],
-  },
-  {
-    year: 2000,
-    teams: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
-  },
-];
+const data = {
+  2022: ["France", "Ireland", "England", "Scotland", "Wales", "Italy"],
+  2021: ["Wales", "France", "Ireland", "Scotland", "England", "Italy"],
+  2020: ["England", "France", "Ireland", "Scotland", "Wales", "Italy"],
+  2019: ["Wales", "England", "Ireland", "France", "Scotland", "Italy"],
+  2018: ["Ireland", "Wales", "Scotland", "France", "England", "Italy"],
+  2017: ["England", "Ireland", "France", "Scotland", "Wales", "Italy"],
+  2016: ["England", "Wales", "Ireland", "Scotland", "France", "Italy"],
+  2015: ["Ireland", "England", "Wales", "France", "Italy", "Scotland"],
+  2014: ["Ireland", "England", "Wales", "France", "Scotland", "Italy"],
+  2013: ["Wales", "England", "Scotland", "Italy", "Ireland", "France"],
+  2012: ["Wales", "England", "Ireland", "France", "Italy", "Scotland"],
+  2011: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
+  2010: ["France", "Ireland", "England", "Wales", "Scotland", "Italy"],
+  2009: ["Ireland", "England", "France", "Wales", "Scotland", "Italy"],
+  2008: ["Wales", "England", "France", "Ireland", "Scotland", "Italy"],
+  2007: ["France", "Ireland", "England", "Italy", "Wales", "Scotland"],
+  2006: ["France", "Ireland", "Scotland", "England", "Wales", "Italy"],
+  2005: ["Wales", "France", "Ireland", "England", "Scotland", "Italy"],
+  2004: ["France", "Ireland", "England", "Wales", "Italy", "Scotland"],
+  2003: ["England", "Ireland", "France", "Scotland", "Italy", "Wales"],
+  2002: ["France", "England", "Ireland", "Scotland", "Wales", "Italy"],
+  2001: ["England", "Ireland", "Scotland", "Wales", "France", "Italy"],
+  2000: ["England", "France", "Ireland", "Wales", "Scotland", "Italy"],
+};
 
-const nodes = [{ index: 0 }, { index: 1 }, { index: 2 }, { index: 3 }];
+const dataRibbons = Object.entries(data).reduce(
+  (acc, curr) => {
+    const [year, teams] = curr;
+    const nodes = teams.map((team, i) => ({
+      id: `${year}-${team}`,
+      position: i + 1,
+      source: `${year}-${team}`,
+      target: `${parseInt(year, 10) + 1}-${team}`,
+      value: 1,
+    }));
+    acc.nodes.push(...nodes);
 
-const links = [
-  { source: 0, target: 3, value: 1 },
-  { source: 1, target: 2, value: 1 },
-];
+    if (year !== "2022") {
+      const links = teams.map((team) => ({
+        source: `${year}-${team}`,
+        target: `${parseInt(year, 10) + 1}-${team}`,
+        value: 1,
+      }));
+      acc.links.push(...links);
+    }
+    acc.years.push(year);
+    return acc;
+  },
+  {
+    nodes: [],
+    links: [],
+    years: [],
+  }
+);
 
-const width = 500;
-const height = 500;
+const { nodes, links, years } = dataRibbons;
+
+const widthPerYear = 150;
+const width = widthPerYear * years.length;
+const height = 600;
 const margin = {
   top: 20,
   bottom: 20,
@@ -111,11 +68,11 @@ const margin = {
 
 const sankey = d3
   .sankey()
-  .nodeSort((a, b) => a.id - b.id)
-  .nodePadding(20)
+  .nodeId((d) => d.id)
+  .nodeSort((a, b) => a.position - b.position)
   .extent([
     [0, 0],
-    [height, width],
+    [width, height],
   ]);
 
 const graph = sankey({ nodes, links });
