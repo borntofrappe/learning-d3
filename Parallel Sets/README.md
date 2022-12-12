@@ -1,6 +1,6 @@
-# Parallel sets
+# [Parallel sets](https://codepen.io/borntofrappe/full/rNKgmbB)
 
-Create a visualization similar to [parallel sets](https://datavizproject.com/data-type/parallel-sets/)
+Create a visualization similar to [parallel sets](https://datavizproject.com/data-type/parallel-sets/).
 
 ## Data
 

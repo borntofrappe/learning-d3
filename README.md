@@ -6,7 +6,7 @@ Here's a repository filled with projects to master the library, its many modules
 
 | Title                                                                         | Keywords                   |
 | ----------------------------------------------------------------------------- | -------------------------- |
-| [Parallel Sets](https://codepen.io/borntofrappe/pen/GRGLWoR)                  | sankey, filter             |
+| [Parallel Sets](https://codepen.io/borntofrappe/pen/rNKgmbB)                  | sankey, filter             |
 | [Sparkline Component](https://codepen.io/borntofrappe/pen/GRGLWoR)            | component, table           |
 | [Beeswarm Plot](https://codepen.io/borntofrappe/pen/RwJdomB)                  | forceSimulation            |
 | [Legend Component](https://codepen.io/borntofrappe/pen/RwJEOyg)               | component, dispatch        |
