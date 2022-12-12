@@ -74,10 +74,7 @@ const sankey = d3
   .sankey()
   .nodeId((d) => d.id)
   .nodeSort((a, b) => b.position - a.position)
-  .extent([
-    [0, 0],
-    [height, width],
-  ]);
+  .size([height, width]);
 
 const graph = sankey({ nodes, links });
 
@@ -137,6 +134,8 @@ const groupsNodes = groupNodes
   .append("g")
   .attr("transform", (d) => `translate(${d.y0} ${d.x0})`);
 
+groupsNodes.append("title").text((d) => `${d.year} ${d.team}: ${d.position}`);
+
 groupsNodes
   .append("rect")
   .attr("width", (d) => d.y1 - d.y0)
@@ -145,6 +144,7 @@ groupsNodes
 
 const labels = groupsNodes
   .append("text")
+  .style("pointer-events", "none")
   .attr("fill", "currentColor")
   .attr("font-weight", "700")
   .attr("font-size", "12")
@@ -168,12 +168,12 @@ const paths = groupLinks
   .attr("fill", "currentColor")
   .attr("d", (d) => {
     const { source, target } = d;
-    const { y0: x0, y1: x1, x1: y0 } = source;
-    const { y1: x2, y0: x3, x0: y1 } = target;
+    const { y0: x0, y1: x1, x1: yStart } = source;
+    const { y1: x2, y0: x3, x0: yEnd } = target;
 
-    return `M ${x0} ${y0} ${x1} ${y0} ${x2} ${y1} ${x3} ${y1}`;
+    return `M ${x0} ${yStart} ${x1} ${yStart} ${x2} ${yEnd} ${x3} ${yEnd}`;
   })
-  .attr("opacity", "0.2");
+  .attr("opacity", "0.18");
 
 groupsNodes.on("click", (e, d) => {
   e.stopPropagation();
@@ -192,10 +192,10 @@ groupsNodes.on("click", (e, d) => {
 
   paths
     .attr("fill", "currentColor")
-    .attr("opacity", "0.2")
+    .attr("opacity", "0.18")
     .filter(({ source }) => source.team === d.team)
     .attr("fill", "var(--color-highlight, hsl(45, 91%, 54%))")
-    .attr("opacity", "0.36");
+    .attr("opacity", "0.32");
 });
 
 svg.on("click", () => {
@@ -204,5 +204,5 @@ svg.on("click", () => {
     .filter((d) => d.year !== years[0] && d.year !== years[years.length - 1])
     .attr("opacity", "0");
 
-  paths.attr("fill", "currentColor").attr("opacity", "0.2");
+  paths.attr("fill", "currentColor").attr("opacity", "0.18");
 });

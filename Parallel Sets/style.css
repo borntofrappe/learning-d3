@@ -5,7 +5,7 @@
 }
 
 body {
-  color: hsl(250, 52%, 33%);
+  color: hsl(240, 56%, 14%);
   background: hsl(0, 0%, 97%);
   --color-highlight: hsl(45, 91%, 54%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
@@ -13,6 +13,7 @@ body {
 }
 
 #root {
+  padding: 1rem;
   max-width: 52rem;
   margin: 1rem auto;
 }
