@@ -16,84 +16,134 @@ const data = [
     { date: "2022-12-16", "Email & messages": 0.11, Writing: 0.19, Coding: 0.25, Designing: 0.28, Research: 0.12, Paperwork: 0, Planning: 0.05 }
 ];
 
-const width = 500;
-const height = 350;
-const margin = {
-  top: 10,
-  bottom: 25,
-  left: 35,
-  right: 10,
-};
+(() => {
+  const width = 500;
+  const height = 350;
+  const margin = {
+    top: 10,
+    bottom: 25,
+    left: 35,
+    right: 10,
+  };
 
-const timeParse = d3.timeParse("%Y-%m-%d");
-const timeFormat = d3.timeFormat("%b %-d");
+  const timeParse = d3.timeParse("%Y-%m-%d");
+  const timeFormat = d3.timeFormat("%b %-d");
 
-const keys = Object.keys(data[0]).filter((d) => d !== "date");
+  const keys = Object.keys(data[0]).filter((d) => d !== "date");
 
-const stack = d3.stack().keys(keys);
+  const stack = d3.stack().keys(keys);
 
-const series = stack(data);
+  const series = stack(data);
 
-const scaleX = d3
-  .scaleBand()
-  .domain(data.map((d) => timeParse(d.date)))
-  .range([0, width])
-  .padding(0.4);
+  const scaleX = d3
+    .scaleBand()
+    .domain(data.map((d) => timeParse(d.date)))
+    .range([0, width])
+    .padding(0.4);
 
-const scaleY = d3
-  .scaleLinear()
-  .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
-  .range([height, 0])
-  .nice();
+  const scaleY = d3
+    .scaleLinear()
+    .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
+    .range([height, 0])
+    .nice();
 
-const scaleColor = d3.scaleOrdinal(d3.schemeTableau10).domain(keys);
+  const scaleColor = d3.scaleOrdinal(d3.schemeTableau10).domain(keys);
 
-const axisX = d3
-  .axisBottom(scaleX)
-  .tickFormat((d) => timeFormat(d))
-  .tickSize(0)
-  .tickPadding(10);
+  const axisX = d3
+    .axisBottom(scaleX)
+    .tickFormat((d) => timeFormat(d))
+    .tickSize(0)
+    .tickPadding(10);
 
-const axisY = d3
-  .axisLeft(scaleY)
-  .ticks(4)
-  .tickFormat((d) => (d ? `${d} h` : ""))
-  .tickSize(0)
-  .tickPadding(6);
+  const axisY = d3
+    .axisLeft(scaleY)
+    .ticks(4)
+    .tickFormat((d) => (d ? `${d} h` : ""))
+    .tickSize(0)
+    .tickPadding(6);
 
-const svg = d3
-  .select("body")
-  .append("svg")
-  .attr(
-    "viewBox",
-    `0 0 ${width + margin.left + margin.right} ${
-      height + margin.top + margin.bottom
-    }`
-  );
+  const article = d3.select("body").append("article");
+  article.append("h2").text("Stacked bar chart");
+  const legendKeys = article.append("div").attr("class", "legend");
 
-const group = svg
-  .append("g")
-  .attr("transform", `translate(${margin.left} ${margin.top})`);
+  const legendsKeys = legendKeys
+    .selectAll("span")
+    .data(keys)
+    .enter()
+    .append("span")
+    .text((d) => d);
 
-const groupData = group.append("g");
-const groupAxis = group.append("g");
+  legendsKeys
+    .append("svg")
+    .attr("viewBox", "0 0 1 1")
+    .style("height", "1em")
+    .attr("fill", (d) => scaleColor(d))
+    .append("rect")
+    .attr("width", "1")
+    .attr("height", "1");
 
-groupAxis.append("g").attr("transform", `translate(0 ${height})`).call(axisX);
-groupAxis.append("g").call(axisY);
+  const svg = article
+    .append("svg")
+    .attr(
+      "viewBox",
+      `0 0 ${width + margin.left + margin.right} ${
+        height + margin.top + margin.bottom
+      }`
+    );
 
-const groupsData = groupData
-  .selectAll("g")
-  .data(series)
-  .enter()
-  .append("g")
-  .attr("fill", (d) => scaleColor(d.key));
+  const group = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-groupsData
-  .selectAll("rect")
-  .data((d) => d)
-  .enter()
-  .append("rect")
-  .attr("x", (d) => scaleX(timeParse(d.data.date)))
-  .attr("width", scaleX.bandwidth())
-  .attr("y", (d) => scaleY(d[1]))
-  .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+  const groupData = group.append("g");
+  const groupAxis = group.append("g");
+
+  groupAxis.append("g").attr("transform", `translate(0 ${height})`).call(axisX);
+  groupAxis.append("g").call(axisY);
+
+  const groupsData = groupData
+    .selectAll("g")
+    .data(series)
+    .enter()
+    .append("g")
+    .attr("fill", (d) => scaleColor(d.key));
+
+  groupsData
+    .selectAll("rect")
+    .data((d) => d)
+    .enter()
+    .append("rect")
+    .attr("x", (d) => scaleX(timeParse(d.data.date)))
+    .attr("width", scaleX.bandwidth())
+    .attr("y", (d) => scaleY(d[1]))
+    .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+
+  legendsKeys
+    .style("cursor", "pointer")
+    .on("pointerenter", function (e, d) {
+      legendsKeys
+        .filter((key) => key !== d)
+        .transition()
+        .style("opacity", "0.5")
+        .style("filter", "grayscale(1)");
+
+      groupsData
+        .filter(({ key }) => key !== d)
+        .transition()
+        .attr("opacity", "0.5")
+        .style("filter", "grayscale(1)");
+
+      d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
+
+      groupsData
+        .filter(({ key }) => key === d)
+        .attr("opacity", "1")
+        .style("filter", "grayscale(0)");
+    })
+    .on("pointerleave", (e, d) => {
+      groupsData
+        .transition()
+        .attr("opacity", "1")
+        .style("filter", "grayscale(0)");
+    });
+})();

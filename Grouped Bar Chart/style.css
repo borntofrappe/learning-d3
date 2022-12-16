@@ -9,17 +9,28 @@ body {
   color: hsl(0, 0%, 7%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
 
-svg {
-  max-width: 48rem;
-  height: auto;
-  width: 100%;
-  outline: 1px solid currentColor;
+article {
+  max-width: 60rem;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+
+article > * + * {
+  margin-top: 0.75em;
+}
+
+.legend {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.legend svg {
+  margin-inline: 0.5em 1em;
 }
 
 svg text {
