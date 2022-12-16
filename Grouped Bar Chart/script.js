@@ -15,3 +15,85 @@ const data = [
     { date: "2022-12-15", "Email & messages": 0.12, Writing: 0.08, Coding: 0.51, Designing: 0.18, Research: 0.02, Paperwork: 0.03, Planning: 0.06 },
     { date: "2022-12-16", "Email & messages": 0.11, Writing: 0.19, Coding: 0.25, Designing: 0.28, Research: 0.12, Paperwork: 0, Planning: 0.05 }
 ];
+
+const width = 500;
+const height = 350;
+const margin = {
+  top: 10,
+  bottom: 25,
+  left: 35,
+  right: 10,
+};
+
+const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%b %-d");
+
+const keys = Object.keys(data[0]).filter((d) => d !== "date");
+
+const stack = d3.stack().keys(keys);
+
+const series = stack(data);
+
+const scaleX = d3
+  .scaleBand()
+  .domain(data.map((d) => timeParse(d.date)))
+  .range([0, width])
+  .padding(0.4);
+
+const scaleY = d3
+  .scaleLinear()
+  .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
+  .range([height, 0])
+  .nice();
+
+const scaleColor = d3.scaleOrdinal(d3.schemeTableau10).domain(keys);
+
+const axisX = d3
+  .axisBottom(scaleX)
+  .tickFormat((d) => timeFormat(d))
+  .tickSize(0)
+  .tickPadding(10);
+
+const axisY = d3
+  .axisLeft(scaleY)
+  .ticks(4)
+  .tickFormat((d) => (d ? `${d} h` : ""))
+  .tickSize(0)
+  .tickPadding(6);
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupData = group.append("g");
+const groupAxis = group.append("g");
+
+groupAxis.append("g").attr("transform", `translate(0 ${height})`).call(axisX);
+groupAxis.append("g").call(axisY);
+
+const groupsData = groupData
+  .selectAll("g")
+  .data(series)
+  .enter()
+  .append("g")
+  .attr("fill", (d) => scaleColor(d.key));
+
+groupsData
+  .selectAll("rect")
+  .data((d) => d)
+  .enter()
+  .append("rect")
+  .attr("x", (d) => scaleX(timeParse(d.data.date)))
+  .attr("width", scaleX.bandwidth())
+  .attr("y", (d) => scaleY(d[1]))
+  .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
