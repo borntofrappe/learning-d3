@@ -20,12 +20,13 @@ const data = [
   const width = 500;
   const height = 350;
   const margin = {
-    top: 10,
+    top: 25,
     bottom: 25,
     left: 35,
     right: 10,
   };
 
+  const valueFormat = (d) => `${d3.format(".2")(d)}h`;
   const timeParse = d3.timeParse("%Y-%m-%d");
   const timeFormat = d3.timeFormat("%b %-d");
 
@@ -44,8 +45,7 @@ const data = [
   const scaleY = d3
     .scaleLinear()
     .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
-    .range([height, 0])
-    .nice();
+    .range([height, 0]);
 
   const scaleColor = d3.scaleOrdinal(d3.schemeTableau10).domain(keys);
 
@@ -97,9 +97,10 @@ const data = [
 
   const groupData = group.append("g");
   const groupAxis = group.append("g");
+  const groupDetails = group.append("g").style("pointer-events", "none");
 
   groupAxis.append("g").attr("transform", `translate(0 ${height})`).call(axisX);
-  groupAxis.append("g").call(axisY);
+  groupAxis.append("g").call(axisY).select("path").remove();
 
   const groupsData = groupData
     .selectAll("g")
@@ -118,32 +119,72 @@ const data = [
     .attr("y", (d) => scaleY(d[1]))
     .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
 
-  legendsKeys
-    .style("cursor", "pointer")
-    .on("pointerenter", function (e, d) {
-      legendsKeys
-        .filter((key) => key !== d)
-        .transition()
-        .style("opacity", "0.5")
-        .style("filter", "grayscale(1)");
+  legendsKeys.style("cursor", "pointer").on("click", function (e, d) {
+    e.stopPropagation();
 
-      groupsData
-        .filter(({ key }) => key !== d)
-        .transition()
-        .attr("opacity", "0.5")
-        .style("filter", "grayscale(1)");
+    legendsKeys
+      .filter((key) => key !== d)
+      .transition()
+      .style("opacity", "0.25")
+      .style("filter", "grayscale(1)");
 
-      d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
+    groupsData
+      .filter(({ key }) => key !== d)
+      .transition()
+      .attr("opacity", "0.25")
+      .style("filter", "grayscale(1)");
 
-      groupsData
-        .filter(({ key }) => key === d)
-        .attr("opacity", "1")
-        .style("filter", "grayscale(0)");
-    })
-    .on("pointerleave", (e, d) => {
-      groupsData
-        .transition()
-        .attr("opacity", "1")
-        .style("filter", "grayscale(0)");
-    });
+    d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
+
+    groupsData
+      .filter(({ key }) => key === d)
+      .attr("opacity", "1")
+      .style("filter", "grayscale(0)");
+
+    const dataDetails = series.find(({ key }) => key === d);
+    groupDetails
+      .selectAll("text")
+      .data(dataDetails)
+      .join(
+        (enter) => {
+          enter
+            .append("text")
+            .attr("font-size", "10")
+            .attr("font-weight", "700")
+            .attr("text-anchor", "middle")
+            .attr("x", scaleX.bandwidth() / 2)
+            .attr("y", -5)
+            .attr(
+              "transform",
+              (d) => `translate(${scaleX(timeParse(d.data.date))} 0)`
+            )
+            .text((d) => valueFormat(d[1] - d[0]));
+        },
+        (update) => {
+          update
+            .attr(
+              "transform",
+              (d) => `translate(${scaleX(timeParse(d.data.date))} 0)`
+            )
+            .text((d) => valueFormat(d[1] - d[0]));
+        },
+        (exit) => {
+          exit.remove();
+        }
+      );
+  });
+
+  article.on("click", () => {
+    legendsKeys
+      .transition()
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
+
+    groupsData
+      .transition()
+      .attr("opacity", "1")
+      .style("filter", "grayscale(0)");
+
+    groupDetails.selectAll("*").remove();
+  });
 })();
