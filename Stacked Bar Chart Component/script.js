@@ -340,7 +340,7 @@ form.on("input", (e) => {
       .style("opacity", "0")
       .style("visibility", "hidden");
 
-    group.call(stackedBarChart.keys(keys));
+    group.transition(transition).call(stackedBarChart.keys(keys));
   } else {
     labels
       .filter((d) => d !== key)
@@ -360,6 +360,6 @@ form.on("input", (e) => {
       .style("opacity", "1")
       .style("filter", "grayscale(0)");
 
-    group.call(stackedBarChart.keys([key]));
+    group.transition(transition).call(stackedBarChart.keys([key]));
   }
 });
