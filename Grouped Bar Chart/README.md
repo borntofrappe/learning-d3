@@ -1,3 +1,1 @@
-# Bar Charts
-
-Consider a grouped bar chart and the advantages the visualization offers over a stacked bar chart.
+# Stacked Bars Component

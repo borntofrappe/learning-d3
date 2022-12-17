@@ -120,7 +120,6 @@ const data = [
         .attr("fill", (d) => scaleColor(d.key));
 
       let groupsSeriesExit = groupsSeries.exit();
-      // groupsSeries = groupsSeries.merge(groupsSeriesEnter);
 
       groupsSeriesEnter
         .selectAll("rect")
@@ -202,6 +201,29 @@ const data = [
 
   const myStackedBar = stackedBar().data(data).keys(keys);
   group.call(myStackedBar);
+
+  legendsKeys.style("cursor", "pointer").on("click", function (e, key) {
+    e.stopPropagation();
+
+    legendsKeys
+      .filter((d) => d !== key)
+      .transition()
+      .style("opacity", "0.25")
+      .style("filter", "grayscale(1)");
+
+    group.transition().call(myStackedBar.keys([key]));
+
+    d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
+  });
+
+  article.on("click", () => {
+    legendsKeys
+      .transition()
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
+
+    group.transition().call(myStackedBar.keys(keys));
+  });
 })();
 
 (() => {
