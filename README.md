@@ -6,6 +6,7 @@ Here's a repository filled with projects to master the library, its many modules
 
 | Title                                                                         | Keywords                   |
 | ----------------------------------------------------------------------------- | -------------------------- |
+| [Stacked Bar Chart Component](https://codepen.io/borntofrappe/pen/wvxwjGY)    | stack, component, input    |
 | [Parallel Sets](https://codepen.io/borntofrappe/pen/rNKgmbB)                  | sankey, filter             |
 | [Sparkline Component](https://codepen.io/borntofrappe/pen/GRGLWoR)            | component, table           |
 | [Beeswarm Plot](https://codepen.io/borntofrappe/pen/RwJdomB)                  | forceSimulation            |

@@ -12,7 +12,7 @@ body {
 }
 
 #root {
-  max-width: 56rem;
+  max-width: 52rem;
   margin: 1rem auto;
   padding: 1rem;
 }
@@ -23,10 +23,6 @@ body {
 
 h1 {
   font-size: 1.43rem;
-}
-
-p {
-  line-height: 1.5;
 }
 
 .stacked-bar-chart {
