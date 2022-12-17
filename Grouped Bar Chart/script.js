@@ -137,8 +137,10 @@ const data = [
 
         groupsSeriesEnter
           .selectAll("rect")
+          .attr("y", height)
           .attr("height", "0")
           .transition(context)
+          .attr("y", (d) => scaleY(d[1]))
           .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
 
         groupsSeries
@@ -150,9 +152,10 @@ const data = [
                 .append("rect")
                 .attr("x", (d) => scaleX(timeParse(d.data.date)))
                 .attr("width", scaleX.bandwidth())
-                .attr("y", (d) => scaleY(d[1]))
+                .attr("y", (d) => scaleY(d[0]))
                 .attr("height", "0")
                 .transition(context)
+                .attr("y", (d) => scaleY(d[1]))
                 .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
             },
             (update) => {
@@ -171,6 +174,7 @@ const data = [
         groupsSeriesExit
           .selectAll("rect")
           .transition(context)
+          .attr("y", height)
           .attr("height", "0");
 
         groupsSeriesExit = groupsSeriesExit.transition(context);
@@ -211,7 +215,11 @@ const data = [
       .style("opacity", "0.25")
       .style("filter", "grayscale(1)");
 
-    group.transition().call(myStackedBar.keys([key]));
+    group
+      .transition()
+      .duration(500)
+      .ease(d3.easeQuadInOut)
+      .call(myStackedBar.keys([key]));
 
     d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
   });
@@ -222,7 +230,11 @@ const data = [
       .style("opacity", "1")
       .style("filter", "grayscale(0)");
 
-    group.transition().call(myStackedBar.keys(keys));
+    group
+      .transition()
+      .duration(500)
+      .ease(d3.easeQuadInOut)
+      .call(myStackedBar.keys(keys));
   });
 })();
 
