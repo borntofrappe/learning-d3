@@ -32,7 +32,3 @@ article > * + * {
 .legend svg {
   margin-inline: 0.5em 1em;
 }
-
-svg text {
-  font-family: inherit;
-}
