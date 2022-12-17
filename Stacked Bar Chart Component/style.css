@@ -1,4 +1,4 @@
-* {
+/* * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
@@ -78,4 +78,8 @@ label svg {
   top: 0;
   right: 0;
   position: absolute;
+} */
+
+svg {
+  max-width: 30rem;
 }
