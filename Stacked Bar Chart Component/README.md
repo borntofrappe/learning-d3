@@ -1,5 +1,11 @@
 # Stacked Bar Chart Component
 
+Create a component function to map data in a stacked bar chart. Animate the transition whenever the function is called with a different set of arguments.
+
+## Inspiration
+
+[d3-axis API](https://github.com/d3/d3-axis/blob/main/src/axis.js).
+
 <!--
 (() => {
   const width = 500;
