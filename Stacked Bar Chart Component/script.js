@@ -189,148 +189,146 @@ const stackedBarChartComponent = () => {
   return stackedBarChartComponent;
 };
 
-const svg = d3.select("body").append("svg").attr("viewBox", "-50 -50 600 350");
-svg.call(stackedBarChartComponent());
-
 // prettier-ignore
-// const data = [
-//   { "date": "2022-12-03", "Email & messages": 1, "Writing": 2, "Coding": 3, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 1 },
-//   { "date": "2022-12-04", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 1, "Research": 1, "Paperwork": 0, "Planning": 0 },
-//   { "date": "2022-12-05", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 0, "Research": 1, "Paperwork": 2, "Planning": 0 },
-//   { "date": "2022-12-06", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 0 },
-//   { "date": "2022-12-07", "Email & messages": 0, "Writing": 0, "Coding": 5, "Designing": 0, "Research": 0, "Paperwork": 0, "Planning": 2 },
-//   { "date": "2022-12-08", "Email & messages": 0, "Writing": 1, "Coding": 3, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 0 },
-//   { "date": "2022-12-09", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 },
-//   { "date": "2022-12-10", "Email & messages": 0, "Writing": 3, "Coding": 2, "Designing": 0, "Research": 0, "Paperwork": 0, "Planning": 1 },
-//   { "date": "2022-12-11", "Email & messages": 1, "Writing": 0, "Coding": 4, "Designing": 0, "Research": 2, "Paperwork": 0, "Planning": 1 },
-//   { "date": "2022-12-12", "Email & messages": 0, "Writing": 2, "Coding": 0, "Designing": 3, "Research": 1, "Paperwork": 0, "Planning": 0 },
-//   { "date": "2022-12-13", "Email & messages": 0, "Writing": 0, "Coding": 1, "Designing": 2, "Research": 1, "Paperwork": 2, "Planning": 0 },
-//   { "date": "2022-12-14", "Email & messages": 1, "Writing": 3, "Coding": 1, "Designing": 1, "Research": 0, "Paperwork": 1, "Planning": 0 },
-//   { "date": "2022-12-15", "Email & messages": 1, "Writing": 0, "Coding": 4, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 0 },
-//   { "date": "2022-12-16", "Email & messages": 1, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 }
-// ];
+const data = [
+  { "date": "2022-12-03", "Email & messages": 1, "Writing": 2, "Coding": 3, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 1 },
+  { "date": "2022-12-04", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 1, "Research": 1, "Paperwork": 0, "Planning": 0 },
+  { "date": "2022-12-05", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 0, "Research": 1, "Paperwork": 2, "Planning": 0 },
+  { "date": "2022-12-06", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 0 },
+  { "date": "2022-12-07", "Email & messages": 0, "Writing": 0, "Coding": 5, "Designing": 0, "Research": 0, "Paperwork": 0, "Planning": 2 },
+  { "date": "2022-12-08", "Email & messages": 0, "Writing": 1, "Coding": 3, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 0 },
+  { "date": "2022-12-09", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 },
+  { "date": "2022-12-10", "Email & messages": 0, "Writing": 3, "Coding": 2, "Designing": 0, "Research": 0, "Paperwork": 0, "Planning": 1 },
+  { "date": "2022-12-11", "Email & messages": 1, "Writing": 0, "Coding": 4, "Designing": 0, "Research": 2, "Paperwork": 0, "Planning": 1 },
+  { "date": "2022-12-12", "Email & messages": 0, "Writing": 2, "Coding": 0, "Designing": 3, "Research": 1, "Paperwork": 0, "Planning": 0 },
+  { "date": "2022-12-13", "Email & messages": 0, "Writing": 0, "Coding": 1, "Designing": 2, "Research": 1, "Paperwork": 2, "Planning": 0 },
+  { "date": "2022-12-14", "Email & messages": 1, "Writing": 3, "Coding": 1, "Designing": 1, "Research": 0, "Paperwork": 1, "Planning": 0 },
+  { "date": "2022-12-15", "Email & messages": 1, "Writing": 0, "Coding": 4, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 0 },
+  { "date": "2022-12-16", "Email & messages": 1, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 }
+];
 
-// const width = 600;
-// const height = 375;
-// const margin = {
-//   top: 10,
-//   bottom: 25,
-//   left: 35,
-//   right: 10,
-// };
+const keys = Object.keys(data[0]).filter((d) => d !== "date");
 
-// const keys = Object.keys(data[0]).filter((d) => d !== "date");
+const width = 600;
+const height = 375;
+const margin = {
+  top: 10,
+  bottom: 25,
+  left: 35,
+  right: 10,
+};
 
-// const timeParse = d3.timeParse("%Y-%m-%d");
-// const timeFormat = d3.timeFormat("%b %-d");
+const xAccessor = (d) => d.date;
 
-// const xAccessor = (d) => d.date;
-// const xFormat = (d) => timeFormat(timeParse(d));
+const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%b %-d");
+const xFormat = (d) => timeFormat(timeParse(d));
 
-// const valueFormat = (d) => (d ? `${d} h` : "");
+const valueFormat = (d) => (d ? `${d} h` : "");
 
-// const colorScale = d3
-//   .scaleOrdinal(d3.schemeTableau10)
-//   .domain(keys)
-//   .unknown("currentColor");
+const colorScale = d3
+  .scaleOrdinal(d3.schemeTableau10)
+  .domain(keys)
+  .unknown("currentColor");
 
-// const stackedBarChart = stackedBarChartComponent()
-//   .data(data)
-//   .keys(keys)
-//   .width(width)
-//   .height(height)
-//   .xAccessor(xAccessor)
-//   .xFormat(xFormat)
-//   .valueFormat(valueFormat)
-//   .colorScale(colorScale);
+const stackedBarChart = stackedBarChartComponent()
+  .data(data)
+  .keys(keys)
+  .width(width)
+  .height(height)
+  .xAccessor(xAccessor)
+  .xFormat(xFormat)
+  .valueFormat(valueFormat)
+  .colorScale(colorScale);
 
-// const root = d3.select("body").append("div").attr("id", "root");
-// root.append("h1").text("Stacked Bar Chart Component");
+const root = d3.select("body").append("div").attr("id", "root");
+root.append("h1").text("Stacked Bar Chart Component");
 
-// const svg = root
-//   .append("svg")
-//   .attr(
-//     "viewBox",
-//     `0 0 ${width + margin.left + margin.right} ${
-//       height + margin.top + margin.bottom
-//     }`
-//   );
+const svg = root
+  .append("svg")
+  .attr("class", "chart")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
 
-// const group = svg
-//   .append("g")
-//   .attr("transform", `translate(${margin.left} ${margin.top})`);
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-// group.call(stackedBarChart);
+group.call(stackedBarChart);
 
-// const form = root.append("form").on("submit", (e) => e.preventDefault());
+const form = root.append("form").on("submit", (e) => e.preventDefault());
 
-// const labels = form
-//   .selectAll("label")
-//   .data(["Show all", ...keys])
-//   .enter()
-//   .append("label")
-//   .text((d) => d);
+const labels = form
+  .selectAll("label")
+  .data(["Show all", ...keys])
+  .enter()
+  .append("label")
+  .text((d) => d);
 
-// labels
-//   .append("input")
-//   .attr("type", "radio")
-//   .attr("name", "key")
-//   .attr("value", (d) => d);
+labels
+  .append("input")
+  .attr("type", "radio")
+  .attr("name", "key")
+  .attr("value", (d) => d);
 
-// labels
-//   .append("svg")
-//   .attr("viewBox", "0 0 1 1")
-//   .attr("height", "1em")
-//   .attr("fill", (d) => colorScale(d))
-//   .append("rect")
-//   .attr("width", "1")
-//   .attr("height", "1");
+labels
+  .append("svg")
+  .attr("viewBox", "0 0 1 1")
+  .attr("height", "1em")
+  .attr("fill", (d) => colorScale(d))
+  .append("rect")
+  .attr("width", "1")
+  .attr("height", "1");
 
-// form
-//   .select("label")
-//   .style("opacity", "0")
-//   .style("visibility", "hidden")
-//   .select("input")
-//   .property("checked", true);
+form
+  .select("label")
+  .style("opacity", "0")
+  .style("visibility", "hidden")
+  .select("input")
+  .property("checked", true);
 
-// labels.style("cursor", "pointer");
+labels.style("cursor", "pointer");
 
-// form.on("input", (e) => {
-//   const { value: key } = e.target;
-//   const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
+form.on("input", (e) => {
+  const { value: key } = e.target;
+  const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
 
-//   if (key === "Show all") {
-//     labels
-//       .transition(transition)
-//       .style("opacity", "1")
-//       .style("filter", "grayscale(0)");
+  if (key === "Show all") {
+    labels
+      .transition(transition)
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
 
-//     form
-//       .select("label")
-//       .transition(transition)
-//       .style("opacity", "0")
-//       .style("visibility", "hidden");
+    form
+      .select("label")
+      .transition(transition)
+      .style("opacity", "0")
+      .style("visibility", "hidden");
 
-//     group.transition(transition).call(stackedBarChart.keys(keys));
-//   } else {
-//     labels
-//       .filter((d) => d !== key)
-//       .transition(transition)
-//       .style("opacity", "0.25")
-//       .style("filter", "grayscale(1)");
+    group.transition(transition).call(stackedBarChart.keys(keys));
+  } else {
+    labels
+      .filter((d) => d !== key)
+      .transition(transition)
+      .style("opacity", "0.25")
+      .style("filter", "grayscale(1)");
 
-//     form
-//       .select("label")
-//       .transition(transition)
-//       .style("filter", "grayscale(0)")
-//       .style("opacity", "1")
-//       .style("visibility", "visible");
+    form
+      .select("label")
+      .transition(transition)
+      .style("filter", "grayscale(0)")
+      .style("opacity", "1")
+      .style("visibility", "visible");
 
-//     labels
-//       .filter((d) => d === key)
-//       .style("opacity", "1")
-//       .style("filter", "grayscale(0)");
+    labels
+      .filter((d) => d === key)
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
 
-//     group.transition(transition).call(stackedBarChart.keys([key]));
-//   }
-// });
+    group.transition(transition).call(stackedBarChart.keys([key]));
+  }
+});

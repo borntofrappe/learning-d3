@@ -11,3 +11,5 @@ One way to cope with the comparison: allow to select and highlight a specific ca
 ## Implementation
 
 The `stackedBarChartComponent` takes inspiration from [the source code for `d3-axis`](https://github.com/d3/d3-axis/blob/main/src/axis.js).
+
+<!-- ## Default arguments -->
