@@ -157,23 +157,36 @@ const data = [
 ];
 
 const keys = Object.keys(data[0]).filter((d) => d !== "date");
-const scaleColor = d3.scaleOrdinal(d3.schemeTableau10).domain(keys);
+const scaleColor = d3
+  .scaleOrdinal(d3.schemeTableau10)
+  .domain(keys)
+  .unknown("currentColor");
 
 const article = d3.select("body").append("article");
 article.append("h2").text("Stacked Bar Chart");
-const legendKeys = article.append("div").attr("class", "legend");
 
-const legendsKeys = legendKeys
-  .selectAll("span")
-  .data(keys)
+const legend = article
+  .append("form")
+  .attr("class", "legend")
+  .on("submit", (e) => e.preventDefault());
+
+const legendLabels = legend
+  .selectAll("label")
+  .data(["Show all", ...keys])
   .enter()
-  .append("span")
+  .append("label")
   .text((d) => d);
 
-legendsKeys
+legendLabels
+  .append("input")
+  .attr("type", "radio")
+  .attr("name", "key")
+  .attr("value", (d) => d);
+
+legendLabels
   .append("svg")
   .attr("viewBox", "0 0 1 1")
-  .style("height", "1em")
+  .attr("height", "1em")
   .attr("fill", (d) => scaleColor(d))
   .append("rect")
   .attr("width", "1")
@@ -205,29 +218,51 @@ const group = svg
 const stackedBarChart = stackedBarChartComponent().data(data).keys(keys);
 group.call(stackedBarChart);
 
-legendsKeys.style("cursor", "pointer").on("click", function (e, key) {
-  e.stopPropagation();
+legend
+  .select("label")
+  .style("opacity", "0")
+  .style("visibility", "hidden")
+  .select("input")
+  .property("checked", true);
 
+legendLabels.style("cursor", "pointer");
+
+legend.on("input", (e) => {
+  const { value: key } = e.target;
   const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
 
-  legendsKeys
-    .filter((d) => d !== key)
-    .transition(transition)
-    .style("opacity", "0.25")
-    .style("filter", "grayscale(1)");
+  if (key === "Show all") {
+    legendLabels
+      .transition(transition)
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
 
-  group.transition(transition).call(stackedBarChart.keys([key]));
+    legend
+      .select("label")
+      .transition(transition)
+      .style("opacity", "0")
+      .style("visibility", "hidden");
 
-  d3.select(this).style("opacity", "1").style("filter", "grayscale(0)");
-});
+    group.transition(transition).call(stackedBarChart.keys(keys));
+  } else {
+    legendLabels
+      .filter((d) => d !== key)
+      .transition(transition)
+      .style("opacity", "0.25")
+      .style("filter", "grayscale(1)");
 
-article.on("click", () => {
-  const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
+    legend
+      .select("label")
+      .transition(transition)
+      .style("filter", "grayscale(0)")
+      .style("opacity", "1")
+      .style("visibility", "visible");
 
-  legendsKeys
-    .transition(transition)
-    .style("opacity", "1")
-    .style("filter", "grayscale(0)");
+    legendLabels
+      .filter((d) => d === key)
+      .style("opacity", "1")
+      .style("filter", "grayscale(0)");
 
-  group.transition(transition).call(stackedBarChart.keys(keys));
+    group.transition(transition).call(stackedBarChart.keys([key]));
+  }
 });

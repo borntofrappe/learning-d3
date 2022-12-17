@@ -12,7 +12,7 @@ body {
 }
 
 article {
-  max-width: 60rem;
+  max-width: 56rem;
   margin: 1rem auto;
   padding: 1rem;
 }
@@ -21,16 +21,38 @@ article > * + * {
   margin-top: 0.75em;
 }
 
-.legend {
-  justify-content: center;
-  align-items: center;
+form {
   display: flex;
+  justify-content: space-evenly;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.legend svg {
-  margin-inline: 0.5em 1em;
+label {
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0 0.5rem;
+}
+
+label input {
+  width: 1em;
+  height: 1em;
+  opacity: 0;
+}
+
+label svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  top: 0;
+  right: 0;
+  position: absolute;
+}
+
+.stacked-bar-chart {
+  display: block;
 }
 
 .stacked-bar-chart .axis-y path {
