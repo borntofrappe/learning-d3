@@ -162,46 +162,19 @@ const scaleColor = d3
   .domain(keys)
   .unknown("currentColor");
 
-const article = d3.select("body").append("article");
-article.append("h2").text("Stacked Bar Chart");
-
-const legend = article
-  .append("form")
-  .attr("class", "legend")
-  .on("submit", (e) => e.preventDefault());
-
-const legendLabels = legend
-  .selectAll("label")
-  .data(["Show all", ...keys])
-  .enter()
-  .append("label")
-  .text((d) => d);
-
-legendLabels
-  .append("input")
-  .attr("type", "radio")
-  .attr("name", "key")
-  .attr("value", (d) => d);
-
-legendLabels
-  .append("svg")
-  .attr("viewBox", "0 0 1 1")
-  .attr("height", "1em")
-  .attr("fill", (d) => scaleColor(d))
-  .append("rect")
-  .attr("width", "1")
-  .attr("height", "1");
+const root = d3.select("body").append("div").attr("id", "root");
+root.append("h1").text("Stacked Bar Chart Component");
 
 const width = 600;
 const height = 375;
 const margin = {
-  top: 30,
+  top: 10,
   bottom: 25,
   left: 35,
   right: 10,
 };
 
-const svg = article
+const svg = root
   .append("svg")
   .attr("class", "stacked-bar-chart")
   .attr(
@@ -218,26 +191,50 @@ const group = svg
 const stackedBarChart = stackedBarChartComponent().data(data).keys(keys);
 group.call(stackedBarChart);
 
-legend
+const form = root.append("form").on("submit", (e) => e.preventDefault());
+
+const labels = form
+  .selectAll("label")
+  .data(["Show all", ...keys])
+  .enter()
+  .append("label")
+  .text((d) => d);
+
+labels
+  .append("input")
+  .attr("type", "radio")
+  .attr("name", "key")
+  .attr("value", (d) => d);
+
+labels
+  .append("svg")
+  .attr("viewBox", "0 0 1 1")
+  .attr("height", "1em")
+  .attr("fill", (d) => scaleColor(d))
+  .append("rect")
+  .attr("width", "1")
+  .attr("height", "1");
+
+form
   .select("label")
   .style("opacity", "0")
   .style("visibility", "hidden")
   .select("input")
   .property("checked", true);
 
-legendLabels.style("cursor", "pointer");
+labels.style("cursor", "pointer");
 
-legend.on("input", (e) => {
+form.on("input", (e) => {
   const { value: key } = e.target;
   const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
 
   if (key === "Show all") {
-    legendLabels
+    labels
       .transition(transition)
       .style("opacity", "1")
       .style("filter", "grayscale(0)");
 
-    legend
+    form
       .select("label")
       .transition(transition)
       .style("opacity", "0")
@@ -245,20 +242,20 @@ legend.on("input", (e) => {
 
     group.transition(transition).call(stackedBarChart.keys(keys));
   } else {
-    legendLabels
+    labels
       .filter((d) => d !== key)
       .transition(transition)
       .style("opacity", "0.25")
       .style("filter", "grayscale(1)");
 
-    legend
+    form
       .select("label")
       .transition(transition)
       .style("filter", "grayscale(0)")
       .style("opacity", "1")
       .style("visibility", "visible");
 
-    legendLabels
+    labels
       .filter((d) => d === key)
       .style("opacity", "1")
       .style("filter", "grayscale(0)");

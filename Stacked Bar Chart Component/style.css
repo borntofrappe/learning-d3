@@ -11,44 +11,22 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
-article {
+#root {
   max-width: 56rem;
   margin: 1rem auto;
   padding: 1rem;
 }
 
-article > * + * {
+#root > * + * {
   margin-top: 0.75em;
 }
 
-form {
-  display: flex;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+h1 {
+  font-size: 1.43rem;
 }
 
-label {
-  cursor: pointer;
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0 0.5rem;
-}
-
-label input {
-  width: 1em;
-  height: 1em;
-  opacity: 0;
-}
-
-label svg {
-  display: block;
-  width: 1em;
-  height: 1em;
-  top: 0;
-  right: 0;
-  position: absolute;
+p {
+  line-height: 1.5;
 }
 
 .stacked-bar-chart {
@@ -73,4 +51,35 @@ label svg {
   color: hsl(0, 0%, 37%);
   font-size: 0.6rem;
   font-weight: 700;
+}
+
+form {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+label {
+  color: hsl(0, 0%, 25%);
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0 0.5rem;
+}
+
+label input {
+  width: 1em;
+  height: 1em;
+  opacity: 0;
+}
+
+label svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  top: 0;
+  right: 0;
+  position: absolute;
 }

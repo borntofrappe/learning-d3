@@ -1,8 +1,14 @@
 # Stacked Bar Chart Component
 
-Create a component function to map data in a stacked bar chart. Animate the transition whenever the function is called with a different set of arguments.
+Create a component function to map data with an interactive stacked bar chart. Animate the transition whenever the function is called with a different set of arguments.
 
-## Inspiration
+## Input
+
+The issue I personally have with _stacked_ bar charts is that it can be difficult to understand how the individual categories change over time (except the bottom-most one perhaps).
+
+One way to cope with the comparison: allow to select and highlight a specific category.
+
+## Implementation
 
 [d3-axis API](https://github.com/d3/d3-axis/blob/main/src/axis.js).
 
