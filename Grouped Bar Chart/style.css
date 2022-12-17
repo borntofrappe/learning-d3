@@ -32,3 +32,23 @@ article > * + * {
 .legend svg {
   margin-inline: 0.5em 1em;
 }
+
+.stacked-bar-chart .axis-y path {
+  opacity: 0;
+}
+
+.stacked-bar-chart .axis-y text {
+  color: hsl(0, 0%, 25%);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stacked-bar-chart .axis-x path {
+  color: hsl(0, 0%, 57%);
+}
+
+.stacked-bar-chart .axis-x text {
+  color: hsl(0, 0%, 37%);
+  font-size: 0.6rem;
+  font-weight: 700;
+}
