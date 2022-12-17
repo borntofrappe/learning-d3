@@ -87,7 +87,7 @@ const stackedBarChartComponent = () => {
               .append("rect")
               .attr("x", (d) => scaleX(timeParse(d.data.date)))
               .attr("width", scaleX.bandwidth())
-              .attr("y", (d) => scaleY(d[0]))
+              .attr("y", height)
               .attr("height", "0")
               .transition(context)
               .attr("y", (d) => scaleY(d[1]))
@@ -102,7 +102,11 @@ const stackedBarChartComponent = () => {
               .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
           },
           (exit) => {
-            exit.transition(context).attr("height", "0").remove();
+            exit
+              .transition(context)
+              .attr("y", height)
+              .attr("height", "0")
+              .remove();
           }
         );
 
