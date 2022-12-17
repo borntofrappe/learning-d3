@@ -1,58 +1,57 @@
 const stackedBarChartComponent = () => {
   let data;
   let keys;
+  let width;
+  let height;
+  let xAccessor = (_, i) => i;
+  let xFormat = (d) => d;
+  let valueFormat = (d) => d;
+  let colorScale = d3.scaleOrdinal().domain(d3.schemeTableau10);
 
   const stack = d3.stack();
-  const scaleX = d3.scaleBand().range([0, width]).padding(0.4);
-  const scaleY = d3.scaleLinear().range([height, 0]);
+  const xScale = d3.scaleBand().padding(0.4);
+  const yScale = d3.scaleLinear();
 
-  const axisX = d3
-    .axisBottom(scaleX)
-    .tickFormat((d) => timeFormat(d))
-    .tickSize(0)
-    .tickPadding(10);
+  const xAxis = d3.axisBottom(xScale).tickSize(0).tickPadding(10);
+  const yAxis = d3.axisLeft(yScale).ticks(4).tickSize(0).tickPadding(6);
 
-  const axisY = d3
-    .axisLeft(scaleY)
-    .ticks(4)
-    .tickFormat((d) => (d ? `${d} h` : ""))
-    .tickSize(0)
-    .tickPadding(6);
-
-  const timeParse = d3.timeParse("%Y-%m-%d");
-  const timeFormat = d3.timeFormat("%b %-d");
-
-  const stackedBar = (context) => {
+  const stackedBarChartComponent = (context) => {
     const series = stack.keys(keys)(data);
 
     const selection = context.selection ? context.selection() : context;
 
-    scaleX.domain(data.map((d) => timeParse(d.date)));
-    scaleY.domain([0, d3.max(series[series.length - 1], (d) => d[1])]);
+    xScale.domain(data.map((d) => xAccessor(d))).range([0, width]);
 
-    let groupAxisX = selection.selectAll("g.axis-x").data([null]);
-    let groupAxisY = selection.selectAll("g.axis-y").data([null]);
+    yScale
+      .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
+      .range([height, 0]);
+
+    xAxis.tickFormat((d) => xFormat(d));
+    yAxis.tickFormat((d) => valueFormat(d));
+
+    let groupxAxis = selection.selectAll("g.axis-x").data([null]);
+    let groupyAxis = selection.selectAll("g.axis-y").data([null]);
     let groupsSeries = selection
       .selectAll("g.series")
       .data(series, (d) => d.key);
 
-    groupAxisX = groupAxisX.merge(
-      groupAxisX
+    groupxAxis = groupxAxis.merge(
+      groupxAxis
         .enter()
         .append("g")
         .attr("class", "axis-x")
         .attr("transform", `translate(0 ${height})`)
     );
 
-    groupAxisY = groupAxisY.merge(
-      groupAxisY.enter().append("g").attr("class", "axis-y")
+    groupyAxis = groupyAxis.merge(
+      groupyAxis.enter().append("g").attr("class", "axis-y")
     );
 
     const groupsSeriesEnter = groupsSeries
       .enter()
       .append("g")
       .attr("class", "series")
-      .attr("fill", (d) => scaleColor(d.key));
+      .attr("fill", (d) => colorScale(d.key));
 
     let groupsSeriesExit = groupsSeries.exit();
 
@@ -61,22 +60,22 @@ const stackedBarChartComponent = () => {
       .data((d) => d)
       .enter()
       .append("rect")
-      .attr("x", (d) => scaleX(timeParse(d.data.date)))
-      .attr("width", scaleX.bandwidth())
-      .attr("y", (d) => scaleY(d[1]))
-      .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+      .attr("x", (d) => xScale(xAccessor(d.data)))
+      .attr("width", xScale.bandwidth())
+      .attr("y", (d) => yScale(d[1]))
+      .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
 
     if (context !== selection) {
-      groupAxisX = groupAxisX.transition(context);
-      groupAxisY = groupAxisY.transition(context);
+      groupxAxis = groupxAxis.transition(context);
+      groupyAxis = groupyAxis.transition(context);
 
       groupsSeriesEnter
         .selectAll("rect")
         .attr("y", height)
         .attr("height", "0")
         .transition(context)
-        .attr("y", (d) => scaleY(d[1]))
-        .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+        .attr("y", (d) => yScale(d[1]))
+        .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
 
       groupsSeries
         .selectAll("rect")
@@ -85,21 +84,21 @@ const stackedBarChartComponent = () => {
           (enter) => {
             enter
               .append("rect")
-              .attr("x", (d) => scaleX(timeParse(d.data.date)))
-              .attr("width", scaleX.bandwidth())
+              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("width", xScale.bandwidth())
               .attr("y", height)
               .attr("height", "0")
               .transition(context)
-              .attr("y", (d) => scaleY(d[1]))
-              .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+              .attr("y", (d) => yScale(d[1]))
+              .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
           },
           (update) => {
             update
               .transition(context)
-              .attr("x", (d) => scaleX(timeParse(d.data.date)))
-              .attr("width", scaleX.bandwidth())
-              .attr("y", (d) => scaleY(d[1]))
-              .attr("height", (d) => scaleY(d[0]) - scaleY(d[1]));
+              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("width", xScale.bandwidth())
+              .attr("y", (d) => yScale(d[1]))
+              .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
           },
           (exit) => {
             exit
@@ -121,25 +120,67 @@ const stackedBarChartComponent = () => {
 
     groupsSeriesExit.remove();
 
-    groupAxisX.call(axisX);
-    groupAxisY.call(axisY);
+    groupxAxis.call(xAxis);
+    groupyAxis.call(yAxis);
   };
 
-  stackedBar.data = function (d) {
+  stackedBarChartComponent.data = function (d) {
     if (!arguments.length) return data;
 
     data = d;
     return this;
   };
 
-  stackedBar.keys = function (d) {
+  stackedBarChartComponent.keys = function (d) {
     if (!arguments.length) return keys;
 
     keys = d;
     return this;
   };
 
-  return stackedBar;
+  stackedBarChartComponent.width = function (d) {
+    if (!arguments.length) return width;
+
+    width = d;
+    return this;
+  };
+
+  stackedBarChartComponent.height = function (d) {
+    if (!arguments.length) return height;
+
+    height = d;
+    return this;
+  };
+
+  stackedBarChartComponent.xAccessor = function (d) {
+    if (!arguments.length) return xAccessor;
+
+    xAccessor = d;
+    return this;
+  };
+
+  stackedBarChartComponent.xFormat = function (d) {
+    if (!arguments.length) return xFormat;
+
+    xFormat = d;
+    return this;
+  };
+
+  stackedBarChartComponent.valueFormat = function (d) {
+    if (!arguments.length) return valueFormat;
+
+    valueFormat = d;
+    return this;
+  };
+
+  stackedBarChartComponent.colorScale = function (d) {
+    if (!arguments.length) return colorScale;
+
+    colorScale = d;
+    return this;
+  };
+
+  return stackedBarChartComponent;
 };
 
 // prettier-ignore
@@ -160,15 +201,6 @@ const data = [
   { "date": "2022-12-16", "Email & messages": 1, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 }
 ];
 
-const keys = Object.keys(data[0]).filter((d) => d !== "date");
-const scaleColor = d3
-  .scaleOrdinal(d3.schemeTableau10)
-  .domain(keys)
-  .unknown("currentColor");
-
-const root = d3.select("body").append("div").attr("id", "root");
-root.append("h1").text("Stacked Bar Chart Component");
-
 const width = 600;
 const height = 375;
 const margin = {
@@ -177,6 +209,34 @@ const margin = {
   left: 35,
   right: 10,
 };
+
+const keys = Object.keys(data[0]).filter((d) => d !== "date");
+
+const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%b %-d");
+
+const xAccessor = (d) => d.date;
+const xFormat = (d) => timeFormat(timeParse(d));
+
+const valueFormat = (d) => (d ? `${d} h` : "");
+
+const colorScale = d3
+  .scaleOrdinal(d3.schemeTableau10)
+  .domain(keys)
+  .unknown("currentColor");
+
+const stackedBarChart = stackedBarChartComponent()
+  .data(data)
+  .keys(keys)
+  .width(width)
+  .height(height)
+  .xAccessor(xAccessor)
+  .xFormat(xFormat)
+  .valueFormat(valueFormat)
+  .colorScale(colorScale);
+
+const root = d3.select("body").append("div").attr("id", "root");
+root.append("h1").text("Stacked Bar Chart Component");
 
 const svg = root
   .append("svg")
@@ -192,7 +252,6 @@ const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const stackedBarChart = stackedBarChartComponent().data(data).keys(keys);
 group.call(stackedBarChart);
 
 const form = root.append("form").on("submit", (e) => e.preventDefault());
@@ -214,7 +273,7 @@ labels
   .append("svg")
   .attr("viewBox", "0 0 1 1")
   .attr("height", "1em")
-  .attr("fill", (d) => scaleColor(d))
+  .attr("fill", (d) => colorScale(d))
   .append("rect")
   .attr("width", "1")
   .attr("height", "1");
