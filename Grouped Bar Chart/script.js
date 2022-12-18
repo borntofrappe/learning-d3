@@ -1,5 +1,5 @@
 // prettier-ignore
-const data = [
+const dataset = [
     { "date": "2022-12-03", "Email & messages": 1, "Writing": 2, "Coding": 3, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 1 },
     { "date": "2022-12-04", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 1, "Research": 1, "Paperwork": 0, "Planning": 0 },
     { "date": "2022-12-05", "Email & messages": 0, "Writing": 1, "Coding": 2, "Designing": 0, "Research": 1, "Paperwork": 2, "Planning": 0 },
@@ -15,3 +15,73 @@ const data = [
     { "date": "2022-12-15", "Email & messages": 1, "Writing": 0, "Coding": 4, "Designing": 1, "Research": 0, "Paperwork": 0, "Planning": 0 },
     { "date": "2022-12-16", "Email & messages": 1, "Writing": 1, "Coding": 2, "Designing": 2, "Research": 0, "Paperwork": 0, "Planning": 1 }
   ];
+
+const datapoints = 5;
+const data = dataset.slice(0, datapoints);
+const keys = Object.keys(data[0]).filter((d) => d !== "date");
+
+const width = 600;
+const height = 375;
+const margin = {
+  top: 10,
+  bottom: 25,
+  left: 40,
+  right: 10,
+};
+
+const timeParse = d3.timeParse("%Y-%m-%d");
+const timeFormat = d3.timeFormat("%b %-d");
+
+const yMax = d3.max(data, (d) =>
+  d3.max(
+    Object.entries(d)
+      .filter((d) => d[0] !== "date")
+      .map((d) => d[1])
+  )
+);
+
+const xScale = d3
+  .scaleBand()
+  .domain(data.map((d) => d.date))
+  .range([0, width]);
+
+const yScale = d3.scaleLinear().domain([0, yMax]).range([height, 0]);
+
+const xAxis = d3
+  .axisBottom(xScale)
+  .tickSize(0)
+  .tickPadding(10)
+  .tickFormat((d) => timeFormat(timeParse(d)));
+
+const yAxis = d3
+  .axisLeft(yScale)
+  .ticks(4)
+  .tickSize(0)
+  .tickPadding(6)
+  .tickFormat((d) => (d ? `${d} h` : ""));
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr("class", "chart")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g");
+const groupData = group.append("g");
+
+groupAxis
+  .append("g")
+  .attr("class", "axis-x")
+  .attr("transform", `translate(0 ${height})`)
+  .call(xAxis);
+
+groupAxis.append("g").attr("class", "axis-y").call(yAxis);
