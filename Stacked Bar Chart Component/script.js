@@ -7,12 +7,12 @@ const stackedBarChartComponent = () => {
     { apples: 320, bananas: 480, cherries: 640, durians: 400 },
   ];
   let keys = Object.keys(data[0]);
-  let width = 500;
-  let height = 250;
   let xAccessor = (_, i) => i;
   let xFormat = (d) => d;
   let valueFormat = (d) => d;
   let colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
+  let width = 500;
+  let height = 250;
 
   const stack = d3.stack();
   const xScale = d3.scaleBand().padding(0.4);
@@ -26,7 +26,7 @@ const stackedBarChartComponent = () => {
 
     const selection = context.selection ? context.selection() : context;
 
-    xScale.domain(data.map((d, i) => xAccessor(d, i))).range([0, width]);
+    xScale.domain(data.map(xAccessor)).range([0, width]);
 
     yScale
       .domain([0, d3.max(series[series.length - 1], (d) => d[1])])
@@ -62,6 +62,8 @@ const stackedBarChartComponent = () => {
     let groupsSeriesExit = groupsSeries.exit();
 
     if (context !== selection) {
+      selection.selectAll("*").interrupt();
+
       groupXAxis = groupXAxis.transition(context);
       groupYAxis = groupYAxis.transition(context);
 
@@ -85,7 +87,7 @@ const stackedBarChartComponent = () => {
           (enter) => {
             enter
               .append("rect")
-              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("x", (d, i) => xScale(xAccessor(d.data, i)))
               .attr("width", xScale.bandwidth())
               .attr("y", height)
               .attr("height", "0")
@@ -96,7 +98,7 @@ const stackedBarChartComponent = () => {
           (update) => {
             update
               .transition(context)
-              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("x", (d, i) => xScale(xAccessor(d.data, i)))
               .attr("width", xScale.bandwidth())
               .attr("y", (d) => yScale(d[1]))
               .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
@@ -135,14 +137,14 @@ const stackedBarChartComponent = () => {
           (enter) => {
             enter
               .append("rect")
-              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("x", (d, i) => xScale(xAccessor(d.data, i)))
               .attr("width", xScale.bandwidth())
               .attr("y", (d) => yScale(d[1]))
               .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
           },
           (update) => {
             update
-              .attr("x", (d) => xScale(xAccessor(d.data)))
+              .attr("x", (d, i) => xScale(xAccessor(d.data, i)))
               .attr("width", xScale.bandwidth())
               .attr("y", (d) => yScale(d[1]))
               .attr("height", (d) => yScale(d[0]) - yScale(d[1]));
@@ -152,7 +154,7 @@ const stackedBarChartComponent = () => {
           }
         );
 
-      groupsSeriesExit.selectAll("rect").attr("y", height).attr("height", "0");
+      groupsSeriesExit.selectAll("rect").remove();
     }
 
     groupsSeriesExit.remove();
@@ -161,31 +163,17 @@ const stackedBarChartComponent = () => {
     groupYAxis.call(yAxis);
   };
 
-  stackedBarChartComponent.data = function (d) {
+  stackedBarChartComponent.data = function (array) {
     if (!arguments.length) return data;
 
-    data = d;
+    data = array;
     return this;
   };
 
-  stackedBarChartComponent.keys = function (d) {
+  stackedBarChartComponent.keys = function (array) {
     if (!arguments.length) return keys;
 
-    keys = d;
-    return this;
-  };
-
-  stackedBarChartComponent.width = function (size) {
-    if (!arguments.length) return width;
-
-    width = size;
-    return this;
-  };
-
-  stackedBarChartComponent.height = function (size) {
-    if (!arguments.length) return height;
-
-    height = size;
+    keys = array;
     return this;
   };
 
@@ -217,6 +205,20 @@ const stackedBarChartComponent = () => {
     return this;
   };
 
+  stackedBarChartComponent.width = function (number) {
+    if (!arguments.length) return width;
+
+    width = number;
+    return this;
+  };
+
+  stackedBarChartComponent.height = function (number) {
+    if (!arguments.length) return height;
+
+    height = number;
+    return this;
+  };
+
   return stackedBarChartComponent;
 };
 
@@ -240,15 +242,6 @@ const data = [
 
 const keys = Object.keys(data[0]).filter((d) => d !== "date");
 
-const width = 600;
-const height = 375;
-const margin = {
-  top: 10,
-  bottom: 25,
-  left: 40,
-  right: 10,
-};
-
 const xAccessor = (d) => d.date;
 
 const timeParse = d3.timeParse("%Y-%m-%d");
@@ -262,15 +255,24 @@ const colorScale = d3
   .domain(keys)
   .unknown("currentColor");
 
+const width = 600;
+const height = 375;
+const margin = {
+  top: 10,
+  bottom: 25,
+  left: 40,
+  right: 10,
+};
+
 const stackedBarChart = stackedBarChartComponent()
   .data(data)
   .keys(keys)
-  .width(width)
-  .height(height)
   .xAccessor(xAccessor)
   .xFormat(xFormat)
   .valueFormat(valueFormat)
-  .colorScale(colorScale);
+  .colorScale(colorScale)
+  .width(width)
+  .height(height);
 
 const root = d3.select("body").append("div").attr("id", "root");
 root.append("h1").text("Stacked Bar Chart Component");
