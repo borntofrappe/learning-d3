@@ -1,20 +1,68 @@
 # [Stacked Bar Chart Component](https://codepen.io/borntofrappe/full/wvxwjGY)
 
-Create a component function to map data with an interactive stacked bar chart. Transition the elements whenever the function is called with a different set of arguments.
+Create a component function to map data with an interactive stacked bar chart. Apply a transition if the function is called with a d3 transition instead of a d3 selection.
 
-## Input
+## Goal
 
-The issue I personally have with _stacked_ bar charts is that it can be difficult to understand how the individual categories change over time (except the bottom-most one perhaps).
+Map data with a stacked bar chart to highlight the overall trend for several categories. Allow to select a category to examine the change of the individual components.
 
-One way to cope with the comparison: allow to select and highlight a specific category.
+## How to use
 
-## Implementation
+Create an instance.
 
-`stackedBarChartComponent` takes inspiration from [the source code for the `d3-axis` module](https://github.com/d3/d3-axis/blob/main/src/axis.js).
+```js
+const stackedBarChart = stackedBarChartComponent();
+```
 
-> being my first attempt at a component function which handles a transition and a relatively complex SVG structure, the code is bound to have several areas of improvement
+Inject the chart in a D3 selection.
 
-### Enter update exit
+```js
+group.call(stackedBarChart);
+```
+
+Update and call as needed.
+
+```js
+stackedBarChart.height = 500;
+group.call(stackedBarChart);
+```
+
+Apply a transition.
+
+```js
+group.transition().duration(500).call(stackedBarChart);
+```
+
+Set different values to customize the chart and map the desired data:
+
+- `data`: an array of objects with repeated keys, which you intend to highlight with stacked values
+
+- `keys`: an array of strings describing which key you want to stack in the input data
+
+- `width` and `height`: numbers for the dimensions of the chart
+
+- `xAccessor`: a function to decide which value is used to position the series horizontally
+
+  The component uses an instance of `d3.scaleBand()` to position the arrays produced with `d3.stack`.
+
+  By default I set the accessor function to use the index in the arrays, but to highlight a different value, say a date, you pass an accessor function which points to the specific property.
+
+- `xFormat`: a function to format the labels for the ticks of the horizontal axis
+
+- `valueFormat`: a function to format the labels for the ticks of the vertical axis
+
+- `colorScale`: a function which maps the keys to a color value.
+
+  I prefer not to create the scale in the component since you might want to enforce a color scheme for all the keys and then visualize only a subset, but with the same colors.
+
+---
+
+## Source code
+
+In the script I take inspiration from [the source code for the `d3-axis` module](https://github.com/d3/d3-axis/blob/main/src/axis.js).
+Being my first attempt at a component function which handles a transition, as well as a relatively complex SVG structure, the code is bound to have several areas of improvement.
+
+### Getting started
 
 The component function is called on a group element.
 
@@ -30,9 +78,15 @@ The challenge is that you ultimately want to update the instance of the function
 group.call(stackedBarChart.keys([keys[0]]));
 ```
 
-With this in mind you cannot just add elements on the input selection through the `.append` method. You need to handle the D3's pattern of enter, update, and exit selections.
+What is more, you want to optionally apply a transition, similarly to how you'd transition an axis produced with the `d3-axis` module.
 
-To understand how consider the section relative to the axis (roughly line 38):
+```js
+group.transition().call(stackedBarChart.keys([keys[0]]));
+```
+
+### Enter-update-exit
+
+Consider the section relative to the axis (roughly line 38):
 
 - use `selectAll` to target group elements with a specific class
 
@@ -40,9 +94,9 @@ To understand how consider the section relative to the axis (roughly line 38):
   let groupXAxis = selection.selectAll("g.axis-x").data([null]);
   ```
 
-  Use `let` since the variable is going to be updated throughout the rest of the function
+  Use `let` since the variable is going to be updated throughout the rest of the function.
 
-- bind a solitary value — `[null]` — since the axis is meant to be one and one only
+- bind a solitary value since the axis is meant to be one and one only
 
   ```js
   let groupXAxis = selection.selectAll("g.axis-x").data([null]);
@@ -60,9 +114,9 @@ To understand how consider the section relative to the axis (roughly line 38):
   );
   ```
 
-  In the variable you now have a reference to the solitary group element, whether appended with the enter selection or found throuh the update counterpart.
+  In the variable you now have a reference to the solitary group element, whether appended with the enter selection or found through the update counterpart.
 
-  You can actually create an intermediate step, storing the enter selection if you need more clarity.
+  You can actually create an intermediate step, storing the enter selection, if you need more clarity.
 
   ```js
   groupXAxisEnter = groupXAxis
@@ -74,23 +128,21 @@ To understand how consider the section relative to the axis (roughly line 38):
   groupXAxis = groupXAxis.merge(groupXAxisEnter);
   ```
 
-  This is actually the approach used for the group elements relative to the data points, since you need a specific handle on the new elements.
-
-  - finally, inject the axis elements as you would with a regular axis, invoking the instance of `d3.axisBottom` on the group element.
+  - inject the axis elements as you would with a regular axis, invoking the instance of `d3.axisBottom` on the group element.
 
   ```js
   groupXAxis.call(xAxis);
   ```
 
-### Context
+### Transition
 
-Consider how you would ultimately transition axis functions generated through the `d3-axis` module.
+Once more consider how you would transition axis functions generated through the `d3-axis` module.
 
 ```js
 groupXAxis.transition().call(xAxis);
 ```
 
-Since the `.transition` method returns a transition selection, the axis function here receives a transition, not the group element.
+Since [`selection.transition()`](https://github.com/d3/d3-transition/blob/main/README.md#selection_transition) returns a transition, the axis function here receives a transition, not the group element.
 
 ---
 
@@ -109,7 +161,7 @@ In light of this:
 - declare the function's parameter as `context`, reflecting the different types of input
 
   ```js
-  const stackedBarChartComponent = (context) => {
+  const stackedBarChartComponent = (context) => {};
   ```
 
 - retrieve `selection`, the element, either as the value of `context.selection()` or through the `context` variable itself
@@ -118,7 +170,7 @@ In light of this:
   const selection = context.selection ? context.selection() : context;
   ```
 
-  In the moment you pass a transition, this transition has a `.selection` method to retrieve the element. When you pass an element however, there is no such reference.
+  In the moment you pass a transition, this object has a `.selection` method to retrieve the current selection. When you pass an element however, there is no such reference.
 
 - proceed with the logic [of the previous section](#enter-update-exit), adding elements on `selection` like `groupXAxis`
 
@@ -130,24 +182,23 @@ In light of this:
   }
   ```
 
-- finally, update the reference to `groupXAxis` so that the variable refers to the transition
+- update the reference to `groupXAxis` so that the variable refers to the transition
 
   ```js
-  groupXAxis.call(xAxis);
+  groupXAxis = groupXAxis.transition(context);
   ```
 
   The instruction is essential if you consider how you finally update the axis' elements.
 
   ```js
   groupXAxis.call(xAxis);
-  // xAxis(groupXAxis);
   ```
 
   In this manner the axis function receives the transition if there is such a transition, or the element if the `if` statement is not executed.
 
-### Practice makes perfect
+### groupYAxis
 
-For the vertical axis the logic repeats the steps discussed for the x axis:
+For the vertical axis the script repeats the steps for the horizontal axis:
 
 - use `selectAll` to bind a single value
 
@@ -179,7 +230,7 @@ For the vertical axis the logic repeats the steps discussed for the x axis:
 
 ### Data
 
-For the elements bound to the data points, the logic is slightly more convoluted. This is because you need to map two layers of elements: the group for the stacks and the rectangles for the bars in each stack.
+For the elements bound to the data points, the logic is slightly more convoluted. This is because you need to map two layers of elements: the group for the stacks and the rectangles for the bars in each stack. Furthermore, you need to handle the transition of the rectangles.
 
 - use `selectAll` to find the group elements with a specific class
 
@@ -215,7 +266,7 @@ From this basis, you now have:
 
 2. existing group elements, potentially with a different number of rectangles
 
-3. old group elements
+3. old group elements, with a set of rectangle children
 
 Without a transition you would:
 
@@ -232,7 +283,7 @@ Without a transition you would:
 - remove rectangles from the exit selection
 
   ```js
-  groupsSeriesExit.selectAll("rect").attr("y", height).attr("height", "0");
+  groupsSeriesExit.selectAll("rect").remove();
   ```
 
   Ultimately you remove the group elements altogether, so the instruction might be redundant.
@@ -271,14 +322,28 @@ Without a transition you would:
     update.attr("x", "").attr("y", "").attr("width", "").attr("height", "");
   ```
 
-With a transition you ultimately repeat the instructions, but choose how you want to animate the elements. In the specific demo, for instance, I decided to have new rectangles grow from the bottom of the chart, and old elements shrink toward the same spot. Just take notice of the final line in the body of the `if` statement.
+With a transition you ultimately repeat the instructions, but choose how you want to animate the elements. In the specific demo, for instance, I decided to have new rectangles grow from the bottom of the chart, and old elements shrink toward the same spot.
 
-```js
-groupsSeriesExit = groupsSeriesExit.transition(context);
-```
+That being said, take notice of two additional lines in the body of the `if` statement evaluating that `context` describes a transition, not a selection:
 
-As in previous instances, the instruction is necessary to have the variable refer to the transition. Here specifically it is necessary to "stall" the removal of the old group elements, until the nested rectangle elements are transitioned outside of sight.
+1. the first line
 
-```js
-groupsSeriesExit.remove();
-```
+   ```js
+   selection.selectAll("*").interrupt();
+   ```
+
+   I found that rapidly changing the categories has the effect of stacking transitions. It might happen that you end up with an empty chart, where the rectangles are added and then immediately removed.
+
+   `interrupt` has the effect of stopping a transition, in this instance all transitions, to consider only new changes.
+
+2. the final line
+
+   ```js
+   groupsSeriesExit = groupsSeriesExit.transition(context);
+   ```
+
+   As in previous instances, the instruction is necessary to have the variable refer to the transition. Here specifically it is necessary to "stall" the removal of the old group elements, until the nested rectangle elements are transitioned and removed.
+
+   ```js
+   groupsSeriesExit.remove();
+   ```
