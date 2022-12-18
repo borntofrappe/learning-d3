@@ -16,9 +16,9 @@ const width = 400;
 const height = 300;
 
 const margin = {
-  top: 25,
+  top: 45,
   bottom: 10,
-  left: 40,
+  left: 60,
   right: 10,
 };
 
@@ -49,7 +49,11 @@ const colorScale = d3
   .domain(keys)
   .unknown("currentColor");
 
-const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
+const xAxis = d3
+  .axisTop(xScale)
+  .tickSize(0)
+  .tickPadding(10)
+  .tickFormat((d) => (d % 2 === 0 ? "" : d));
 const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(6);
 
 const svg = d3
@@ -62,15 +66,54 @@ const svg = d3
     }`
   );
 
+const defs = svg.append("defs");
+defs
+  .append("clipPath")
+  .attr("id", "clip-path")
+  .append("rect")
+  .attr("x", 1)
+  .attr("width", width - 2)
+  .attr("height", height);
+
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
-const groupData = group.append("g");
 const groupAxis = group.append("g");
+const groupData = group.append("g").attr("clip-path", "url(#clip-path)");
 
-groupAxis.append("g").attr("class", "axis-x").call(xAxis);
-groupAxis.append("g").attr("class", "axis-y").call(yAxis);
+const groupAxisX = groupAxis.append("g").attr("class", "axis-x").call(xAxis);
+const groupAxisY = groupAxis.append("g").attr("class", "axis-y").call(yAxis);
+
+groupAxisX.select("path").remove();
+groupAxisX
+  .selectAll(".tick")
+  .append("line")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", "0.1")
+  .attr("y1", height);
+
+groupAxisX.selectAll("text").attr("font-weight", "700");
+groupAxisY.selectAll("text").attr("font-size", "9");
+
+groupAxis
+  .append("text")
+  .attr("x", width / 2)
+  .attr("y", -margin.top + 1)
+  .attr("font-size", "10")
+  .attr("font-weight", "700")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .text("Number of teams");
+
+groupAxis
+  .append("text")
+  .attr("transform", `translate(${-margin.left + 1} ${height / 2}) rotate(-90)`)
+  .attr("font-size", "10")
+  .attr("font-weight", "700")
+  .attr("text-anchor", "middle")
+  .attr("dominant-baseline", "hanging")
+  .text("World Cup");
 
 const groupsData = groupData
   .selectAll("g")
