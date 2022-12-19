@@ -169,3 +169,47 @@ groupsData
   .attr("fill", (d) => colorScale(d[0]));
 
 form.on("submit", (e) => e.preventDefault());
+form.on("input", (e) => {
+  const keys = [...form.node().querySelectorAll('input[type="checkbox"]')]
+    .filter((d) => d.checked)
+    .map((d) => d.value);
+
+  labels
+    .filter((d) => !keys.includes(d))
+    .transition()
+    .style("opacity", "0.3")
+    .style("filter", "grayscale(1)");
+
+  labels
+    .filter((d) => keys.includes(d))
+    .style("opacity", "1")
+    .style("filter", "grayscale(0)");
+
+  groupsData
+    .selectAll("rect")
+    .data((d) =>
+      Object.entries(d).filter((d) => d[0] !== "edition" && keys.includes(d[0]))
+    )
+    .join(
+      (enter) => {
+        enter
+          .append("rect")
+          .attr("y", (d) => valueScale(d[1]))
+          .attr("height", (d) => height - valueScale(d[1]))
+          .attr("x", (d) => positionScale2(d[0]))
+          .attr("width", positionScale2.bandwidth())
+          .attr("fill", (d) => colorScale(d[0]));
+      },
+      (update) => {
+        update
+          .attr("y", (d) => valueScale(d[1]))
+          .attr("height", (d) => height - valueScale(d[1]))
+          .attr("x", (d) => positionScale2(d[0]))
+          .attr("width", positionScale2.bandwidth())
+          .attr("fill", (d) => colorScale(d[0]));
+      },
+      (exit) => {
+        exit.remove();
+      }
+    );
+});
