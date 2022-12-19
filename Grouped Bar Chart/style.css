@@ -25,13 +25,19 @@ h1 {
   font-size: 1.48rem;
 }
 
+p {
+  line-height: 1.5;
+}
+
 a {
   color: inherit;
-  font-weight: 700;
 }
 
 .chart {
   display: block;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
   color: hsl(0, 0%, 32%);
 }
 
@@ -44,6 +50,7 @@ form {
   justify-content: space-evenly;
   flex-wrap: wrap;
   gap: 0.5rem;
+  font-size: 0.9rem;
 }
 
 label {
@@ -54,6 +61,20 @@ label {
   align-items: center;
   line-height: 1;
   gap: 0 0.5rem;
+}
+
+input + svg {
+  border-radius: 50%;
+  display: block;
+}
+
+input:focus + svg {
+  outline-offset: 0.1rem;
+  outline: 0.1rem solid currentColor;
+}
+
+input:focus:not(:focus-visible) + svg {
+  outline: none;
 }
 
 label input {

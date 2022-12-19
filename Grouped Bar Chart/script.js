@@ -1,13 +1,13 @@
 // prettier-ignore
 const data = [
-    { "edition": "1994", "Final winner": 1, "Finalists": 2, "Semi-finalists": 4, "Quarter-finalists": 8 },
-    { "edition": "1998", "Final winner": 1, "Finalists": 2, "Semi-finalists": 3, "Quarter-finalists": 6 },
-    { "edition": "2002", "Final winner": 1, "Finalists": 2, "Semi-finalists": 3, "Quarter-finalists": 4 },
-    { "edition": "2006", "Final winner": 1, "Finalists": 1, "Semi-finalists": 3, "Quarter-finalists": 6 },
-    { "edition": "2010", "Final winner": 1, "Finalists": 2, "Semi-finalists": 4, "Quarter-finalists": 7 },
-    { "edition": "2014", "Final winner": 1, "Finalists": 2, "Semi-finalists": 4, "Quarter-finalists": 8 },
-    { "edition": "2018", "Final winner": 1, "Finalists": 2, "Semi-finalists": 3, "Quarter-finalists": 6 },
-    { "edition": "2022", "Final winner": 1, "Finalists": 2, "Semi-finalists": 3, "Quarter-finalists": 7 },
+    { "edition": "1994", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 4, "Quarter-finalists (out of 8)": 8 },
+    { "edition": "1998", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 3, "Quarter-finalists (out of 8)": 6 },
+    { "edition": "2002", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 3, "Quarter-finalists (out of 8)": 4 },
+    { "edition": "2006", "Final winner": 1, "Finalists": 1, "Semi-finalists (out of 4)": 3, "Quarter-finalists (out of 8)": 6 },
+    { "edition": "2010", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 4, "Quarter-finalists (out of 8)": 7 },
+    { "edition": "2014", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 4, "Quarter-finalists (out of 8)": 8 },
+    { "edition": "2018", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 3, "Quarter-finalists (out of 8)": 6 },
+    { "edition": "2022", "Final winner": 1, "Finalists": 2, "Semi-finalists (out of 4)": 3, "Quarter-finalists (out of 8)": 7 },
   ];
 
 const keys = Object.keys(data[0]).filter((d) => d !== "edition");
@@ -17,7 +17,7 @@ const height = 280;
 
 const margin = {
   top: 10,
-  bottom: 40,
+  bottom: 35,
   left: 45,
   right: 10,
 };
@@ -45,7 +45,7 @@ const positionScale2 = d3
 const valueScale = d3.scaleLinear().domain([0, valueMax]).range([height, 0]);
 
 const colorScale = d3
-  .scaleOrdinal(d3.schemePastel2)
+  .scaleOrdinal(d3.schemeSet2)
   .domain(keys)
   .unknown("currentColor");
 
@@ -63,11 +63,6 @@ const positionAxis = d3.axisBottom(positionScale).tickSize(0).tickPadding(6);
 
 const root = d3.select("body").append("div").attr("id", "root");
 root.append("h1").text("Grouped Bar Chart");
-root
-  .append("p")
-  .text(
-    "The graph plots bars in groups, illustrating the value for multiple categories on the same axis."
-  );
 
 const form = root.append("form");
 
@@ -107,7 +102,7 @@ const footer = root.append("footer");
 footer
   .append("p")
   .html(
-    `The specific visualization takes inspiration from <a href="https://www.lemonde.fr/les-decodeurs/article/2022/11/30/coupe-du-monde-2022-quel-est-le-destin-des-premiers-de-chaque-poule-pour-la-suite-de-la-competition_6152373_4355770.html">an article from lemonde.fr</a> which considers how the teams finishing first in the group stages continue their path in the FIFA World Cup.`
+    `The specific visualization takes inspiration from an article from <cite><a href="https://www.lemonde.fr/les-decodeurs/article/2022/11/30/coupe-du-monde-2022-quel-est-le-destin-des-premiers-de-chaque-poule-pour-la-suite-de-la-competition_6152373_4355770.html">Le Monde</a></cite> which considers how the teams finishing first in the group stages continue their path in the FIFA World Cup.`
   );
 
 const group = svg
