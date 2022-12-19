@@ -13,16 +13,16 @@ const data = [
 const keys = Object.keys(data[0]).filter((d) => d !== "edition");
 
 const width = 400;
-const height = 300;
+const height = 280;
 
 const margin = {
-  top: 45,
-  bottom: 10,
-  left: 60,
+  top: 10,
+  bottom: 40,
+  left: 45,
   right: 10,
 };
 
-const xMax = d3.max(data, (d) =>
+const valueMax = d3.max(data, (d) =>
   d3.max(
     Object.entries(d)
       .filter((d) => d[0] !== "edition")
@@ -30,34 +30,42 @@ const xMax = d3.max(data, (d) =>
   )
 );
 
-const yScale = d3
+const positionScale = d3
   .scaleBand()
   .domain(data.map((d) => d.edition))
-  .range([0, height])
+  .range([0, width])
   .padding(0.3);
 
-const yScale2 = d3
+const positionScale2 = d3
   .scaleBand()
   .domain(keys)
-  .range([0, yScale.bandwidth()])
+  .range([0, positionScale.bandwidth()])
   .padding(0.3);
 
-const xScale = d3.scaleLinear().domain([0, xMax]).range([0, width]);
+const valueScale = d3.scaleLinear().domain([0, valueMax]).range([height, 0]);
 
 const colorScale = d3
   .scaleOrdinal(d3.schemePastel2)
   .domain(keys)
   .unknown("currentColor");
 
-const xAxis = d3
-  .axisTop(xScale)
+const valueAxis = d3
+  .axisLeft(valueScale)
   .tickSize(0)
   .tickPadding(10)
   .tickFormat((d) => (d % 2 === 0 ? "" : d));
-const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(6);
 
-const svg = d3
-  .select("body")
+const positionAxis = d3.axisBottom(positionScale).tickSize(0).tickPadding(6);
+
+const root = d3.select("body").append("div").attr("id", "root");
+root.append("h1").text("Grouped Bar Chart");
+root
+  .append("p")
+  .text(
+    "The graph plots bars in groups, illustrating the value for multiple categories on the same axis."
+  );
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",
@@ -66,45 +74,47 @@ const svg = d3
     }`
   );
 
-const defs = svg.append("defs");
-defs
-  .append("clipPath")
-  .attr("id", "clip-path")
-  .append("rect")
-  .attr("x", 1)
-  .attr("width", width - 2)
-  .attr("height", height);
+const footer = root.append("footer");
+footer
+  .append("p")
+  .html(
+    `The specific visualization takes inspiration from <a href="https://www.lemonde.fr/les-decodeurs/article/2022/11/30/coupe-du-monde-2022-quel-est-le-destin-des-premiers-de-chaque-poule-pour-la-suite-de-la-competition_6152373_4355770.html">an article from lemonde.fr</a> which considers how the teams finishing first in the group stages continue their path in the FIFA World Cup.`
+  );
 
 const group = svg
   .append("g")
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 const groupAxis = group.append("g");
-const groupData = group.append("g").attr("clip-path", "url(#clip-path)");
+const groupData = group.append("g");
 
-const groupAxisX = groupAxis.append("g").attr("class", "axis-x").call(xAxis);
-const groupAxisY = groupAxis.append("g").attr("class", "axis-y").call(yAxis);
+const groupAxisValue = groupAxis.append("g").call(valueAxis);
 
-groupAxisX.select("path").remove();
-groupAxisX
+const groupAxisPosition = groupAxis
+  .append("g")
+  .attr("transform", `translate(0 ${height})`)
+  .call(positionAxis);
+
+groupAxisValue.select("path").remove();
+
+groupAxisValue
   .selectAll(".tick")
   .append("line")
   .attr("stroke", "currentColor")
   .attr("stroke-width", "0.1")
-  .attr("y1", height);
+  .attr("x1", width);
 
-groupAxisX.selectAll("text").attr("font-weight", "700");
-groupAxisY.selectAll("text").attr("font-size", "9");
+groupAxisValue.selectAll("text").attr("font-weight", "700");
+groupAxisPosition.selectAll("text").attr("font-size", "9");
 
 groupAxis
   .append("text")
   .attr("x", width / 2)
-  .attr("y", -margin.top + 1)
+  .attr("y", height + margin.bottom - 2)
   .attr("font-size", "10")
   .attr("font-weight", "700")
   .attr("text-anchor", "middle")
-  .attr("dominant-baseline", "hanging")
-  .text("Number of teams");
+  .text("World cup");
 
 groupAxis
   .append("text")
@@ -113,21 +123,22 @@ groupAxis
   .attr("font-weight", "700")
   .attr("text-anchor", "middle")
   .attr("dominant-baseline", "hanging")
-  .text("World Cup");
+  .text("Number of teams");
 
 const groupsData = groupData
   .selectAll("g")
   .data(data)
   .enter()
   .append("g")
-  .attr("transform", (d) => `translate(0 ${yScale(d.edition)})`);
+  .attr("transform", (d) => `translate(${positionScale(d.edition)} 0)`);
 
 groupsData
   .selectAll("rect")
   .data((d) => Object.entries(d).filter((d) => d[0] !== "edition"))
   .enter()
   .append("rect")
-  .attr("y", (d) => yScale2(d[0]))
-  .attr("width", (d) => xScale(d[1]))
-  .attr("height", yScale2.bandwidth())
+  .attr("y", (d) => valueScale(d[1]))
+  .attr("height", (d) => height - valueScale(d[1]))
+  .attr("x", (d) => positionScale2(d[0]))
+  .attr("width", positionScale2.bandwidth())
   .attr("fill", (d) => colorScale(d[0]));

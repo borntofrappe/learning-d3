@@ -11,9 +11,28 @@ body {
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
+#root {
+  max-width: 52rem;
+  margin: 1rem auto;
+  padding: 1rem;
+}
+
+#root > * + * {
+  margin-top: 0.75em;
+}
+
+h1 {
+  font-size: 1.48rem;
+}
+
+a {
+  color: inherit;
+  font-weight: 700;
+}
+
 svg {
   margin: 1rem auto;
-  max-width: 48rem;
+  max-width: 42rem;
   display: block;
   color: hsl(0, 0%, 32%);
 }
