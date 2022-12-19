@@ -49,11 +49,15 @@ const colorScale = d3
   .domain(keys)
   .unknown("currentColor");
 
+const ticks = valueScale.ticks().filter((d) => d % 2 !== 0);
+const tickFormat = d3.format("d");
+
 const valueAxis = d3
   .axisLeft(valueScale)
   .tickSize(0)
   .tickPadding(10)
-  .tickFormat((d) => (d % 2 === 0 ? "" : d));
+  .tickValues(ticks)
+  .tickFormat((d) => tickFormat(d));
 
 const positionAxis = d3.axisBottom(positionScale).tickSize(0).tickPadding(6);
 
@@ -159,7 +163,10 @@ const groupsData = groupData
 
 groupsData
   .selectAll("rect")
-  .data((d) => Object.entries(d).filter((d) => d[0] !== "edition"))
+  .data(
+    (d) => Object.entries(d).filter((d) => d[0] !== "edition"),
+    (d) => d
+  )
   .enter()
   .append("rect")
   .attr("y", (d) => valueScale(d[1]))
@@ -174,9 +181,24 @@ form.on("input", (e) => {
     .filter((d) => d.checked)
     .map((d) => d.value);
 
+  const valueMax =
+    d3.max(data, (d) =>
+      d3.max(
+        Object.entries(d)
+          .filter((d) => keys.includes(d[0]))
+          .map((d) => d[1])
+      )
+    ) || 1;
+
+  valueScale.domain([0, valueMax]);
+
+  positionScale2.domain(keys);
+
+  const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
+
   labels
     .filter((d) => !keys.includes(d))
-    .transition()
+    .transition(transition)
     .style("opacity", "0.3")
     .style("filter", "grayscale(1)");
 
@@ -187,8 +209,9 @@ form.on("input", (e) => {
 
   groupsData
     .selectAll("rect")
-    .data((d) =>
-      Object.entries(d).filter((d) => d[0] !== "edition" && keys.includes(d[0]))
+    .data(
+      (d) => Object.entries(d).filter((d) => keys.includes(d[0])),
+      (d) => d
     )
     .join(
       (enter) => {
@@ -196,12 +219,16 @@ form.on("input", (e) => {
           .append("rect")
           .attr("y", (d) => valueScale(d[1]))
           .attr("height", (d) => height - valueScale(d[1]))
+          .attr("fill", (d) => colorScale(d[0]))
+          .attr("x", (d) => positionScale2(d[0]) + positionScale2.bandwidth())
+          .attr("width", "0")
+          .transition(transition)
           .attr("x", (d) => positionScale2(d[0]))
-          .attr("width", positionScale2.bandwidth())
-          .attr("fill", (d) => colorScale(d[0]));
+          .attr("width", positionScale2.bandwidth());
       },
       (update) => {
         update
+          .transition(transition)
           .attr("y", (d) => valueScale(d[1]))
           .attr("height", (d) => height - valueScale(d[1]))
           .attr("x", (d) => positionScale2(d[0]))
@@ -209,7 +236,37 @@ form.on("input", (e) => {
           .attr("fill", (d) => colorScale(d[0]));
       },
       (exit) => {
-        exit.remove();
+        exit
+          .attr("data-x", function () {
+            return (
+              parseFloat(d3.select(this).attr("width")) +
+              parseFloat(d3.select(this).attr("x"))
+            );
+          })
+          .transition(transition)
+          .attr("x", function () {
+            return parseFloat(d3.select(this).attr("data-x"));
+          })
+          .attr("width", "0")
+          .remove();
       }
     );
+
+  groupAxisPosition.transition(transition).call(positionAxis);
+  valueAxis.tickValues(valueScale.ticks().filter((d) => ticks.includes(d)));
+  groupAxisValue.transition(transition).call(valueAxis);
+
+  groupAxisValue.select("path").remove();
+
+  groupAxisValue
+    .selectAll(".tick")
+    .selectAll("line")
+    .data([null])
+    .join("line")
+    .attr("stroke", "currentColor")
+    .attr("stroke-width", "0.1")
+    .attr("x1", width);
+
+  groupAxisValue.selectAll("text").attr("font-weight", "700");
+  groupAxisPosition.selectAll("text").attr("font-size", "9");
 });
