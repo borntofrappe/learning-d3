@@ -77,8 +77,7 @@ labels
   .append("input")
   .attr("type", "checkbox")
   .attr("name", "key")
-  .attr("value", (d) => d)
-  .property("checked", true);
+  .attr("value", (d) => d);
 
 labels
   .append("svg")
@@ -160,7 +159,7 @@ groupsData
   .selectAll("rect")
   .data(
     (d) => Object.entries(d).filter((d) => d[0] !== "edition"),
-    (d) => d
+    (d) => d[0]
   )
   .enter()
   .append("rect")
@@ -171,7 +170,9 @@ groupsData
   .attr("fill", (d) => colorScale(d[0]));
 
 form.on("submit", (e) => e.preventDefault());
-form.on("input", (e) => {
+labels.select("input").property("checked", true);
+
+form.on("input", () => {
   const keys = [...form.node().querySelectorAll('input[type="checkbox"]')]
     .filter((d) => d.checked)
     .map((d) => d.value);
@@ -185,9 +186,8 @@ form.on("input", (e) => {
       )
     ) || 1;
 
-  valueScale.domain([0, valueMax]);
-
   positionScale2.domain(keys);
+  valueScale.domain([0, valueMax]);
 
   const transition = d3.transition().duration(500).ease(d3.easeQuadInOut);
 
@@ -206,7 +206,7 @@ form.on("input", (e) => {
     .selectAll("rect")
     .data(
       (d) => Object.entries(d).filter((d) => keys.includes(d[0])),
-      (d) => d
+      (d) => d[0]
     )
     .join(
       (enter) => {
