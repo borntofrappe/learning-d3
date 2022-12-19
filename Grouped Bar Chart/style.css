@@ -18,7 +18,7 @@ body {
 }
 
 #root > * + * {
-  margin-top: 0.75em;
+  margin-top: 1em;
 }
 
 h1 {
@@ -30,13 +30,43 @@ a {
   font-weight: 700;
 }
 
-svg {
-  margin: 1rem auto;
-  max-width: 42rem;
+.chart {
   display: block;
   color: hsl(0, 0%, 32%);
 }
 
-svg text {
+.chart text {
   fill: currentColor;
+}
+
+form {
+  display: flex;
+  justify-content: space-evenly;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+label {
+  color: hsl(0, 0%, 25%);
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  gap: 0 0.5rem;
+}
+
+label input {
+  width: 1em;
+  height: 1em;
+  opacity: 0;
+}
+
+label svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  top: 0;
+  right: 0;
+  position: absolute;
 }

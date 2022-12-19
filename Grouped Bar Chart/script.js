@@ -65,8 +65,33 @@ root
     "The graph plots bars in groups, illustrating the value for multiple categories on the same axis."
   );
 
+const form = root.append("form");
+
+const labels = form
+  .selectAll("label")
+  .data(keys)
+  .enter()
+  .append("label")
+  .text((d) => d);
+
+labels
+  .append("input")
+  .attr("type", "checkbox")
+  .attr("name", "key")
+  .attr("value", (d) => d)
+  .property("checked", true);
+
+labels
+  .append("svg")
+  .attr("viewBox", "-1 -1 2 2")
+  .attr("height", "1em")
+  .attr("fill", (d) => colorScale(d))
+  .append("circle")
+  .attr("r", "0.9");
+
 const svg = root
   .append("svg")
+  .attr("class", "chart")
   .attr(
     "viewBox",
     `0 0 ${width + margin.left + margin.right} ${
@@ -142,3 +167,5 @@ groupsData
   .attr("x", (d) => positionScale2(d[0]))
   .attr("width", positionScale2.bandwidth())
   .attr("fill", (d) => colorScale(d[0]));
+
+form.on("submit", (e) => e.preventDefault());
