@@ -35,6 +35,9 @@ const countries = data.map((d) => d.country);
 
 const width = 320;
 const height = 550;
+const inset = 50;
+const strokeDasharray = 3;
+
 const margin = {
   top: 25,
   bottom: 5,
@@ -42,9 +45,7 @@ const margin = {
   right: 10,
 };
 
-const radius = 3.5;
 const strokeWidth = 1;
-
 const extent = d3.extent(
   data.reduce(
     (acc, curr) => [
@@ -55,13 +56,16 @@ const extent = d3.extent(
   )
 );
 
-const xScale = d3.scaleLinear().domain(extent).range([0, width]).nice();
+const xScale = d3.scaleLinear().domain(extent).range([inset, width]).nice();
 const yScale = d3.scaleBand().domain(countries).range([0, height]);
 
 const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
 const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(10);
 
 const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
+
+const symbolScale = d3.scaleOrdinal([...d3.symbols].reverse()).domain(keys);
+const symbol = d3.symbol().size(64);
 
 const svg = d3
   .select("body")
@@ -80,8 +84,29 @@ const group = svg
 const groupAxis = group.append("g");
 const groupData = group.append("g");
 
-groupAxis.append("g").call(xAxis);
+const textAxis = groupAxis.append("text").text("0");
+
+groupAxis
+  .append("line")
+  .attr("stroke", "currentColor")
+  .attr("stroke-dasharray", strokeDasharray)
+  .attr("stroke-linecap", "square")
+  .attr("x2", inset)
+  .attr("transform", "translate(0.5 0.5)");
+
+const groupAxisX = groupAxis.append("g").call(xAxis);
 groupAxis.append("g").call(yAxis);
+
+const groupGroupAxisX = groupAxis.select("g");
+const textAxisX = groupAxisX.select("text");
+
+textAxis
+  .attr("font-size", groupGroupAxisX.attr("font-size"))
+  .attr("font-family", groupGroupAxisX.attr("font-family"))
+  .attr("text-anchor", groupGroupAxisX.attr("text-anchor"))
+  .attr("y", textAxisX.attr("y"))
+  .attr("dy", textAxisX.attr("dy"))
+  .attr("fill", textAxisX.attr("fill"));
 
 const groupsData = groupData
   .selectAll("g")
@@ -103,12 +128,13 @@ groupsData
   .attr("d", (d) => `M ${d.map(({ value }) => xScale(value)).join(" 0 ")} 0`);
 
 groupsData
-  .selectAll("circle")
+  .selectAll("path.value")
   .data((d) => d.values)
   .enter()
-  .append("circle")
-  .attr("r", radius)
+  .append("path")
+  .attr("class", "value")
   .attr("fill", (d) => colorScale(d.key))
-  .attr("cx", (d) => xScale(d.value));
+  .attr("transform", (d) => `translate(${xScale(d.value)} 0)`)
+  .attr("d", (d) => symbol.type(symbolScale(d.key))());
 
 // const symbolScale = d3.scaleOrdinal(d3.symbols).domain(keys);
