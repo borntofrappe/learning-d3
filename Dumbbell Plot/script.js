@@ -39,16 +39,22 @@ const margin = {
   top: 25,
   bottom: 5,
   left: 80,
-  right: 5,
+  right: 10,
 };
 
-const max = d3.max(data, (d) => d3.max(d.values, (d) => d.value));
+const radius = 3.5;
+const strokeWidth = 1;
 
-const xScale = d3.scaleLinear().domain([0, max]).range([0, width]);
+const max = d3.max(data, (d) => d3.max(d.values, (d) => d.value));
+// const min = d3.min(data, (d) => d3.min(d.values, (d) => d.value));
+
+const xScale = d3.scaleLinear().domain([0, max]).range([0, width]).nice();
 const yScale = d3.scaleBand().domain(countries).range([0, height]);
 
 const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
 const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(10);
+
+const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
 
 const svg = d3
   .select("body")
@@ -65,6 +71,37 @@ const group = svg
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 const groupAxis = group.append("g");
+const groupData = group.append("g");
 
 groupAxis.append("g").call(xAxis);
 groupAxis.append("g").call(yAxis);
+
+const groupsData = groupData
+  .selectAll("g")
+  .data(data)
+  .enter()
+  .append("g")
+  .attr(
+    "transform",
+    (d) => `translate(0 ${yScale(d.country) + yScale.bandwidth() / 2})`
+  );
+
+groupsData
+  .append("path")
+  .datum((d) => d.values)
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("stroke-width", strokeWidth)
+  .attr("stroke-linecap", "round")
+  .attr("d", (d) => `M ${d.map(({ value }) => xScale(value)).join(" 0 ")} 0`);
+
+groupsData
+  .selectAll("circle")
+  .data((d) => d.values)
+  .enter()
+  .append("circle")
+  .attr("r", radius)
+  .attr("fill", (d) => colorScale(d.key))
+  .attr("cx", (d) => xScale(d.value));
+
+// const symbolScale = d3.scaleOrdinal(d3.symbols).domain(keys);
