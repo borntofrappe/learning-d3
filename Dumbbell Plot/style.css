@@ -12,7 +12,8 @@ body {
 }
 
 svg {
-  max-width: 52rem;
+  display: block;
+  max-width: 48rem;
   margin: 1rem auto;
   outline: 1px solid;
 }

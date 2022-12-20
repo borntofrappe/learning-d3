@@ -29,3 +29,42 @@ const data = [
     { country: "Sweden", values: [{ key: "Male", value: 80.6, }, { key: "Female", value: 84.2, }]
   },
 ];
+
+const keys = ["Male", "Female"];
+const countries = data.map((d) => d.country);
+
+const width = 320;
+const height = 550;
+const margin = {
+  top: 25,
+  bottom: 5,
+  left: 80,
+  right: 5,
+};
+
+const max = d3.max(data, (d) => d3.max(d.values, (d) => d.value));
+
+const xScale = d3.scaleLinear().domain([0, max]).range([0, width]);
+const yScale = d3.scaleBand().domain(countries).range([0, height]);
+
+const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
+const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(10);
+
+const svg = d3
+  .select("body")
+  .append("svg")
+  .attr(
+    "viewBox",
+    `0 0 ${width + margin.left + margin.right} ${
+      height + margin.top + margin.bottom
+    }`
+  );
+
+const group = svg
+  .append("g")
+  .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+const groupAxis = group.append("g");
+
+groupAxis.append("g").call(xAxis);
+groupAxis.append("g").call(yAxis);
