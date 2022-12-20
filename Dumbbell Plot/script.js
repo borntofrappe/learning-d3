@@ -47,6 +47,8 @@ const margin = {
   right: 10,
 };
 
+const format = d3.format(".2");
+
 const extent = d3.extent(
   data.reduce(
     (acc, curr) => [
@@ -143,6 +145,23 @@ groupsData
   .attr("stroke-width", strokeWidth)
   .attr("stroke-linecap", "round")
   .attr("d", (d) => `M ${d.map(({ value }) => xScale(value)).join(" 0 ")} 0`);
+
+groupsData
+  .append("text")
+  .datum((d) => {
+    const [min, max] = d3.extent(d.values, (d) => d.value);
+    const gap = max - min;
+    const center = (min + max) / 2;
+    return { gap, center };
+  })
+  .attr("fill", "currentColor")
+  .attr("text-anchor", "middle")
+  .attr("font-weight", "700")
+  .attr("font-size", strokeWidth - 3)
+  .attr("dominant-baseline", "middle")
+  .attr("x", (d) => xScale(d.center))
+  .attr("y", 1)
+  .text((d) => format(d.gap));
 
 groupsData
   .selectAll("circle")
