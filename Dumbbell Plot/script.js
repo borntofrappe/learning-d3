@@ -45,10 +45,17 @@ const margin = {
 const radius = 3.5;
 const strokeWidth = 1;
 
-const max = d3.max(data, (d) => d3.max(d.values, (d) => d.value));
-// const min = d3.min(data, (d) => d3.min(d.values, (d) => d.value));
+const extent = d3.extent(
+  data.reduce(
+    (acc, curr) => [
+      ...acc,
+      ...curr.values.reduce((a, c) => [...a, c.value], []),
+    ],
+    []
+  )
+);
 
-const xScale = d3.scaleLinear().domain([0, max]).range([0, width]).nice();
+const xScale = d3.scaleLinear().domain(extent).range([0, width]).nice();
 const yScale = d3.scaleBand().domain(countries).range([0, height]);
 
 const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
