@@ -47,7 +47,7 @@ const margin = {
   right: 10,
 };
 
-const format = d3.format(".2");
+const format = d3.format(".2r");
 
 const extent = d3.extent(
   data.reduce(
@@ -82,8 +82,22 @@ const values = data
     return acc;
   }, {});
 
-const svg = d3
-  .select("body")
+const root = d3.select("body").append("div").attr("id", "root");
+root.append("h1").text("Dumbbell Plot");
+root
+  .append("p")
+  .html(
+    `Life expectancy at birth in the European Union varies considerably between ${keys
+      .map(
+        (d) =>
+          `<strong style="border-bottom: 0.2rem solid ${colorScale(
+            d
+          )}">${d}</strong>`
+      )
+      .join(" and ")}.`
+  );
+
+const svg = root
   .append("svg")
   .attr(
     "viewBox",

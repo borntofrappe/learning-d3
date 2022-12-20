@@ -5,14 +5,38 @@
 }
 
 body {
-  background: hsl(0, 0%, 97%);
   color: hsl(0, 0%, 7%);
+  background-color: hsl(0, 0%, 97%);
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui,
     helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
 }
 
+::selection {
+  background-color: hsl(0, 0%, 89%);
+}
+
+#root {
+  max-width: 52rem;
+  margin: 1rem auto;
+  padding: 1rem 1.5rem;
+  color: hsl(0, 0%, 14%);
+  background-color: hsl(0, 0%, 100%);
+  box-shadow: 0 0.1rem 0.2rem hsl(0, 0%, 14%, 0.1);
+}
+
+#root > * + * {
+  margin-top: 1em;
+}
+
+h1 {
+  font-size: 1.48rem;
+}
+
+p {
+  line-height: 1.5;
+}
+
 svg {
-  display: block;
   max-width: 48rem;
   margin: 1rem auto;
   color: hsl(0, 0%, 27%);
