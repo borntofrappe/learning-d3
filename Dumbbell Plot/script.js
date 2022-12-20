@@ -33,10 +33,12 @@ const data = [
 const keys = ["Male", "Female"];
 const countries = data.map((d) => d.country);
 
-const width = 320;
-const height = 550;
-const inset = 50;
+const width = 400;
+const height = 800;
+const inset = 60;
 const strokeDasharray = 3;
+const radius = 5;
+const strokeWidth = 12;
 
 const margin = {
   top: 25,
@@ -45,7 +47,6 @@ const margin = {
   right: 10,
 };
 
-const strokeWidth = 1;
 const extent = d3.extent(
   data.reduce(
     (acc, curr) => [
@@ -56,16 +57,28 @@ const extent = d3.extent(
   )
 );
 
-const xScale = d3.scaleLinear().domain(extent).range([inset, width]).nice();
+const xScale = d3
+  .scaleLinear()
+  .domain(extent)
+  .range([inset, width - inset])
+  .nice();
+
 const yScale = d3.scaleBand().domain(countries).range([0, height]);
+
+const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
 
 const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
 const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(10);
 
-const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
+const values = data
+  .map((d) => d.values)
+  .reduce((acc, curr) => {
+    curr.forEach(({ key, value }) => {
+      acc[key] = acc[key] ? [...acc[key], value] : [value];
+    });
 
-const symbolScale = d3.scaleOrdinal([...d3.symbols].reverse()).domain(keys);
-const symbol = d3.symbol().size(64);
+    return acc;
+  }, {});
 
 const svg = d3
   .select("body")
@@ -82,6 +95,7 @@ const group = svg
   .attr("transform", `translate(${margin.left} ${margin.top})`);
 
 const groupAxis = group.append("g");
+const groupStats = group.append("g");
 const groupData = group.append("g");
 
 const textAxis = groupAxis.append("text").text("0");
@@ -95,7 +109,7 @@ groupAxis
   .attr("transform", "translate(0.5 0.5)");
 
 const groupAxisX = groupAxis.append("g").call(xAxis);
-groupAxis.append("g").call(yAxis);
+groupAxis.append("g").call(yAxis).select("path").remove();
 
 const groupGroupAxisX = groupAxis.select("g");
 const textAxisX = groupAxisX.select("text");
@@ -107,6 +121,9 @@ textAxis
   .attr("y", textAxisX.attr("y"))
   .attr("dy", textAxisX.attr("dy"))
   .attr("fill", textAxisX.attr("fill"));
+
+groupAxis.select("line").attr("stroke-width", "0.5");
+groupAxis.select("path").attr("stroke-width", "0.5");
 
 const groupsData = groupData
   .selectAll("g")
@@ -122,19 +139,45 @@ groupsData
   .append("path")
   .datum((d) => d.values)
   .attr("fill", "none")
-  .attr("stroke", "currentColor")
+  .attr("stroke", "var(--color-line, currentColor)")
   .attr("stroke-width", strokeWidth)
   .attr("stroke-linecap", "round")
   .attr("d", (d) => `M ${d.map(({ value }) => xScale(value)).join(" 0 ")} 0`);
 
 groupsData
-  .selectAll("path.value")
+  .selectAll("circle")
   .data((d) => d.values)
   .enter()
-  .append("path")
-  .attr("class", "value")
+  .append("circle")
   .attr("fill", (d) => colorScale(d.key))
-  .attr("transform", (d) => `translate(${xScale(d.value)} 0)`)
-  .attr("d", (d) => symbol.type(symbolScale(d.key))());
+  .attr("cx", (d) => xScale(d.value))
+  .attr("r", radius);
 
-// const symbolScale = d3.scaleOrdinal(d3.symbols).domain(keys);
+const groupsStats = groupStats
+  .selectAll("g")
+  .data(Object.entries(values))
+  .enter()
+  .append("g")
+  .style("color", (d) => colorScale(d[0]));
+
+groupsStats
+  .append("rect")
+  .datum((d) => ({
+    mean: d3.mean(d[1]),
+    deviation: d3.deviation(d[1]),
+  }))
+  .attr("x", (d) => xScale(d.mean - d.deviation / 2))
+  .attr(
+    "width",
+    (d) => xScale(d.mean + d.deviation / 2) - xScale(d.mean - d.deviation / 2)
+  )
+  .attr("height", height)
+  .attr("fill", "currentColor")
+  .attr("fill-opacity", "0.1");
+
+groupsStats
+  .append("path")
+  .datum((d) => d3.mean(d[1]))
+  .attr("fill", "none")
+  .attr("stroke", "currentColor")
+  .attr("d", (d) => `M ${xScale(d)} 0 V ${height}`);

@@ -15,5 +15,6 @@ svg {
   display: block;
   max-width: 48rem;
   margin: 1rem auto;
-  outline: 1px solid;
+  color: hsl(0, 0%, 27%);
+  --color-line: hsl(0, 0%, 89%);
 }
