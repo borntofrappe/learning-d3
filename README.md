@@ -6,6 +6,7 @@ Here's a repository filled with projects to master the library, its many modules
 
 | Title                                                                         | Keywords                   |
 | ----------------------------------------------------------------------------- | -------------------------- |
+| [Dumbbell Plot](https://codepen.io/borntofrappe/pen/VwBYyZe)                  | dumbbell, stats            |
 | [Grouped Bar Chart](https://codepen.io/borntofrappe/pen/qByBPWV)              | bar, group                 |
 | [Stacked Bar Chart Component](https://codepen.io/borntofrappe/pen/wvxwjGY)    | stack, component, input    |
 | [Parallel Sets](https://codepen.io/borntofrappe/pen/rNKgmbB)                  | sankey, filter             |

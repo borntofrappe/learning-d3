@@ -30,6 +30,22 @@ const data = [
   },
 ];
 
+const dataValues = data
+  .map((d) => d.values)
+  .reduce((acc, curr) => {
+    curr.forEach(({ key, value }) => {
+      acc[key] = acc[key] ? [...acc[key], value] : [value];
+    });
+
+    return acc;
+  }, {});
+
+const dataStats = Object.entries(dataValues).map(([key, values]) => ({
+  key,
+  mean: d3.mean(values),
+  deviation: d3.deviation(values),
+}));
+
 const keys = ["Male", "Female"];
 const countries = data.map((d) => d.country);
 
@@ -39,6 +55,10 @@ const inset = 60;
 const strokeDasharray = 3;
 const radius = 5;
 const strokeWidth = 12;
+const fontSizes = {
+  x: 8,
+  y: 8.5,
+};
 
 const margin = {
   top: 25,
@@ -59,6 +79,8 @@ const extent = d3.extent(
   )
 );
 
+const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
+
 const xScale = d3
   .scaleLinear()
   .domain(extent)
@@ -67,34 +89,22 @@ const xScale = d3
 
 const yScale = d3.scaleBand().domain(countries).range([0, height]);
 
-const colorScale = d3.scaleOrdinal(d3.schemeSet2).domain(keys);
-
 const xAxis = d3.axisTop(xScale).tickSize(0).tickPadding(10);
 const yAxis = d3.axisLeft(yScale).tickSize(0).tickPadding(10);
-
-const values = data
-  .map((d) => d.values)
-  .reduce((acc, curr) => {
-    curr.forEach(({ key, value }) => {
-      acc[key] = acc[key] ? [...acc[key], value] : [value];
-    });
-
-    return acc;
-  }, {});
 
 const root = d3.select("body").append("div").attr("id", "root");
 root.append("h1").text("Dumbbell Plot");
 root
   .append("p")
   .html(
-    `Life expectancy at birth in the European Union varies considerably between ${keys
+    `Life expectancy in the European Union varies considerably between member states. The split between ${keys
       .map(
         (d) =>
           `<strong style="border-bottom: 0.2rem solid ${colorScale(
             d
           )}">${d}</strong>`
       )
-      .join(" and ")}.`
+      .join(" and ")} also shows interesting differences.`
   );
 
 const svg = root
@@ -125,7 +135,12 @@ groupAxis
   .attr("transform", "translate(0.5 0.5)");
 
 const groupAxisX = groupAxis.append("g").call(xAxis);
-groupAxis.append("g").call(yAxis).select("path").remove();
+const groupAxisY = groupAxis.append("g").call(yAxis);
+
+groupAxisY.select("path").remove();
+
+groupAxisY.attr("font-size", fontSizes.y);
+groupAxisX.attr("font-size", fontSizes.x);
 
 const groupGroupAxisX = groupAxis.select("g");
 const textAxisX = groupAxisX.select("text");
@@ -165,15 +180,15 @@ groupsData
   .datum((d) => {
     const [min, max] = d3.extent(d.values, (d) => d.value);
     const gap = max - min;
-    const center = (min + max) / 2;
-    return { gap, center };
+    const mid = (min + max) / 2;
+    return { gap, mid };
   })
   .attr("fill", "currentColor")
   .attr("text-anchor", "middle")
   .attr("font-weight", "700")
   .attr("font-size", strokeWidth - 3)
   .attr("dominant-baseline", "middle")
-  .attr("x", (d) => xScale(d.center))
+  .attr("x", (d) => xScale(d.mid))
   .attr("y", 1)
   .text((d) => format(d.gap));
 
@@ -188,17 +203,13 @@ groupsData
 
 const groupsStats = groupStats
   .selectAll("g")
-  .data(Object.entries(values))
+  .data(dataStats)
   .enter()
   .append("g")
-  .style("color", (d) => colorScale(d[0]));
+  .style("color", (d) => colorScale(d.key));
 
 groupsStats
   .append("rect")
-  .datum((d) => ({
-    mean: d3.mean(d[1]),
-    deviation: d3.deviation(d[1]),
-  }))
   .attr("x", (d) => xScale(d.mean - d.deviation / 2))
   .attr(
     "width",
@@ -210,7 +221,13 @@ groupsStats
 
 groupsStats
   .append("path")
-  .datum((d) => d3.mean(d[1]))
   .attr("fill", "none")
   .attr("stroke", "currentColor")
-  .attr("d", (d) => `M ${xScale(d)} 0 V ${height}`);
+  .attr("stroke-width", "0.75")
+  .attr("d", (d) => `M ${xScale(d.mean)} 0 V ${height}`);
+
+root
+  .append("p")
+  .html(
+    'Source: <a href="https://ec.europa.eu/eurostat/databrowser/view/DEMO_MLEXPEC__custom_4282521/default/table?lang=en">Eurostat</a>.'
+  );
