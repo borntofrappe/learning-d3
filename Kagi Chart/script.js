@@ -256,7 +256,7 @@ const div = d3.select("body").append("div").attr("id", "root");
 
 (() => {
   const article = div.append("article");
-  article.append("h2").text("The problem");
+  article.append("h2").text("An issue");
   article
     .append("p")
     .text(
@@ -273,10 +273,8 @@ const div = d3.select("body").append("div").attr("id", "root");
     right: 20,
   };
 
-  const parseDate = d3.timeParse("%m/%d/%Y");
+  const timeParse = d3.timeParse("%m/%d/%Y");
   const formatDate = d3.timeFormat("%B");
-  const xAccessor = (d) => parseDate(d.date);
-  const yAccessor = (d) => d.close;
 
   const svg = article
     .append("svg")
@@ -293,12 +291,12 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   const xScale = d3
     .scaleTime()
-    .domain(d3.extent(data, xAccessor))
+    .domain(d3.extent(data, (d) => timeParse(d.date)))
     .range([0, width]);
 
   const yScale = d3
     .scaleLinear()
-    .domain(d3.extent(data, yAccessor))
+    .domain(d3.extent(data, (d) => d.close))
     .range([height, 0]);
 
   const xAxis = d3
@@ -309,8 +307,8 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   const line = d3
     .line()
-    .x((d) => xScale(xAccessor(d)))
-    .y((d) => yScale(yAccessor(d)));
+    .x((d) => xScale(timeParse(d.date)))
+    .y((d) => yScale(d.close));
 
   const groupAxis = group.append("g");
   const groupData = group.append("g");
@@ -369,4 +367,144 @@ const div = d3.select("body").append("div").attr("id", "root");
     .attr("stroke", "#8b909b")
     .attr("stroke-width", "1")
     .attr("d", line(data));
+})();
+
+(() => {
+  const article = div.append("article");
+  article.append("h2").text("A solution");
+  article
+    .append("p")
+    .text(
+      "A Kagi chart, independent of time, allows to focus on the closing price by highlighting the direction of the changes."
+    );
+
+  const width = 200;
+  const height = 200;
+
+  const margin = {
+    top: 5,
+    bottom: 5,
+    left: 5,
+    right: 20,
+  };
+
+  const timeParse = d3.timeParse("%m/%d/%Y");
+
+  const dataSort = [...data].sort(
+    (a, b) => timeParse(a.date) - timeParse(b.date)
+  );
+  const [first, second] = dataSort;
+
+  let segment = 0;
+  let wasRising = second.close > first.close;
+  const dataKagi = [
+    { ...first, segment },
+    { ...second, segment },
+  ];
+
+  const reversalRate = 0.03;
+
+  for (let i = 2; i < dataSort.length; i++) {
+    const datum = dataSort[i];
+    const { close } = datum;
+    const { close: lastClose } = dataKagi[dataKagi.length - 1];
+
+    const isRising = close >= lastClose;
+    if (isRising === wasRising) {
+      dataKagi.push({
+        ...datum,
+        segment,
+      });
+    } else {
+      if (Math.abs(close - lastClose) / lastClose >= reversalRate) {
+        segment++;
+        wasRising = isRising;
+
+        dataKagi.push({
+          ...dataKagi[dataKagi.length - 1],
+          segment,
+        });
+
+        dataKagi.push({
+          ...datum,
+          segment,
+        });
+      }
+    }
+  }
+
+  const svg = article
+    .append("svg")
+    .attr(
+      "viewBox",
+      `0 0 ${width + margin.left + margin.right} ${
+        height + margin.top + margin.bottom
+      }`
+    );
+
+  const group = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+  const xScale = d3
+    .scaleLinear()
+    .domain(d3.extent(dataKagi, (d) => d.segment))
+    .range([0, width]);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain(d3.extent(dataKagi, (d) => d.close))
+    .range([height, 0]);
+
+  const yTicks = yScale.ticks(5);
+
+  const line = d3
+    .line()
+    .x((d) => xScale(d.segment))
+    .y((d) => yScale(d.close));
+
+  const groupAxis = group.append("g");
+  const groupData = group.append("g");
+
+  groupAxis
+    .append("text")
+    .text("Kagi chart")
+    .attr("fill", "#a2a2a2")
+    .attr("x", "2")
+    .attr("y", "8")
+    .attr("font-family", "sans-serif")
+    .attr("font-weight", "700")
+    .attr("font-size", "8")
+    .style("text-transform", "uppercase");
+
+  const groupsYAxis = groupAxis
+    .append("g")
+    .selectAll("g")
+    .data(yTicks)
+    .enter()
+    .append("g")
+    .attr("transform", (d) => `translate(0 ${yScale(d)})`);
+
+  groupsYAxis
+    .append("text")
+    .attr("fill", "#8b909b")
+    .attr("x", width + 2)
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "7")
+    .text((d) => `${d}$`);
+
+  groupsYAxis
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#d5d7e4")
+    .attr("stroke-width", "1")
+    .attr("stroke-dasharray", "1 2")
+    .attr("d", `M 0 0 h ${width}`);
+
+  groupData
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#8b909b")
+    .attr("stroke-width", "1")
+    .attr("d", line(dataKagi));
 })();
