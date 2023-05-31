@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -6 152 114">
+	<text fill="#a2a2a2" x="2" y="-1" font-family="sans-serif" font-weight="700" font-size="6" style="text-transform: uppercase;">Line Chart</text>
+	<g fill="#8b909b" transform="translate(148 -1)" font-family="sans-serif" font-size="4" text-anchor="end">
+		<text>18$</text>
+		<text y="20">17$</text>
+		<text y="40">16$</text>
+		<text y="60">15$</text>
+		<text y="80">14$</text>
+		<text y="100">13$</text>
+	</g>
+	<g fill="none" stroke="#d5d7e4" stroke-width="0.5">
+		<g stroke-dasharray="1 2">
+			<path d="M 0 0 h 150"  />
+			<path d="M 0 20 h 150"  />
+			<path d="M 0 40 h 150"  />
+			<path d="M 0 60 h 150"  />
+			<path d="M 0 80 h 150"  />
+			<path d="M 0 100 h 150"  />
+		</g>
+	</g>
+	<path fill="none" stroke="#8b909b" stroke-width="1" d="M 0 90 5 95 10 85 15 90 20 93 25 95 30 85 35 80 40 80 45 70 50 85 55 83 60 85 65 90" />
+</svg>

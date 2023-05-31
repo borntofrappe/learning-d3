@@ -19,3 +19,7 @@ To change the thickness and or color:
 ## Data
 
 Stock price from nasdaq.com and the commodity [rough rice](https://www.nasdaq.com/market-activity/commodities/zr/historical) for the year 2022.
+
+## res
+
+In the `res` folder you find a first approximation of the data visualizations for the project, a line chart and the promised kagi chart. The two visuals are meant to be as slimmed down as possible so that it is possible to focus on the core of each type (the line and the segments).
