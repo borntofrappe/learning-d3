@@ -397,9 +397,11 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   let segment = 0;
   let wasRising = second.close > first.close;
+  let thickLine = second.close >= first.close;
+
   const dataKagi = [
-    { ...first, segment },
-    { ...second, segment },
+    { ...first, segment, thickLine },
+    { ...second, segment, thickLine },
   ];
 
   const reversalRate = 0.03;
@@ -410,10 +412,43 @@ const div = d3.select("body").append("div").attr("id", "root");
     const { close: lastClose } = dataKagi[dataKagi.length - 1];
 
     const isRising = close >= lastClose;
+
     if (isRising === wasRising) {
+      if (segment > 0) {
+        if (thickLine) {
+          const [low] = dataKagi
+            .filter((d) => d.segment === segment - 1)
+            .sort((a, b) => a.close - b.close);
+
+          if (close <= low.close) {
+            dataKagi.push({
+              ...low,
+              segment,
+              thickLine,
+            });
+
+            thickLine = false;
+          }
+        } else {
+          const [high] = dataKagi
+            .filter((d) => d.segment === segment - 1)
+            .sort((a, b) => b.close - a.close);
+
+          if (close >= high.close) {
+            thickLine = true;
+            dataKagi.push({
+              ...high,
+              segment,
+              thickLine,
+            });
+          }
+        }
+      }
+
       dataKagi.push({
         ...datum,
         segment,
+        thickLine,
       });
     } else {
       if (Math.abs(close - lastClose) / lastClose >= reversalRate) {
@@ -423,11 +458,42 @@ const div = d3.select("body").append("div").attr("id", "root");
         dataKagi.push({
           ...dataKagi[dataKagi.length - 1],
           segment,
+          thickLine,
         });
+
+        if (thickLine) {
+          const [low] = dataKagi
+            .filter((d) => d.segment === segment - 1)
+            .sort((a, b) => a.close - b.close);
+
+          if (close <= low.close) {
+            dataKagi.push({
+              ...low,
+              segment,
+              thickLine,
+            });
+
+            thickLine = false;
+          }
+        } else {
+          const [high] = dataKagi
+            .filter((d) => d.segment === segment - 1)
+            .sort((a, b) => b.close - a.close);
+
+          if (close >= high.close) {
+            thickLine = true;
+            dataKagi.push({
+              ...high,
+              segment,
+              thickLine,
+            });
+          }
+        }
 
         dataKagi.push({
           ...datum,
           segment,
+          thickLine,
         });
       }
     }
@@ -462,6 +528,12 @@ const div = d3.select("body").append("div").attr("id", "root");
     .line()
     .x((d) => xScale(d.segment))
     .y((d) => yScale(d.close));
+
+  const lineThick = d3
+    .line()
+    .x((d) => xScale(d.segment))
+    .y((d) => yScale(d.close))
+    .defined((d) => d.thickLine);
 
   const groupAxis = group.append("g");
   const groupData = group.append("g");
@@ -504,7 +576,14 @@ const div = d3.select("body").append("div").attr("id", "root");
   groupData
     .append("path")
     .attr("fill", "none")
-    .attr("stroke", "#8b909b")
+    .attr("stroke", "#e97070")
     .attr("stroke-width", "1")
     .attr("d", line(dataKagi));
+
+  groupData
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#005cfc")
+    .attr("stroke-width", "2")
+    .attr("d", lineThick(dataKagi));
 })();
