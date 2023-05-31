@@ -252,5 +252,121 @@ const data = [
   { date: "01/03/2022", close: 14.635 },
 ];
 
-const div = d3.select("body").append("div");
-div.append("h1").text("Kagi Chart");
+const div = d3.select("body").append("div").attr("id", "root");
+
+(() => {
+  const article = div.append("article");
+  article.append("h2").text("The problem");
+  article
+    .append("p")
+    .text(
+      "In the moment you want to track the closing price of a certain stock, a simple line chart is often ineffective as the number of observation grows."
+    );
+
+  const width = 400;
+  const height = 100;
+
+  const margin = {
+    top: 10,
+    bottom: 25,
+    left: 5,
+    right: 20,
+  };
+
+  const parseDate = d3.timeParse("%m/%d/%Y");
+  const formatDate = d3.timeFormat("%B");
+  const xAccessor = (d) => parseDate(d.date);
+  const yAccessor = (d) => d.close;
+
+  const svg = article
+    .append("svg")
+    .attr(
+      "viewBox",
+      `0 0 ${width + margin.left + margin.right} ${
+        height + margin.top + margin.bottom
+      }`
+    );
+
+  const group = svg
+    .append("g")
+    .attr("transform", `translate(${margin.left} ${margin.top})`);
+
+  const xScale = d3
+    .scaleTime()
+    .domain(d3.extent(data, xAccessor))
+    .range([0, width]);
+
+  const yScale = d3
+    .scaleLinear()
+    .domain(d3.extent(data, yAccessor))
+    .range([height, 0]);
+
+  const xAxis = d3
+    .axisBottom(xScale)
+    .tickFormat((d, i) => (i % 2 === 0 ? formatDate(d) : ""));
+
+  const yTicks = yScale.ticks(5);
+
+  const line = d3
+    .line()
+    .x((d) => xScale(xAccessor(d)))
+    .y((d) => yScale(yAccessor(d)));
+
+  const groupAxis = group.append("g");
+  const groupData = group.append("g");
+
+  groupAxis
+    .append("text")
+    .text("Line chart")
+    .attr("fill", "#a2a2a2")
+    .attr("x", "2")
+    .attr("y", "8")
+    .attr("font-family", "sans-serif")
+    .attr("font-weight", "700")
+    .attr("font-size", "8")
+    .style("text-transform", "uppercase");
+
+  const groupXAxis = groupAxis
+    .append("g")
+    .attr("transform", `translate(0 ${height})`)
+    .call(xAxis);
+
+  groupXAxis.selectAll("path").remove();
+  groupXAxis.selectAll("line").remove();
+  groupXAxis
+    .selectAll("text")
+    .attr("fill", "#8b909b")
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "7");
+
+  const groupsYAxis = groupAxis
+    .append("g")
+    .selectAll("g")
+    .data(yTicks)
+    .enter()
+    .append("g")
+    .attr("transform", (d) => `translate(0 ${yScale(d)})`);
+
+  groupsYAxis
+    .append("text")
+    .attr("fill", "#8b909b")
+    .attr("x", width + 2)
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "7")
+    .text((d) => `${d}$`);
+
+  groupsYAxis
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#d5d7e4")
+    .attr("stroke-width", "1")
+    .attr("stroke-dasharray", "1 2")
+    .attr("d", `M 0 0 h ${width}`);
+
+  groupData
+    .append("path")
+    .attr("fill", "none")
+    .attr("stroke", "#8b909b")
+    .attr("stroke-width", "1")
+    .attr("d", line(data));
+})();
