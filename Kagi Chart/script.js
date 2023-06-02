@@ -254,15 +254,14 @@ const data = [
 
 const div = d3.select("body").append("div").attr("id", "root");
 
-(() => {
-  const article = div.append("article");
-  article.append("h2").text("An issue");
-  article
-    .append("p")
-    .text(
-      "In the moment you want to track the closing price of a certain stock, a simple line chart is often ineffective as the number of observation grows."
-    );
+div.append("h1").text("Rough rice");
+div
+  .append("p")
+  .html(
+    'The stock price <a href="https://www.nasdaq.com/market-activity/commodities/zr/historical">for the commodity</a> fluctuated considerably in the 2022 year.'
+  );
 
+(() => {
   const width = 400;
   const height = 100;
 
@@ -274,9 +273,9 @@ const div = d3.select("body").append("div").attr("id", "root");
   };
 
   const timeParse = d3.timeParse("%m/%d/%Y");
-  const formatDate = d3.timeFormat("%B");
+  const timeFormat = d3.timeFormat("%B");
 
-  const svg = article
+  const svg = div
     .append("svg")
     .attr(
       "viewBox",
@@ -301,7 +300,7 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   const xAxis = d3
     .axisBottom(xScale)
-    .tickFormat((d, i) => (i % 2 === 0 ? formatDate(d) : ""));
+    .tickFormat((d, i) => (i % 2 === 0 ? timeFormat(d) : ""));
 
   const yTicks = yScale.ticks(5);
 
@@ -313,17 +312,6 @@ const div = d3.select("body").append("div").attr("id", "root");
   const groupAxis = group.append("g");
   const groupData = group.append("g");
 
-  groupAxis
-    .append("text")
-    .text("Line chart")
-    .attr("fill", "#a2a2a2")
-    .attr("x", "2")
-    .attr("y", "8")
-    .attr("font-family", "sans-serif")
-    .attr("font-weight", "700")
-    .attr("font-size", "8")
-    .style("text-transform", "uppercase");
-
   const groupXAxis = groupAxis
     .append("g")
     .attr("transform", `translate(0 ${height})`)
@@ -331,11 +319,7 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   groupXAxis.selectAll("path").remove();
   groupXAxis.selectAll("line").remove();
-  groupXAxis
-    .selectAll("text")
-    .attr("fill", "#8b909b")
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "7");
+  groupXAxis.selectAll("text").attr("fill", "#8b909b").attr("font-size", "7");
 
   const groupsYAxis = groupAxis
     .append("g")
@@ -349,8 +333,8 @@ const div = d3.select("body").append("div").attr("id", "root");
     .append("text")
     .attr("fill", "#8b909b")
     .attr("x", width + 2)
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "7")
+    .attr("y", 2)
+    .attr("font-size", 7)
     .text((d) => `${d}$`);
 
   groupsYAxis
@@ -369,15 +353,13 @@ const div = d3.select("body").append("div").attr("id", "root");
     .attr("d", line(data));
 })();
 
-(() => {
-  const article = div.append("article");
-  article.append("h2").text("A solution");
-  article
-    .append("p")
-    .text(
-      "A Kagi chart, independent of time, allows to focus on the closing price by highlighting the direction of the changes."
-    );
+div
+  .append("p")
+  .html(
+    "A Kagi chart helps to filter out the noise of the <em>many</em> observations and guide purchasing decisions."
+  );
 
+(() => {
   const width = 200;
   const height = 200;
 
@@ -499,7 +481,7 @@ const div = d3.select("body").append("div").attr("id", "root");
     }
   }
 
-  const svg = article
+  const svg = div
     .append("svg")
     .attr(
       "viewBox",
@@ -529,7 +511,7 @@ const div = d3.select("body").append("div").attr("id", "root");
     .x((d) => xScale(d.segment))
     .y((d) => yScale(d.close));
 
-  const lineThick = d3
+  const lineHighlight = d3
     .line()
     .x((d) => xScale(d.segment))
     .y((d) => yScale(d.close))
@@ -537,17 +519,6 @@ const div = d3.select("body").append("div").attr("id", "root");
 
   const groupAxis = group.append("g");
   const groupData = group.append("g");
-
-  groupAxis
-    .append("text")
-    .text("Kagi chart")
-    .attr("fill", "#a2a2a2")
-    .attr("x", "2")
-    .attr("y", "8")
-    .attr("font-family", "sans-serif")
-    .attr("font-weight", "700")
-    .attr("font-size", "8")
-    .style("text-transform", "uppercase");
 
   const groupsYAxis = groupAxis
     .append("g")
@@ -560,9 +531,9 @@ const div = d3.select("body").append("div").attr("id", "root");
   groupsYAxis
     .append("text")
     .attr("fill", "#8b909b")
-    .attr("x", width + 2)
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "7")
+    .attr("x", width + 4)
+    .attr("y", 2)
+    .attr("font-size", 7)
     .text((d) => `${d}$`);
 
   groupsYAxis
@@ -585,5 +556,5 @@ const div = d3.select("body").append("div").attr("id", "root");
     .attr("fill", "none")
     .attr("stroke", "#005cfc")
     .attr("stroke-width", "2")
-    .attr("d", lineThick(dataKagi));
+    .attr("d", lineHighlight(dataKagi));
 })();

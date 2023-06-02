@@ -13,24 +13,12 @@ body {
 }
 
 #root {
-  max-inline-size: 48rem;
+  inline-size: 90vi;
+  max-inline-size: 44rem;
   margin-inline: auto;
   padding-block: 1rem;
 }
 
 #root > * + * {
-  margin-block-start: 1.5rem;
-}
-
-article {
-  padding: 1rem;
-  background-color: hsl(0 0% 100%);
-}
-
-article > * * {
-  margin-block-start: 1em;
-}
-
-article > svg {
-  margin-block-start: 1.25rem;
+  margin-block-start: 1rem;
 }
